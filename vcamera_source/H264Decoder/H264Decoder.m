@@ -269,7 +269,7 @@ static void VTDecodeCallback(void *outputRefCon,
 
     VTSessionSetProperty((VTSessionRef)_session,
                          kVTDecompressionPropertyKey_ThreadCount,
-                         (__bridge CFTypeRef)@2);
+                         (__bridge CFTypeRef)@1);
     // RealTime=YES: callback fires synchronously (inside VTDecompressionSessionDecodeFrame)
     // on the RTMP thread, in decode order. B-frame display ordering is handled by our
     // software reorder buffer (vcamReorderInsert) — independent of VT internals and

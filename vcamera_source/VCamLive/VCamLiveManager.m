@@ -46,8 +46,14 @@ static void vcamDedupInsert(uint64_t key, double now) {
     //   All subsequent firings before the next RTMP frame reuse _cycleBuffer unchanged.
     // This guarantees every pipeline node in one batch sees the same RTMP frame.
     CVPixelBufferRef _cycleBuffer;    // RTMP frame locked for current batch
-    CVPixelBufferRef _cycleBuffer90;  // 90°-rotated variant for current batch
+    CVPixelBufferRef _cycleBuffer90;  // 90°-rotated variant (from setYUVSampleBuffer: path)
     BOOL             _pixelDirty;     // YES = new RTMP frame arrived, snapshot needed
+
+    // Lazy rotation cache for setYUVPixelBuffer: fast path (RTMP decode thread never
+    // pre-computes rotation; we do it here on the camera thread to avoid GPU contention).
+    // Camera pipeline is serial — these are accessed only from modifyImageBuffer:.
+    CVPixelBufferRef _cachedRotBuf;    // last rotation result
+    uintptr_t        _cachedRotSrcPtr; // _cycleBuffer pointer it was computed for
 }
 
 // ── +sharedInstance (0x900EC) ──────────────────────────────────────────────
@@ -170,21 +176,23 @@ static void vcamDedupInsert(uint64_t key, double now) {
 - (void)setYUVPixelBuffer:(CVPixelBufferRef)pixbuf {
     if (!pixbuf) return;
 
-    // Pre-rotate OUTSIDE the spinlock — GPU rotation session, ~0.5-2ms.
-    CVPixelBufferRef new90      = [self create90ImageBuffer:pixbuf];
+    // Skip create90ImageBuffer: here — on iOS 16 (A12+) at 60fps camera + 30fps RTMP,
+    // calling VTImageRotationSessionTransferImage + CVPixelBufferCreate (IOSurface alloc)
+    // on the RTMP decode thread 30/sec creates GPU pressure that stalls the decode loop,
+    // causing TCP buffer fill → "periodic pause / auto-recover" symptom.
+    // Rotation is now computed lazily in modifyImageBuffer: (camera thread) with a
+    // pointer-keyed cache — computed once per new RTMP frame, reused for all camera ticks.
     CVPixelBufferRef retainedNew = (CVPixelBufferRef)CVBufferRetain(pixbuf);
 
-    // Swap under spinlock — only pointer assignments, held for nanoseconds.
     os_unfair_lock_lock(&_spinlock);
     CVPixelBufferRef oldBuf = _pixelYUVBuffer;
     CVPixelBufferRef old90  = _pixelYUVBuffer90;
     _pixelYUVBuffer   = retainedNew;
-    _pixelYUVBuffer90 = new90;
-    _pixelDirty       = YES;  // signal modifyImageBuffer: to snapshot on next call
+    _pixelYUVBuffer90 = NULL;  // rotation deferred; modifyImageBuffer: uses _cachedRotBuf
+    _pixelDirty       = YES;
     if (!_bLive) _bLive = YES;
     os_unfair_lock_unlock(&_spinlock);
 
-    // Release old buffers outside the lock.
     if (oldBuf) CVPixelBufferRelease(oldBuf);
     if (old90)  CVPixelBufferRelease(old90);
 }
@@ -289,6 +297,20 @@ static void vcamDedupInsert(uint64_t key, double now) {
     // Release old cycle buffers outside the lock (avoids dealloc under spinlock).
     if (oldCycle)   CVPixelBufferRelease(oldCycle);
     if (oldCycle90) CVPixelBufferRelease(oldCycle90);
+
+    // Lazy rotation: setYUVPixelBuffer: (RTMP fast path) does not pre-compute the 90°
+    // buffer. Compute it here on the camera thread, cached by source pointer.
+    // _cachedRotBuf/_cachedRotSrcPtr are accessed only from modifyImageBuffer: (camera
+    // pipeline is serial), so no lock is needed.
+    if (!transferSrc && needRotation && _cycleBuffer) {
+        uintptr_t srcPtr = (uintptr_t)_cycleBuffer;
+        if (_cachedRotSrcPtr != srcPtr || !_cachedRotBuf) {
+            CVPixelBufferRelease(_cachedRotBuf);
+            _cachedRotBuf    = [self create90ImageBuffer:_cycleBuffer];
+            _cachedRotSrcPtr = _cachedRotBuf ? srcPtr : 0;
+        }
+        transferSrc = _cachedRotBuf ? (CVImageBufferRef)CVBufferRetain(_cachedRotBuf) : NULL;
+    }
 
     if (!transferSrc) return nil;
 
