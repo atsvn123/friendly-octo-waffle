@@ -7,6 +7,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: write      # required to create/update GitHub Releases
+
 jobs:
   build:
     name: Build (arm64 + arm64e · iOS 15 & 16)
