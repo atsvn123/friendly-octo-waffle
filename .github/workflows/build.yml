@@ -1,0 +1,79 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (arm64 + arm64e · iOS 15 & 16)
+    runs-on: macos-14          # Apple M1 runner — Xcode 16, native arm64e clang
+
+    steps:
+      # ── 1. Source ──────────────────────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── 2. Tools ──────────────────────────────────────────────────────────
+      - name: Install build tools
+        run: brew install ldid dpkg
+
+      # ── 3. Theos (cached) ─────────────────────────────────────────────────
+      - name: Cache Theos
+        id: cache-theos
+        uses: actions/cache@v4
+        with:
+          path: ~/theos
+          # Re-install only when this workflow file changes (Theos version bump etc.)
+          key: theos-macos14-${{ hashFiles('.github/workflows/build.yml') }}
+
+      - name: Install Theos
+        if: steps.cache-theos.outputs.cache-hit != 'true'
+        run: |
+          export THEOS=~/theos
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+
+      # ── 4. Build ──────────────────────────────────────────────────────────
+      # Command-line variables override the Makefile's WSL-specific settings:
+      #   TARGET  → use Xcode 16's latest SDK (iOS 18 SDK, deploy target stays 14.0)
+      #   ARCHS   → fat binary: arm64 (A10/A11, iOS 15) + arm64e (A12+, iOS 16)
+      - name: Build package
+        run: |
+          cd VCAMVIP_theos
+          THEOS=~/theos make package \
+            THEOS_PACKAGE_SCHEME=rootless \
+            TARGET="iphone:clang:latest:14.0" \
+            ARCHS="arm64 arm64e"
+
+      # ── 5. Verify output ──────────────────────────────────────────────────
+      - name: Verify architectures
+        run: |
+          DEB=$(ls VCAMVIP_theos/packages/*.deb | tail -1)
+          echo "Built: $DEB"
+          dpkg-deb -x "$DEB" /tmp/chk
+          for dylib in /tmp/chk/var/jb/Library/MobileSubstrate/DynamicLibraries/*.dylib; do
+            echo "$(basename $dylib): $(lipo -archs $dylib)"
+          done
+
+      # ── 6. Upload artifact (every push) ───────────────────────────────────
+      - name: Upload .deb artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vcamvip-${{ github.ref_name }}-${{ github.sha }}
+          path: VCAMVIP_theos/packages/*.deb
+          if-no-files-found: error
+          retention-days: 30
+
+      # ── 7. Create GitHub Release (tag pushes only) ────────────────────────
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: VCAMVIP_theos/packages/*.deb
+          generate_release_notes: false
+          body: |
+            Built from tag ${{ github.ref_name }}.
+            Fat binary: **arm64** (iPhone 7/8/X · iOS 15) + **arm64e** (iPhone XS+ · iOS 16).
