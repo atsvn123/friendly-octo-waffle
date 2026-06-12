@@ -104,11 +104,13 @@ static void vcamInstallHooks(void) {
         }
     } else if ([pn rangeOfString:@"springboard"].location != NSNotFound) {
         installSpringBoardHooks();
+    } else {
+        // Foreground UIKit app (TikTok, camera apps, etc.):
+        // Installs a Darwin notify listener that captures a pixel region via
+        // drawViewHierarchyInRect:afterScreenUpdates:YES and posts the hue back.
+        // This is the only approach that reliably sees on-screen camera content.
+        vcamInstallColorSampleListener();
     }
-    // Foreground UIKit apps (TikTok, camera apps, etc.) need nothing here.
-    // VCamColorPickerWindow reads the composited display IOSurface directly
-    // inside SpringBoard via IOMobileFramebuffer — no activity in the target
-    // app, no screenshot API call, completely undetectable.
 }
 
 // --- Constructor 4: sub_86A4C (0x86A4C) — Register process cleanup via __cxa_atexit ---
