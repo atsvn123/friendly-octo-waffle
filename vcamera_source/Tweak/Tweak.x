@@ -104,12 +104,11 @@ static void vcamInstallHooks(void) {
         }
     } else if ([pn rangeOfString:@"springboard"].location != NSNotFound) {
         installSpringBoardHooks();
-    } else {
-        // Foreground UIKit app (camera app, TikTok, etc.):
-        // drawViewHierarchyInRect:afterScreenUpdates:YES can capture
-        // AVCaptureVideoPreviewLayer content that renderInContext: cannot.
-        vcamInstallColorSampleListener();
     }
+    // Foreground UIKit apps (TikTok, camera apps, etc.) need nothing here.
+    // VCamColorPickerWindow reads the composited display IOSurface directly
+    // inside SpringBoard via IOMobileFramebuffer — no activity in the target
+    // app, no screenshot API call, completely undetectable.
 }
 
 // --- Constructor 4: sub_86A4C (0x86A4C) — Register process cleanup via __cxa_atexit ---

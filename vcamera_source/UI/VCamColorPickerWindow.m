@@ -3,8 +3,12 @@
 #import "VCamColorPickerWindow.h"
 #import "../BINFlash/BINFlashPrefs.h"
 #import <QuartzCore/QuartzCore.h>
+#import <IOSurface/IOSurfaceRef.h>
 #import <notify.h>
+#include <dlfcn.h>
 #include <string.h>
+#include <math.h>
+#include <mach/mach.h>
 
 // ── Circle view (transparent hole, colored ring) ──────────────────────────────
 
@@ -75,6 +79,108 @@
     return hit;
 }
 @end
+
+// ─────────────────────────────────────────────────────────────────────────────
+// vcamSampleDisplayHue — reads a pixel from the composited display IOSurface
+// directly inside SpringBoard via IOMobileFramebuffer (private, dlopen'd) +
+// IOSurface (public, linked). Runs entirely in SpringBoard's process; no
+// activity in TikTok or any other app — completely invisible to app security
+// frameworks.
+//
+// Returns hue in [0.0, 1.0), or -1.0 if the pixel is achromatic / framebuffer
+// unavailable (caller falls back to Darwin notify → RTMP sampler).
+// ─────────────────────────────────────────────────────────────────────────────
+
+typedef uint32_t vcam_io_object_t;
+typedef vcam_io_object_t vcam_io_service_t;
+typedef vcam_io_service_t (*vcam_IOServiceGetMatchingService_t)(mach_port_t, CFDictionaryRef);
+typedef kern_return_t (*vcam_IOObjectRelease_t)(vcam_io_object_t);
+typedef CFMutableDictionaryRef (*vcam_IOServiceMatching_t)(const char *);
+typedef kern_return_t (*vcamFBOpen_t)(vcam_io_service_t, mach_port_t, uint32_t, void **);
+typedef kern_return_t (*vcamFBGetSurface_t)(void *, int, IOSurfaceRef *);
+
+static double vcamSampleDisplayHue(CGPoint pt) {
+    static void              *s_fb         = NULL;
+    static vcamFBGetSurface_t s_getSurface = NULL;
+    static vcam_IOObjectRelease_t s_ioRelease = NULL;
+    static dispatch_once_t    s_once       = 0;
+
+    dispatch_once(&s_once, ^{
+        void *iokit = dlopen("/System/Library/Frameworks/IOKit.framework/IOKit",
+                             RTLD_NOW | RTLD_GLOBAL);
+        if (!iokit) return;
+        vcam_IOServiceGetMatchingService_t ioGetService =
+            (vcam_IOServiceGetMatchingService_t)
+            dlsym(iokit, "IOServiceGetMatchingService");
+        s_ioRelease =
+            (vcam_IOObjectRelease_t)dlsym(iokit, "IOObjectRelease");
+        vcam_IOServiceMatching_t ioMatching =
+            (vcam_IOServiceMatching_t)dlsym(iokit, "IOServiceMatching");
+        if (!ioGetService || !s_ioRelease || !ioMatching) return;
+
+        void *fbLib = dlopen(
+            "/System/Library/PrivateFrameworks/"
+            "IOMobileFramebuffer.framework/IOMobileFramebuffer",
+            RTLD_NOW);
+        if (!fbLib) return;
+        vcamFBOpen_t fbOpen =
+            (vcamFBOpen_t)dlsym(fbLib, "IOMobileFramebufferOpen");
+        s_getSurface =
+            (vcamFBGetSurface_t)dlsym(fbLib,
+                "IOMobileFramebufferGetLayerDefaultSurface");
+        if (!fbOpen || !s_getSurface) return;
+
+        // Try both iOS 15 and iOS 16+ service names.
+        const char *names[] = {
+            "IOMobileFramebuffer", "IOMobileFramebufferShim", NULL
+        };
+        for (int i = 0; names[i] && !s_fb; i++) {
+            CFMutableDictionaryRef m = ioMatching(names[i]);
+            if (!m) continue;
+            vcam_io_service_t svc =
+                ioGetService(0 /* kIOMasterPortDefault */, m);
+            if (!svc) continue;
+            fbOpen(svc, mach_task_self(), 0, &s_fb);
+            s_ioRelease(svc);
+        }
+    });
+
+    if (!s_fb || !s_getSurface) return -1.0;
+
+    IOSurfaceRef surface = NULL;
+    if (s_getSurface(s_fb, 0, &surface) != KERN_SUCCESS || !surface) return -1.0;
+
+    CGFloat scale = [UIScreen mainScreen].scale;
+    size_t px = (size_t)(pt.x * scale);
+    size_t py = (size_t)(pt.y * scale);
+    size_t sw = IOSurfaceGetWidth(surface);
+    size_t sh = IOSurfaceGetHeight(surface);
+    if (px >= sw || py >= sh) { CFRelease(surface); return -1.0; }
+
+    IOSurfaceLock(surface, kIOSurfaceLockReadOnly, NULL);
+    size_t   bpr  = IOSurfaceGetBytesPerRow(surface);
+    uint8_t *base = (uint8_t *)IOSurfaceGetBaseAddress(surface);
+    uint8_t *p    = base + py * bpr + px * 4;
+    // iOS display framebuffer: BGRA byte order  [0]=B [1]=G [2]=R [3]=A
+    double r = p[2] / 255.0;
+    double g = p[1] / 255.0;
+    double b = p[0] / 255.0;
+    IOSurfaceUnlock(surface, kIOSurfaceLockReadOnly, NULL);
+    CFRelease(surface);
+
+    double maxC  = r > g ? (r > b ? r : b) : (g > b ? g : b);
+    double minC  = r < g ? (r < b ? r : b) : (g < b ? g : b);
+    double delta = maxC - minC;
+    if (delta < 0.06 || maxC < 0.04 || (1.0 - minC) < 0.04) return -1.0;
+
+    double h;
+    if      (maxC == r) h = fmod((g - b) / delta, 6.0);
+    else if (maxC == g) h = (b - r) / delta + 2.0;
+    else                h = (r - g) / delta + 4.0;
+    h /= 6.0;
+    if (h < 0.0) h += 1.0;
+    return h;
+}
 
 // ── Color picker window ───────────────────────────────────────────────────────
 
@@ -173,8 +279,8 @@ static int s_respToken = NOTIFY_TOKEN_INVALID;
         notify_register_check("com.vcam.samplerequest", &s_reqToken);
     }
 
-    // Register response listener once.
-    // The frontmost app (TikTok etc.) samples its screen and posts a hue here.
+    // Register response listener once — only needed when IOSurface direct
+    // sampling is unavailable and the RTMP fallback path fires.
     if (s_respToken == NOTIFY_TOKEN_INVALID) {
         VCamColorPickerWindow *bSelf = self;  // singleton, never deallocated
         notify_register_dispatch(
@@ -241,25 +347,32 @@ static int s_respToken = NOTIFY_TOKEN_INVALID;
 }
 
 // ── Sample tick ───────────────────────────────────────────────────────────────
-// Sends the circle's screen-space coordinates to the frontmost app via Darwin notify.
-// The frontmost app (registered by vcamInstallColorSampleListener) takes a UIScreen
-// snapshot from inside its own process and posts the sampled hue back.
 - (void)sampleTick {
-    if (s_reqToken == NOTIFY_TOKEN_INVALID) return;
+    CGPoint pt = _circleView.center;
 
-    // Pack NORMALIZED (0..1) position so the mediaserverd RTMP sampler does not
-    // need UIScreen. Normalized avoids coupling the sender to device screen size.
+    // Primary: read composited display IOSurface directly in SpringBoard.
+    // Runs entirely in this process — no activity in TikTok or any other app,
+    // completely undetectable by app security frameworks.
+    double hue = vcamSampleDisplayHue(pt);
+    if (hue >= 0.0) {
+        _circleView.ringColor = [UIColor colorWithHue:(CGFloat)hue
+                                           saturation:1.0 brightness:1.0 alpha:1.0];
+        [_circleView setNeedsDisplay];
+        BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });
+        return;
+    }
+
+    // Fallback: Darwin notify → RTMP sampler in mediaserverd.
+    // Used only when IOMobileFramebuffer is unavailable (e.g., first-boot race).
+    if (s_reqToken == NOTIFY_TOKEN_INVALID) return;
     CGSize sz = [UIScreen mainScreen].bounds.size;
     if (sz.width <= 0.0 || sz.height <= 0.0) return;
-    CGPoint pt = _circleView.center;
     float xf = (float)(pt.x / sz.width);
     float yf = (float)(pt.y / sz.height);
     uint32_t xBits = 0, yBits = 0;
     memcpy(&xBits, &xf, 4);
     memcpy(&yBits, &yf, 4);
-    uint64_t packed = ((uint64_t)xBits << 32) | (uint64_t)yBits;
-
-    notify_set_state(s_reqToken, packed);
+    notify_set_state(s_reqToken, ((uint64_t)xBits << 32) | (uint64_t)yBits);
     notify_post("com.vcam.samplerequest");
     // Response arrives asynchronously in the handler registered in showPicker.
 }
