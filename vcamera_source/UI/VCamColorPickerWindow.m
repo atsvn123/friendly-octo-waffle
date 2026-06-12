@@ -87,8 +87,10 @@
 // activity in TikTok or any other app — completely invisible to app security
 // frameworks.
 //
-// Returns hue in [0.0, 1.0), or -1.0 if the pixel is achromatic / framebuffer
-// unavailable (caller falls back to Darwin notify → RTMP sampler).
+// Returns:
+//   [0.0, 1.0)  — hue of the sampled pixel
+//   -1.0        — IOSurface working but pixel is achromatic/neutral (skip, no RTMP)
+//   -2.0        — IOSurface completely unavailable (caller falls back to RTMP)
 // ─────────────────────────────────────────────────────────────────────────────
 
 typedef uint32_t vcam_io_object_t;
@@ -145,17 +147,17 @@ static double vcamSampleDisplayHue(CGPoint pt) {
         }
     });
 
-    if (!s_fb || !s_getSurface) return -1.0;
+    if (!s_fb || !s_getSurface) return -2.0;  // hardware unavailable → RTMP fallback
 
     IOSurfaceRef surface = NULL;
-    if (s_getSurface(s_fb, 0, &surface) != KERN_SUCCESS || !surface) return -1.0;
+    if (s_getSurface(s_fb, 0, &surface) != KERN_SUCCESS || !surface) return -2.0;
 
     CGFloat scale = [UIScreen mainScreen].scale;
     size_t px = (size_t)(pt.x * scale);
     size_t py = (size_t)(pt.y * scale);
     size_t sw = IOSurfaceGetWidth(surface);
     size_t sh = IOSurfaceGetHeight(surface);
-    if (px >= sw || py >= sh) { CFRelease(surface); return -1.0; }
+    if (px >= sw || py >= sh) { CFRelease(surface); return -2.0; }
 
     IOSurfaceLock(surface, kIOSurfaceLockReadOnly, NULL);
     size_t   bpr  = IOSurfaceGetBytesPerRow(surface);
@@ -351,8 +353,9 @@ static int s_respToken = NOTIFY_TOKEN_INVALID;
     CGPoint pt = _circleView.center;
 
     // Primary: read composited display IOSurface directly in SpringBoard.
-    // Runs entirely in this process — no activity in TikTok or any other app,
-    // completely undetectable by app security frameworks.
+    // Returns >= 0  → colored pixel found
+    //         -1.0  → IOSurface working but pixel is grey/neutral → skip (no RTMP)
+    //         -2.0  → IOSurface unavailable → use RTMP fallback
     double hue = vcamSampleDisplayHue(pt);
     if (hue >= 0.0) {
         _circleView.ringColor = [UIColor colorWithHue:(CGFloat)hue
@@ -361,9 +364,9 @@ static int s_respToken = NOTIFY_TOKEN_INVALID;
         BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });
         return;
     }
+    if (hue > -1.5) return;  // -1.0: achromatic pixel, IOSurface is fine — do nothing
 
-    // Fallback: Darwin notify → RTMP sampler in mediaserverd.
-    // Used only when IOMobileFramebuffer is unavailable (e.g., first-boot race).
+    // -2.0: IOSurface completely unavailable → Darwin notify → RTMP fallback.
     if (s_reqToken == NOTIFY_TOKEN_INVALID) return;
     CGSize sz = [UIScreen mainScreen].bounds.size;
     if (sz.width <= 0.0 || sz.height <= 0.0) return;
