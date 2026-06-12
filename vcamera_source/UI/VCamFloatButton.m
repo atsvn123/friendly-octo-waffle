@@ -159,7 +159,28 @@ void vcamUpdateFloatButton(void) {
     // ── Create the dedicated window on first call ──
     if (!g_floatWindow) {
         CGRect screenBounds = [UIScreen mainScreen].bounds;
-        g_floatWindow = [[VCamFloatPassthroughWindow alloc] initWithFrame:screenBounds];
+
+        // iOS 16+: UIWindows created with initWithFrame: are not associated with a
+        // UIWindowScene and UIKit silently ignores hidden=NO on them. Use
+        // initWithWindowScene: so the window actually appears on screen.
+        // Prefer the foreground-active scene; fall back to any scene; then
+        // fall back to initWithFrame: for iOS 15 / no-scene environments.
+        UIWindowScene *scene = nil;
+        for (UIScene *s in [UIApplication sharedApplication].connectedScenes) {
+            if (![s isKindOfClass:[UIWindowScene class]]) continue;
+            if (s.activationState == UISceneActivationStateForegroundActive) {
+                scene = (UIWindowScene *)s;
+                break;
+            }
+            if (!scene) scene = (UIWindowScene *)s;  // best fallback so far
+        }
+
+        if (scene) {
+            g_floatWindow = [[VCamFloatPassthroughWindow alloc] initWithWindowScene:scene];
+        } else {
+            g_floatWindow = [[VCamFloatPassthroughWindow alloc] initWithFrame:screenBounds];
+        }
+
         g_floatWindow.backgroundColor = [UIColor clearColor];
         g_floatWindow.opaque = NO;
         g_floatWindow.windowLevel = UIWindowLevelStatusBar + 10000.0;
