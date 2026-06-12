@@ -66,8 +66,10 @@ jobs:
             echo "$(basename $dylib): $(lipo -archs $dylib)"
           done
 
-      # ── 6. Upload artifact (every push) ───────────────────────────────────
+      # ── 6. Upload artifact (PRs and workflow_dispatch only) ──────────────
+      # Main and tag pushes get a proper GitHub Release instead (steps 7/8).
       - name: Upload .deb artifact
+        if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
           name: vcamvip-${{ github.ref_name }}-${{ github.sha }}
@@ -75,8 +77,28 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      # ── 7. Create GitHub Release (tag pushes only) ────────────────────────
-      - name: Create Release
+      # ── 7. Rolling "latest" pre-release (every main push) ────────────────
+      # Creates or overwrites the "latest" GitHub Release tag so users always
+      # have a direct .deb download URL without logging in or navigating Actions.
+      # Direct URL (once the first push lands):
+      #   https://github.com/<owner>/<repo>/releases/download/latest/<file>.deb
+      - name: Publish rolling latest release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Latest Build"
+          prerelease: true
+          make_latest: false
+          files: VCAMVIP_theos/packages/*.deb
+          body: |
+            Rolling build — updated on every push to `main`.
+            Fat binary: **arm64** (iPhone 7/8/X · iOS 15) + **arm64e** (iPhone XS+ · iOS 16).
+
+            > **Download the `.deb` file above**, then install via Sileo (drag & drop) or `dpkg -i`.
+
+      # ── 8. Versioned release (tag pushes only) ───────────────────────────
+      - name: Publish versioned release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:

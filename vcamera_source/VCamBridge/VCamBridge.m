@@ -303,7 +303,26 @@ void vcamSendDiag(NSString *msg) {
     if (!s_menuWindow) {
         UIViewController *rootVC = [[UIViewController alloc] init];
         rootVC.view.backgroundColor = [UIColor clearColor];
-        s_menuWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+
+        // iOS 13+: UIWindows created with initWithFrame: inside SpringBoard are not
+        // associated with a UIWindowScene. UIKit silently ignores presentViewController:
+        // on such windows. Use initWithWindowScene: so presentation actually works.
+        UIWindowScene *scene = nil;
+        for (UIScene *s in [UIApplication sharedApplication].connectedScenes) {
+            if (![s isKindOfClass:[UIWindowScene class]]) continue;
+            if (s.activationState == UISceneActivationStateForegroundActive) {
+                scene = (UIWindowScene *)s;
+                break;
+            }
+            if (!scene) scene = (UIWindowScene *)s;
+        }
+        if (scene) {
+            s_menuWindow = [[UIWindow alloc] initWithWindowScene:scene];
+            s_menuWindow.frame = [UIScreen mainScreen].bounds;
+        } else {
+            s_menuWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        }
+
         s_menuWindow.rootViewController = rootVC;
         [rootVC release];
         s_menuWindow.windowLevel = UIWindowLevelStatusBar + 5000.0;
