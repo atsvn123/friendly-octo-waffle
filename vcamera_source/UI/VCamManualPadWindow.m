@@ -49,7 +49,19 @@
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
+    // iOS 13+: UIWindows without a UIWindowScene are invisible in SpringBoard.
+    UIWindowScene *scene = nil;
+    for (UIScene *sc in [UIApplication sharedApplication].connectedScenes) {
+        if (![sc isKindOfClass:[UIWindowScene class]]) continue;
+        if (sc.activationState == UISceneActivationStateForegroundActive) { scene = (UIWindowScene *)sc; break; }
+        if (!scene) scene = (UIWindowScene *)sc;
+    }
+    if (scene) {
+        self = [super initWithWindowScene:scene];
+        if (self) self.frame = frame;
+    } else {
+        self = [super initWithFrame:frame];
+    }
     if (self) {
         self.backgroundColor = [UIColor clearColor];
         self.opaque = NO;

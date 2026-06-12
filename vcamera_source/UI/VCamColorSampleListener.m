@@ -45,18 +45,21 @@ void vcamInstallColorSampleListener(void) {
             if (!targetWindow) targetWindow = [[UIApplication sharedApplication] keyWindow];
             if (!targetWindow) return;
 
-            // Sample a 2×2 region (4 pixels) centred on the circle.
+            // Sample an 8×8 point region centred on the circle.
             // The dominant colour (most-represented hue bin) is returned,
             // so a single outlier pixel does not skew the result.
-            const int DIM = 2;
+            // NOTE: drawViewHierarchyInRect: ignores the CGContext CTM — it always
+            // renders into the ABSOLUTE rect, not the translated one. Use
+            // layer.renderInContext: instead, which DOES respect the CTM.
+            const int DIM = 8;
 
             UIGraphicsBeginImageContextWithOptions(CGSizeMake(DIM, DIM), YES, 1.0);
             CGContextRef ctx = UIGraphicsGetCurrentContext();
             if (!ctx) { UIGraphicsEndImageContext(); return; }
 
-            // Translate so (xf, yf) maps to pixel (1, 1) — the centre of the 2×2 block.
-            CGContextTranslateCTM(ctx, -(CGFloat)xf + 1.0, -(CGFloat)yf + 1.0);
-            [targetWindow drawViewHierarchyInRect:targetWindow.bounds afterScreenUpdates:NO];
+            // Translate so (xf, yf) maps to the centre of the DIM×DIM context.
+            CGContextTranslateCTM(ctx, -(CGFloat)xf + DIM * 0.5, -(CGFloat)yf + DIM * 0.5);
+            [targetWindow.layer renderInContext:ctx];
 
             UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
