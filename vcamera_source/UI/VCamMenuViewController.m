@@ -270,7 +270,7 @@ static UIColor *BorderColor(void) {
     _overlayView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.45];
     _overlayView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
-                                   initWithTarget:self action:@selector(hideTapped)];
+                                   initWithTarget:self action:@selector(hideTapped:)];
     [_overlayView addGestureRecognizer:tap];
     [tap release];
     [self.view addSubview:_overlayView];
@@ -380,7 +380,7 @@ static UIColor *BorderColor(void) {
 
     // Version label (visible through transparent handleView above it)
     _versionLabel = [[UILabel alloc] initWithFrame:CGRectMake(pad, y, cw, 15)];
-    _versionLabel.text = @"v2.98-VCAM";
+    _versionLabel.text = @"v2.99-VCAM";
     _versionLabel.font = [UIFont systemFontOfSize:11.0];
     _versionLabel.textColor = [UIColor lightGrayColor];
     _versionLabel.textAlignment = NSTextAlignmentCenter;
@@ -828,7 +828,12 @@ static UIColor *BorderColor(void) {
     }
 }
 
-- (void)hideTapped {
+- (void)hideTapped:(UITapGestureRecognizer *)tap {
+    // Guard: only dismiss when tap is outside the card.
+    // On iOS 16, system gesture handling can route orphaned touches to the overlay
+    // even when the original touch landed on the card — causing accidental dismissal.
+    CGPoint pt = [tap locationInView:self.view];
+    if (_cardView && CGRectContainsPoint(_cardView.frame, pt)) return;
     [[VCamBridge sharedInstance] dismiss];
 }
 

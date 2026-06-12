@@ -19,11 +19,3 @@ void BINFlashComputeFaceRegion(NSDictionary *prefs,
 
 // Called from BINFlash_hook_setUniformsWithLandmarks in BINFlashEffectBridge.
 void BINFlashUpdateFaceFromLandmarks(NSArray *landmarks);
-
-// Schedule async Vision face detection using a CPU-allocated YUV biplanar copy.
-// Takes OWNERSHIP of both plane pointers (caller malloc'd them while holding the CPU lock).
-// Creates a non-IOSurface CVPixelBuffer from the copies — safe, no kernel IOSurface access.
-// Also writes result to /tmp/vcam_face_dbg for cross-process debug display.
-void BINFlashScheduleVisionDetection(uint8_t *ownedYBytes,  size_t yBPR,
-                                     uint8_t *ownedUVBytes, size_t uvBPR,
-                                     size_t width, size_t height);

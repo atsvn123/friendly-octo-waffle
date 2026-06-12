@@ -63,9 +63,6 @@ static void HueToRGB(double hue, double *r, double *g, double *b) {
     }
 }
 
-// Throttle counter for Vision face detection — run every 6 frames (~5 fps for 30fps stream)
-static int s_visionThrottle = 0;
-
 // ── sub_4628 ──────────────────────────────────────────────────────────────
 void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
     if (!pixbuf) return;
@@ -80,9 +77,8 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
     size_t height      = CVPixelBufferGetHeight(pixbuf);
     OSType pixelFormat = CVPixelBufferGetPixelFormatType(pixbuf);
 
-    // Face position from GPUImageThinFaceFilter landmarks (updated by swizzle).
-    // Sticky: after first detection the last known position is held even when
-    // the face is temporarily not found — no jump to frame centre.
+    // Face position from GPUImageThinFaceFilter landmarks (updated by BINFlashCamera swizzle).
+    // Sticky: last known position held when GPUImage temporarily loses tracking.
     double cx, cy, rx, ry;
     BINFlashComputeFaceRegion(prefs, width, height, &cx, &cy, &rx, &ry);
 
@@ -91,33 +87,6 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
     HueToRGB(hue, &hR, &hG, &hB);
 
     if (CVPixelBufferLockBaseAddress(pixbuf, 0) != kCVReturnSuccess) return;
-
-    // Snapshot Y+UV planes for Vision face detection BEFORE applying flash.
-    // Copies made while CPU lock is held. Both are passed to background Vision
-    // detection as a non-IOSurface 420v CVPixelBuffer — no kernel panic.
-    uint8_t *ySnapshot  = NULL;
-    uint8_t *uvSnapshot = NULL;
-    size_t   ySnapBPR   = 0;
-    size_t   uvSnapBPR  = 0;
-    if ((pixelFormat & 0xFFFFFFEFU) == 0x34323066U) {
-        if ((++s_visionThrottle % 12) == 0) {
-            size_t yBPR  = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, 0);
-            size_t uvBPR = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, 1);
-            size_t ySize  = height       * yBPR;
-            size_t uvSize = (height / 2) * uvBPR;
-            ySnapshot  = (uint8_t *)malloc(ySize);
-            uvSnapshot = (uint8_t *)malloc(uvSize);
-            if (ySnapshot && uvSnapshot) {
-                memcpy(ySnapshot,  CVPixelBufferGetBaseAddressOfPlane(pixbuf, 0), ySize);
-                memcpy(uvSnapshot, CVPixelBufferGetBaseAddressOfPlane(pixbuf, 1), uvSize);
-                ySnapBPR  = yBPR;
-                uvSnapBPR = uvBPR;
-            } else {
-                free(ySnapshot);  ySnapshot  = NULL;
-                free(uvSnapshot); uvSnapshot = NULL;
-            }
-        }
-    }
 
     if ((pixelFormat & 0xFFFFFFEFU) == 0x34323066U) {
         // ── YUV 420 biplanar (420v / 420f) ────────────────────────────
@@ -234,15 +203,4 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
     }
 
     CVPixelBufferUnlockBaseAddress(pixbuf, 0);
-
-    // Schedule Vision face detection with pre-flash YUV snapshots (after unlock).
-    // Ownership of both pointers transfers to BINFlashScheduleVisionDetection.
-    if (ySnapshot && uvSnapshot) {
-        BINFlashScheduleVisionDetection(ySnapshot,  ySnapBPR,
-                                        uvSnapshot, uvSnapBPR,
-                                        width, height);
-    } else {
-        free(ySnapshot);
-        free(uvSnapshot);
-    }
 }

@@ -22,6 +22,13 @@ void vcamInstallColorSampleListener(void) {
         &s_reqToken,
         dispatch_get_main_queue(),
         ^(int token) {
+            // Only the foreground app should respond. Every UIKit app receives this
+            // notification (com.apple.UIKit filter injects us everywhere). If a
+            // background app responds last it overwrites the correct foreground hue
+            // with a black-window sample, making the picker appear broken.
+            if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive)
+                return;
+
             uint64_t packed = 0;
             notify_get_state(token, &packed);
 
