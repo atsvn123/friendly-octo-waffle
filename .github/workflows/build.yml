@@ -19,6 +19,9 @@ jobs:
 
       # ── 2. Tools ──────────────────────────────────────────────────────────
       - name: Install build tools
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1      # skip full brew update — already done above
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
         run: brew install ldid dpkg
 
       # ── 3. Theos (cached) ─────────────────────────────────────────────────
@@ -26,14 +29,17 @@ jobs:
         id: cache-theos
         uses: actions/cache@v4
         with:
-          path: ~/theos
+          path: /Users/runner/theos
           # Re-install only when this workflow file changes (Theos version bump etc.)
           key: theos-macos14-${{ hashFiles('.github/workflows/build.yml') }}
 
       - name: Install Theos
         if: steps.cache-theos.outputs.cache-hit != 'true'
+        env:
+          THEOS: /Users/runner/theos
+          # Authenticated API calls → higher rate limit for SDK downloads
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          export THEOS=~/theos
           bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
 
       # ── 4. Build ──────────────────────────────────────────────────────────
@@ -41,9 +47,11 @@ jobs:
       #   TARGET  → use Xcode 16's latest SDK (iOS 18 SDK, deploy target stays 14.0)
       #   ARCHS   → fat binary: arm64 (A10/A11, iOS 15) + arm64e (A12+, iOS 16)
       - name: Build package
+        env:
+          THEOS: /Users/runner/theos
         run: |
           cd VCAMVIP_theos
-          THEOS=~/theos make package \
+          make package \
             THEOS_PACKAGE_SCHEME=rootless \
             TARGET="iphone:clang:latest:14.0" \
             ARCHS="arm64 arm64e"
