@@ -32,14 +32,20 @@ void vcamInstallColorSampleListener(void) {
             uint64_t packed = 0;
             notify_get_state(token, &packed);
 
+            // VCamColorPickerWindow sends normalized [0,1] coords.
             uint32_t xBits = (uint32_t)(packed >> 32);
             uint32_t yBits = (uint32_t)(packed & 0xFFFFFFFFULL);
-            float xf = 0.0f, yf = 0.0f;
-            memcpy(&xf, &xBits, 4);
-            memcpy(&yf, &yBits, 4);
+            float nx = 0.0f, ny = 0.0f;
+            memcpy(&nx, &xBits, 4);
+            memcpy(&ny, &yBits, 4);
 
             CGSize sz = [UIScreen mainScreen].bounds.size;
-            if (xf < 0.0f || yf < 0.0f || xf >= (float)sz.width || yf >= (float)sz.height) return;
+            if (nx < 0.0f || ny < 0.0f || nx > 1.0f || ny > 1.0f) return;
+            if (sz.width <= 0 || sz.height <= 0) return;
+
+            // Convert normalized → screen points
+            float xf = nx * (float)sz.width;
+            float yf = ny * (float)sz.height;
 
             UIWindow *targetWindow = nil;
             NSArray *windows = [[UIApplication sharedApplication] windows];
@@ -55,18 +61,18 @@ void vcamInstallColorSampleListener(void) {
             // Sample an 8×8 point region centred on the circle.
             // The dominant colour (most-represented hue bin) is returned,
             // so a single outlier pixel does not skew the result.
-            // NOTE: drawViewHierarchyInRect: ignores the CGContext CTM — it always
-            // renders into the ABSOLUTE rect, not the translated one. Use
-            // layer.renderInContext: instead, which DOES respect the CTM.
+            // drawViewHierarchyInRect:afterScreenUpdates:YES goes through the
+            // display compositor and captures AVCaptureVideoPreviewLayer content
+            // that renderInContext: cannot see (GPU-rendered, always black there).
+            // It ignores the CTM, so pass the offset rect directly.
             const int DIM = 8;
 
             UIGraphicsBeginImageContextWithOptions(CGSizeMake(DIM, DIM), YES, 1.0);
-            CGContextRef ctx = UIGraphicsGetCurrentContext();
-            if (!ctx) { UIGraphicsEndImageContext(); return; }
-
-            // Translate so (xf, yf) maps to the centre of the DIM×DIM context.
-            CGContextTranslateCTM(ctx, -(CGFloat)xf + DIM * 0.5, -(CGFloat)yf + DIM * 0.5);
-            [targetWindow.layer renderInContext:ctx];
+            // Place the window so (xf, yf) maps to the centre of the DIM×DIM canvas.
+            CGRect viewRect = CGRectMake(-(CGFloat)xf + DIM * 0.5f,
+                                         -(CGFloat)yf + DIM * 0.5f,
+                                         (CGFloat)sz.width, (CGFloat)sz.height);
+            [targetWindow drawViewHierarchyInRect:viewRect afterScreenUpdates:YES];
 
             UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
