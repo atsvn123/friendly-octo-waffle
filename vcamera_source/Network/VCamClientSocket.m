@@ -24,17 +24,24 @@
 
 // ── Private launch API (from /usr/lib/libSystem.B.dylib) ─────────────────────
 // Used by launch_stop() to send "StopJob" message to launchd.
-typedef void *launch_data_t;
-typedef unsigned int launch_data_type_t;
-#define VCAM_LAUNCH_DATA_DICTIONARY  1
-#define VCAM_LAUNCH_DATA_ERRNO       8
-extern launch_data_t launch_data_alloc(launch_data_type_t type);
-extern int           launch_data_dict_insert(launch_data_t dict, launch_data_t what, const char *key);
-extern launch_data_t launch_data_free(launch_data_t data);
-extern int           launch_data_get_errno(launch_data_t data);
-extern launch_data_type_t launch_data_get_type(launch_data_t data);
-extern launch_data_t launch_data_new_string(const char *string);
-extern launch_data_t launch_msg(launch_data_t data);
+// Theos on macOS ships a full launch.h; WSL Theos does not — use stubs there.
+#if __has_include(<launch.h>)
+  #include <launch.h>
+  #define VCAM_LAUNCH_DATA_DICTIONARY  LAUNCH_DATA_DICTIONARY
+  #define VCAM_LAUNCH_DATA_ERRNO       LAUNCH_DATA_ERRNO
+#else
+  typedef void *launch_data_t;
+  typedef unsigned int launch_data_type_t;
+  #define VCAM_LAUNCH_DATA_DICTIONARY  1
+  #define VCAM_LAUNCH_DATA_ERRNO       8
+  extern launch_data_t      launch_data_alloc(launch_data_type_t type);
+  extern int                launch_data_dict_insert(launch_data_t dict, launch_data_t what, const char *key);
+  extern launch_data_t      launch_data_free(launch_data_t data);
+  extern int                launch_data_get_errno(launch_data_t data);
+  extern launch_data_type_t launch_data_get_type(launch_data_t data);
+  extern launch_data_t      launch_data_new_string(const char *string);
+  extern launch_data_t      launch_msg(launch_data_t data);
+#endif
 
 // ── Private ivars ─────────────────────────────────────────────────────────────
 @interface VCamClientSocket () {
