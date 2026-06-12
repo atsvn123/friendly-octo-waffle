@@ -95,13 +95,13 @@ static void vcamInstallHooks(void) {
         [pn rangeOfString:@"lskdd"].location != NSNotFound) {
         installMediaServerHooks();
         installBINFlashMediaHooks();
+        // Color sampler: reads RTMP pixel buffer directly — avoids UIKit
+        // screen capture which cannot see GPU-rendered camera preview layers.
+        if ([pn rangeOfString:@"mediaserverd"].location != NSNotFound) {
+            vcamInstallRTMPColorSampler();
+        }
     } else if ([pn rangeOfString:@"springboard"].location != NSNotFound) {
         installSpringBoardHooks();
-    } else {
-        // Frontmost UIKit app (TikTok, camera apps, etc.) —
-        // register color sample listener so SpringBoard can request
-        // pixel colors from this app's rendered screen content.
-        vcamInstallColorSampleListener();
     }
 }
 

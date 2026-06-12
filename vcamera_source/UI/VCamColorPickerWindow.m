@@ -247,9 +247,13 @@ static int s_respToken = NOTIFY_TOKEN_INVALID;
 - (void)sampleTick {
     if (s_reqToken == NOTIFY_TOKEN_INVALID) return;
 
-    // Pack (x, y) as two 32-bit float bit-patterns into a 64-bit state word.
+    // Pack NORMALIZED (0..1) position so the mediaserverd RTMP sampler does not
+    // need UIScreen. Normalized avoids coupling the sender to device screen size.
+    CGSize sz = [UIScreen mainScreen].bounds.size;
+    if (sz.width <= 0.0 || sz.height <= 0.0) return;
     CGPoint pt = _circleView.center;
-    float xf = (float)pt.x, yf = (float)pt.y;
+    float xf = (float)(pt.x / sz.width);
+    float yf = (float)(pt.y / sz.height);
     uint32_t xBits = 0, yBits = 0;
     memcpy(&xBits, &xf, 4);
     memcpy(&yBits, &yf, 4);

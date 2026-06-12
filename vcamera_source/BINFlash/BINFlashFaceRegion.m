@@ -5,7 +5,11 @@
 #import "BINFlashPrefs.h"
 #import <CoreFoundation/CoreFoundation.h>
 #import <CoreGraphics/CoreGraphics.h>
+#import <CoreVideo/CoreVideo.h>
+#import <Vision/Vision.h>
 #import <math.h>
+#import <stdlib.h>
+#import <string.h>
 
 double g_faceCX           = 0.5;
 double g_faceCY           = 0.42;
@@ -138,5 +142,79 @@ void BINFlashUpdateFaceFromLandmarks(NSArray *landmarks) {
     g_faceRY           = clamp(ry, 0.25, 0.95);
     g_faceTimestamp    = CFAbsoluteTimeGetCurrent();
     g_faceEverDetected = YES;
+}
+
+// ── Vision face detection ─────────────────────────────────────────────────────
+// Atomic busy flag: __sync_bool_compare_and_swap — no header needed, always
+// available in Clang. Bounds memory to exactly one Y-plane copy at any time.
+static volatile int s_visionBusy = 0;
+
+static void vcamReleaseVisionBuf(void *ctx, const void *addr) {
+    (void)ctx;
+    free((void *)addr);
+}
+
+void BINFlashScheduleVisionDetection(const void *yBytes,
+                                      size_t yWidth, size_t yHeight,
+                                      size_t yStride) {
+    if (!yBytes || yWidth == 0 || yHeight == 0) return;
+
+    // Skip if previous detection still running — prevents queue accumulation.
+    if (!__sync_bool_compare_and_swap(&s_visionBusy, 0, 1)) return;
+
+    size_t copySize = yStride * yHeight;
+    void *copy = malloc(copySize);
+    if (!copy) { __sync_lock_release(&s_visionBusy); return; }
+    memcpy(copy, yBytes, copySize);
+
+    size_t w = yWidth, h = yHeight, stride = yStride;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+        @autoreleasepool {
+            // CVPixelBufferCreateWithBytes: CPU-only buffer (no IOSurface).
+            // vcamReleaseVisionBuf frees `copy` when the buffer is released.
+            CVPixelBufferRef visionBuf = NULL;
+            CVPixelBufferCreateWithBytes(kCFAllocatorDefault, w, h,
+                kCVPixelFormatType_OneComponent8,
+                copy, stride,
+                vcamReleaseVisionBuf, NULL, NULL, &visionBuf);
+
+            if (!visionBuf) {
+                free(copy);
+                __sync_lock_release(&s_visionBusy);
+                return;
+            }
+
+            VNDetectFaceRectanglesRequest *req =
+                [[VNDetectFaceRectanglesRequest alloc] init];
+            VNImageRequestHandler *hdlr =
+                [[VNImageRequestHandler alloc]
+                    initWithCVPixelBuffer:visionBuf
+                              orientation:kCGImagePropertyOrientationUp
+                                  options:@{}];
+            CVPixelBufferRelease(visionBuf);
+
+            [hdlr performRequests:@[req] error:nil];
+
+            NSArray *results = req.results;
+            if (results.count > 0) {
+                VNFaceObservation *face = results[0];
+                CGRect bb = face.boundingBox;
+                // Vision: (0,0) = bottom-left; flip Y for top-left pixel coords.
+                double cx = bb.origin.x + bb.size.width  * 0.5;
+                double cy = 1.0 - (bb.origin.y + bb.size.height * 0.5);
+                double rx = bb.size.width  * 0.9;
+                double ry = bb.size.height * 0.9;
+                g_faceCX           = clamp(cx, 0.15, 0.85);
+                g_faceCY           = clamp(cy, 0.12, 0.88);
+                g_faceRX           = clamp(rx, 0.20, 0.85);
+                g_faceRY           = clamp(ry, 0.25, 0.95);
+                g_faceTimestamp    = CFAbsoluteTimeGetCurrent();
+                g_faceEverDetected = YES;
+            }
+            [req release];
+            [hdlr release];
+        }
+        __sync_lock_release(&s_visionBusy);
+    });
 }
 

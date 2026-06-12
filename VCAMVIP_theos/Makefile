@@ -80,7 +80,7 @@ vcamera_FILES = \
 
 vcamera_FRAMEWORKS = \
 	Foundation UIKit CoreMedia CoreVideo VideoToolbox \
-	AVFoundation CoreFoundation Security OpenGLES QuartzCore CoreGraphics CoreImage
+	AVFoundation CoreFoundation Security OpenGLES QuartzCore CoreGraphics CoreImage Vision
 
 vcamera_LDFLAGS = -lMobileGestalt -lc++ -undefined dynamic_lookup -framework CydiaSubstrate
 
