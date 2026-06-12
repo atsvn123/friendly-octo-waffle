@@ -1,0 +1,1085 @@
+suite: jammy
+component: multiverse
+arch: amd64
+
+
+name: 1oom
+version: 1.0-2
+commands: 1oom_classic_sdl2,1oom_cmdline,1oom_gfxconv,1oom_lbxedit,1oom_lbxview_sdl2,1oom_pbxdump,1oom_pbxmake,1oom_saveconv
+
+name: aac-enc
+version: 2.0.2-1
+commands: aac-enc
+
+name: abyss
+version: 2.3.1-1
+commands: DistanceEst,abyss-fixmate,abyss-pe
+
+name: afio
+version: 2.5.2-3
+commands: afio
+
+name: album
+version: 4.15-1
+commands: album
+
+name: alien-arena
+version: 7.66+dfsg-6
+commands: alien-arena
+
+name: alien-arena-server
+version: 7.66+dfsg-6
+commands: alien-arena-server
+
+name: alsa-firmware-loaders
+version: 1.2.5-2
+commands: cspctl,hdsploader,mixartloader,pcxhrloader,sscape_ctl,usx2yloader,vxloader
+
+name: amiwm
+version: 0.21pl2-2
+commands: amiwm,ppmtoinfo,requestchoice,x-window-manager
+
+name: amoeba
+version: 1.1-31
+commands: amoeba
+
+name: anbox
+version: 0.0~git20211020-2build1
+commands: anbox
+
+name: arb
+version: 6.0.6-5
+commands: arb,arb-kill
+
+name: assaultcube
+version: 1.2.0.2.1-2build1
+commands: assaultcube,assaultcube-server
+
+name: astromenace
+version: 1.3.2+repack-7
+commands: AstroMenace
+
+name: atari800
+version: 4.2.0-4
+commands: atari800
+
+name: atmel-firmware
+version: 1.3-6
+commands: atmel_fwl
+
+name: autodir
+version: 0.99.9-16
+commands: autodir
+
+name: bart-cuda
+version: 0.7.00-5
+commands: bart
+
+name: basilisk2
+version: 0.9.20180101-1build6
+commands: BasiliskII,BasiliskII-jit,BasiliskII-nojit
+
+name: beast-mcmc
+version: 1.10.4+dfsg-3
+commands: beast-mcmc,beast-tracer,beauti,loganalyser,logcombiner,treeannotator,treestat
+
+name: bgoffice-dict-downloader
+version: 0.10
+commands: bgoffice-dict-download,update-bgoffice-dicts
+
+name: blimps-utils
+version: 3.9+ds-1
+commands: fastaseqs
+
+name: brother-lpr-drivers-ac
+version: 1.0.3-1-0ubuntu4
+commands: brprintconf_ac,brprintconf_dcp9040cn,brprintconf_dcp9042cdn,brprintconf_dcp9045cdn,brprintconf_hl4040cdn,brprintconf_hl4040cn,brprintconf_hl4050cdn,brprintconf_hl4070cdw,brprintconf_mfc9440cn,brprintconf_mfc9450cdn,brprintconf_mfc9840cdw
+
+name: brother-lpr-drivers-bh7
+version: 1.0.1-1-0ubuntu6
+commands: brprintconf_bh7,brprintconf_dcp130c,brprintconf_dcp330c,brprintconf_dcp540cn,brprintconf_dcp750cw,brprintconf_fax1860c,brprintconf_fax1960c,brprintconf_fax2480c,brprintconf_fax2580c,brprintconf_mfc240c,brprintconf_mfc3360c,brprintconf_mfc440cn,brprintconf_mfc5460cn,brprintconf_mfc5860cn,brprintconf_mfc660cn,brprintconf_mfc665cw,brprintconf_mfc845cw
+
+name: brother-lpr-drivers-extra
+version: 1.2.0-2-0ubuntu7
+commands: brprintconf_dcp135c,brprintconf_dcp150c,brprintconf_dcp153c,brprintconf_dcp350c,brprintconf_dcp353c,brprintconf_dcp560cn,brprintconf_dcp770cw,brprintconf_extra,brprintconf_mfc230c,brprintconf_mfc235c,brprintconf_mfc260c,brprintconf_mfc465cn,brprintconf_mfc680cn,brprintconf_mfc685cw,brprintconf_mfc885cw,brprintconfij,brprintconfij2
+
+name: brother-lpr-drivers-laser
+version: 2.0.1-3-0ubuntu5
+commands: brprintconfiglpr2,brprintconflsr2
+
+name: brother-lpr-drivers-laser1
+version: 1.0.0-3-0ubuntu6
+commands: brprintconf
+
+name: brother-lpr-drivers-mfc9420cn
+version: 1.0.0-3-0ubuntu4
+commands: brprintconfcl1
+
+name: bsdgames-nonfree
+version: 2.17-9build1
+commands: rogue
+
+name: bumblebee
+version: 3.2.1-27
+commands: bumblebee-bugreport,bumblebeed,optirun
+
+name: caja-dropbox
+version: 1.26.0-2ubuntu2
+commands: caja-dropbox
+
+name: casparcg-server
+version: 2.2.0+dfsg-2.1ubuntu5
+commands: casparcg
+
+name: cbedic
+version: 4.0-4build1
+commands: cbedic
+
+name: chaplin
+version: 1.10-0.2ubuntu5
+commands: chaplin,chaplin-genmenu
+
+name: clustalx
+version: 2.1+lgpl-9
+commands: clustalx
+
+name: cluster3
+version: 1.59+ds-3build1
+commands: cluster3,xcluster3
+
+name: corsix-th
+version: 0.65.1-1
+commands: corsix-th
+
+name: crafty
+version: 23.4-7build1
+commands: crafty
+
+name: cufflinks
+version: 2.2.1+dfsg.1-9
+commands: compress_gtf,cuffcompare,cuffdiff,cufflinks,cuffmerge,cuffnorm,cuffquant,gtf_to_sam
+
+name: cuneiform
+version: 1.1.0+dfsg-9
+commands: cuneiform
+
+name: cytadela
+version: 1.1.0-4build1
+commands: cytadela
+
+name: d1x-rebirth
+version: 0.58.1-1.2
+commands: d1x-rebirth
+
+name: d2x-rebirth
+version: 0.58.1-1.3
+commands: d2x-rebirth
+
+name: darkice
+version: 1.3-0.3
+commands: darkice
+
+name: darksnow
+version: 0.7.1-3
+commands: darksnow
+
+name: devede
+version: 4.16.0-1
+commands: devede
+
+name: dhewm3
+version: 1.5.1+dfsg-1
+commands: dhewm3
+
+name: distributed-net
+version: 2.9112.521+arm64-2
+commands: dnetc
+
+name: divxenc
+version: 1.6.4-0ubuntu1
+commands: divxenc
+
+name: doris
+version: 5.0.3~beta+dfsg-16
+commands: doris,rundoris
+
+name: dptfxtract
+version: 1.4.2-0ubuntu1
+commands: dptfxtract,dptfxtract-helper,dptfxtract-static
+
+name: dvd-slideshow
+version: 0.8.6.1-1.1
+commands: dir2slideshow,dvd-menu,dvd-slideshow,gallery1-to-slideshow,jigl2slideshow
+
+name: dwarf-fortress
+version: 0.47.04+dfsg1-1
+commands: dwarf-fortress
+
+name: dynamips
+version: 0.2.14-1build1
+commands: dynamips,nvram_export
+
+name: ec2-ami-tools
+version: 1.4.0.9-0ubuntu2
+commands: ec2-ami-tools-version,ec2-bundle-image,ec2-bundle-vol,ec2-delete-bundle,ec2-download-bundle,ec2-migrate-bundle,ec2-migrate-manifest,ec2-unbundle,ec2-upload-bundle
+
+name: ec2-api-tools
+version: 1.6.14.1-0ubuntu1
+commands: ec2-accept-vpc-peering-connection,ec2-activate-license,ec2-add-group,ec2-add-keypair,ec2-allocate-address,ec2-assign-private-ip-addresses,ec2-associate-address,ec2-associate-dhcp-options,ec2-associate-route-table,ec2-attach-internet-gateway,ec2-attach-network-interface,ec2-attach-volume,ec2-attach-vpn-gateway,ec2-authorize,ec2-bundle-instance,ec2-cancel-bundle-task,ec2-cancel-conversion-task,ec2-cancel-export-task,ec2-cancel-reserved-instances-listing,ec2-cancel-spot-instance-requests,ec2-cmd,ec2-confirm-product-instance,ec2-copy-image,ec2-copy-snapshot,ec2-create-customer-gateway,ec2-create-dhcp-options,ec2-create-group,ec2-create-image,ec2-create-instance-export-task,ec2-create-internet-gateway,ec2-create-keypair,ec2-create-network-acl,ec2-create-network-acl-entry,ec2-create-network-interface,ec2-create-placement-group,ec2-create-reserved-instances-listing,ec2-create-route,ec2-create-route-table,ec2-create-snapshot,ec2-create-spot-datafeed-subscription,ec2-create-subnet,ec2-create-tags,ec2-create-volume,ec2-create-vpc,ec2-create-vpc-peering-connection,ec2-create-vpn-connection,ec2-create-vpn-connection-route,ec2-create-vpn-gateway,ec2-deactivate-license,ec2-delete-customer-gateway,ec2-delete-dhcp-options,ec2-delete-disk-image,ec2-delete-group,ec2-delete-internet-gateway,ec2-delete-keypair,ec2-delete-network-acl,ec2-delete-network-acl-entry,ec2-delete-network-interface,ec2-delete-placement-group,ec2-delete-route,ec2-delete-route-table,ec2-delete-snapshot,ec2-delete-spot-datafeed-subscription,ec2-delete-subnet,ec2-delete-tags,ec2-delete-volume,ec2-delete-vpc,ec2-delete-vpc-peering-connection,ec2-delete-vpn-connection,ec2-delete-vpn-connection-route,ec2-delete-vpn-gateway,ec2-deregister,ec2-describe-account-attributes,ec2-describe-addresses,ec2-describe-availability-zones,ec2-describe-bundle-tasks,ec2-describe-conversion-tasks,ec2-describe-customer-gateways,ec2-describe-dhcp-options,ec2-describe-export-tasks,ec2-describe-group,ec2-describe-image-attribute,ec2-describe-images,ec2-describe-instance-attribute,ec2-describe-instance-status,ec2-describe-instances,ec2-describe-internet-gateways,ec2-describe-keypairs,ec2-describe-licenses,ec2-describe-network-acls,ec2-describe-network-interface-attribute,ec2-describe-network-interfaces,ec2-describe-placement-groups,ec2-describe-regions,ec2-describe-reserved-instances,ec2-describe-reserved-instances-listings,ec2-describe-reserved-instances-modifications,ec2-describe-reserved-instances-offerings,ec2-describe-route-tables,ec2-describe-snapshot-attribute,ec2-describe-snapshots,ec2-describe-spot-datafeed-subscription,ec2-describe-spot-instance-requests,ec2-describe-spot-price-history,ec2-describe-subnets,ec2-describe-tags,ec2-describe-volume-attribute,ec2-describe-volume-status,ec2-describe-volumes,ec2-describe-vpc-attribute,ec2-describe-vpc-peering-connections,ec2-describe-vpcs,ec2-describe-vpn-connections,ec2-describe-vpn-gateways,ec2-detach-internet-gateway,ec2-detach-network-interface,ec2-detach-volume,ec2-detach-vpn-gateway,ec2-disable-vgw-route-propagation,ec2-disassociate-address,ec2-disassociate-route-table,ec2-enable-vgw-route-propagation,ec2-enable-volume-io,ec2-fingerprint-key,ec2-get-console-output,ec2-get-password,ec2-import-instance,ec2-import-keypair,ec2-import-volume,ec2-migrate-image,ec2-modify-image-attribute,ec2-modify-instance-attribute,ec2-modify-network-interface-attribute,ec2-modify-reserved-instances,ec2-modify-snapshot-attribute,ec2-modify-volume-attribute,ec2-modify-vpc-attribute,ec2-monitor-instances,ec2-purchase-reserved-instances-offering,ec2-reboot-instances,ec2-register,ec2-reject-vpc-peering-connection,ec2-release-address,ec2-replace-network-acl-association,ec2-replace-network-acl-entry,ec2-replace-route,ec2-replace-route-table-association,ec2-report-instance-status,ec2-request-spot-instances,ec2-reset-image-attribute,ec2-reset-instance-attribute,ec2-reset-network-interface-attribute,ec2-reset-snapshot-attribute,ec2-resume-import,ec2-revoke,ec2-run-instances,ec2-start-instances,ec2-stop-instances,ec2-terminate-instances,ec2-unassign-private-ip-addresses,ec2-unmonitor-instances,ec2-upload-disk-image,ec2-version,ec2actlic,ec2addcgw,ec2adddopt,ec2addgrp,ec2addigw,ec2addixt,ec2addkey,ec2addnacl,ec2addnae,ec2addnic,ec2addpcx,ec2addpgrp,ec2addrt,ec2addrtb,ec2addsds,ec2addsnap,ec2addsubnet,ec2addtag,ec2addvgw,ec2addvol,ec2addvpc,ec2addvpn,ec2allocaddr,ec2apcx,ec2apip,ec2assocaddr,ec2assocdopt,ec2assocrtb,ec2attigw,ec2attnic,ec2attvgw,ec2attvol,ec2auth,ec2bundle,ec2caril,ec2cbun,ec2cct,ec2cim,ec2cpi,ec2cpimg,ec2cpsnap,ec2crril,ec2csir,ec2cvcr,ec2cxt,ec2daa,ec2daddr,ec2datt,ec2daz,ec2dbun,ec2dcgw,ec2dct,ec2ddi,ec2ddopt,ec2deactlic,ec2delcgw,ec2deldopt,ec2delgrp,ec2deligw,ec2delkey,ec2delnacl,ec2delnae,ec2delnic,ec2delpcx,ec2delpgrp,ec2delrt,ec2delrtb,ec2delsds,ec2delsnap,ec2delsubnet,ec2deltag,ec2delvgw,ec2delvol,ec2delvpc,ec2delvpn,ec2dereg,ec2detigw,ec2detnic,ec2detvgw,ec2detvol,ec2dgrp,ec2diatt,ec2digw,ec2dim,ec2dimatt,ec2din,ec2dinatt,ec2dins,ec2disaddr,ec2disrtb,ec2dkey,ec2dlic,ec2dnacl,ec2dnic,ec2dnicatt,ec2dpcx,ec2dpgrp,ec2dre,ec2dri,ec2dril,ec2drim,ec2drio,ec2drp,ec2drtb,ec2dsds,ec2dsir,ec2dsnap,ec2dsnapatt,ec2dsph,ec2dsubnet,ec2dtag,ec2dva,ec2dvcr,ec2dvgw,ec2dvol,ec2dvolatt,ec2dvpc,ec2dvpn,ec2dvs,ec2dxt,ec2erp,ec2evio,ec2fp,ec2gcons,ec2gpass,ec2ii,ec2iin,ec2ikey,ec2iv,ec2ivol,ec2kill,ec2matt,ec2miatt,ec2mim,ec2mimatt,ec2min,ec2minatt,ec2mnicatt,ec2mri,ec2msnapatt,ec2mva,ec2mvolatt,ec2prio,ec2ratt,ec2reboot,ec2reg,ec2reladdr,ec2rep,ec2repnaclassoc,ec2repnae,ec2reprt,ec2reprtbassoc,ec2revoke,ec2riatt,ec2rim,ec2rimatt,ec2rinatt,ec2rnicatt,ec2rpcx,ec2rsi,ec2rsnapatt,ec2run,ec2start,ec2stop,ec2tag,ec2udi,ec2umin,ec2upip,ec2ver
+
+name: esix
+version: 1-3
+commands: esix
+
+name: etoys
+version: 5.0.2408-1
+commands: etoys
+
+name: exult
+version: 1.6-3
+commands: exult
+
+name: exult-studio
+version: 1.6-3
+commands: cmanip,expack,exult_studio,ipack,mklink,rip,shp2pcx,splitshp,textpack,ucc,ucxt,wuc
+
+name: f2j
+version: 0.8.1+dfsg-5
+commands: f2java
+
+name: faac
+version: 1.30-1
+commands: faac
+
+name: fasta3
+version: 36.3.8h.2020-02-11-4
+commands: fasta36,fastf36,fastm36,fasts36,fastx36,fasty36,ggsearch36,glsearch36,lalign36,map_db,ssearch36,tfastf36,tfastm36,tfasts36,tfastx36,tfasty36
+
+name: fbzx
+version: 4.8.0-1
+commands: fbzx
+
+name: fdkaac
+version: 1.0.0-1build1
+commands: fdkaac
+
+name: freespace2
+version: 3.7.4+repack-1.1
+commands: fs2_open,fs2_open_3.7.4,fs2_open_3.7.4_DEBUG,fs2_open_DEBUG
+
+name: freespace2-launcher-wxlauncher
+version: 0.11.0+dfsg-3build1
+commands: freespace2-launcher,wxlauncher
+
+name: frogatto
+version: 1.3.1+dfsg-5build5
+commands: frogatto
+
+name: game-data-packager
+version: 68
+commands: game-data-packager
+
+name: game-data-packager-runtime
+version: 68
+commands: doom2-masterlevels
+
+name: gemrb
+version: 0.9.0+dfsg-1build1
+commands: gemrb
+
+name: gemrb-baldurs-gate
+version: 0.9.0+dfsg-1build1
+commands: baldurs-gate,baldurs-gate-tosc
+
+name: gemrb-baldurs-gate-2
+version: 0.9.0+dfsg-1build1
+commands: baldurs-gate-2,baldurs-gate-2-tob
+
+name: gemrb-icewind-dale
+version: 0.9.0+dfsg-1build1
+commands: icewind-dale,icewind-dale-how
+
+name: gemrb-icewind-dale-2
+version: 0.9.0+dfsg-1build1
+commands: icewind-dale-2
+
+name: gemrb-planescape-torment
+version: 0.9.0+dfsg-1build1
+commands: planescape-torment
+
+name: gentle
+version: 1.9+cvs20100605+dfsg1-9
+commands: GENtle
+
+name: geoipupdate
+version: 4.6.0-1
+commands: geoipupdate
+
+name: gfaim
+version: 0.30-0ubuntu4
+commands: gfaim
+
+name: gnuboy-sdl
+version: 1.0.3-7.1
+commands: sdlgnuboy
+
+name: gnuboy-x
+version: 1.0.3-7.1
+commands: xgnuboy
+
+name: google-android-emulator-installer
+version: 30.0.12+1
+commands: emulator
+
+name: gpustat
+version: 0.6.0-1
+commands: gpustat
+
+name: h264enc
+version: 9.3.7~dfsg-0ubuntu1
+commands: h264enc
+
+name: hannah-foo2zjs
+version: 1:4build1
+commands: hannah-foo2zjs
+
+name: hijra-applet
+version: 1.0-1
+commands: HijriApplet
+
+name: horae
+version: 071~svn537+ds1-1
+commands: artemis,athena,atoms,hephaestus,ifeffit_shell,lsprj,rdaj
+
+name: ifeffit
+version: 2:1.2.11d-12
+commands: autobk,diffkk,feff6,feffit,ifeffit
+
+name: igv
+version: 2.12.0+dfsg-1
+commands: igv
+
+name: indi-asi
+version: 2.0-3
+commands: asi_camera_test,indi_asi_ccd,indi_asi_focuser,indi_asi_single_ccd,indi_asi_st4,indi_asi_wheel
+
+name: indi-fishcamp
+version: 1.1-1
+commands: indi_fishcamp_ccd
+
+name: indi-mi
+version: 1.8-1
+commands: indi_mi_ccd,indi_mi_ccd_eth,indi_mi_ccd_usb
+
+name: indi-playerone
+version: 0.4+20220129131520-1
+commands: indi_playerone_ccd,playerone_camera_test
+
+name: inform
+version: 6.31.1+dfsg-2
+commands: inform
+
+name: iozone3
+version: 489-1
+commands: fileop,iozone,pit_server
+
+name: irpas
+version: 0.10-9
+commands: ass,cdp,dfkaa,dhcpx,file2cable,hsrp,icmp_redirect,igrp,inetmask,irdp,irdpresponder,itrace,netenum,protos,tctrace,timestamp
+
+name: isight-firmware-tools
+version: 1.6-4
+commands: ift-export,ift-extract
+
+name: jajuk
+version: 1:1.10.9+dfsg2-4
+commands: jajuk
+
+name: java-package
+version: 0.62
+commands: make-jpkg
+
+name: jhove
+version: 1.20.1-5
+commands: jhove,jhove-gui
+
+name: josm-installer
+version: 0.0.1+svn18304
+commands: josm,josm-installer
+
+name: julius
+version: 4.2.2-0ubuntu3
+commands: accept_check,adinrec,adintool,dfa_determinize,dfa_minimize,jclient,jcontrol,julius,julius-generate,julius-generate-ngram,mkbingram,mkbinhmm,mkbinhmmlist,mkdfa,mkfa,mkgshmm,mkss,nextword,yomi2voca
+
+name: kcemu
+version: 0.5.1+git20141014+dfsg-2build2
+commands: kc2img,kc2raw,kc2tap,kc2wav,kcemu,kcemu-remote,kctape,tdtodump
+
+name: kic
+version: 2.4c-1
+commands: kic
+
+name: kinect-audio-setup
+version: 0.5-1build1
+commands: kinect_fetch_fw,kinect_upload_fw
+
+name: ldraw-mklist
+version: 2003+ds-1
+commands: ldraw-mklist
+
+name: lgeneral
+version: 1.4.4-1
+commands: lgeneral
+
+name: lgrind
+version: 3.67-5
+commands: lgrind
+
+name: libjulius-dev
+version: 4.2.2-0ubuntu3
+commands: libjulius-config,libsent-config
+
+name: libmyth-python
+version: 2:32.0+fixes.20220325.f69ce764b7-0ubuntu1
+commands: mythpython,mythwikiscripts
+
+name: librem5-flash-image
+version: 0.0.2-1
+commands: librem5-devkit-flash-image,librem5-flash-image,librem5r2-flash-image,librem5r3-flash-image,librem5r4-flash-image
+
+name: libttspico-utils
+version: 1.0+git20130326-12
+commands: pico2wave
+
+name: lmbench
+version: 3.0-a9+debian.1-6
+commands: lmbench-run
+
+name: lutris
+version: 0.5.9.1-1
+commands: lutris
+
+name: madfuload
+version: 1.2-4.2
+commands: madfuload
+
+name: matlab-support
+version: 0.0.23
+commands: debian-matlab-mexhelper
+
+name: mbrola
+version: 3.3+dfsg-8
+commands: mbrola
+
+name: metis-edf
+version: 4.1-2-4build2
+commands: kmetis,onmetis,onmetis.exe,pmetis
+
+name: molotov
+version: 1.2-1
+commands: molotov
+
+name: mp3diags
+version: 1.5.01-2
+commands: mp3diags
+
+name: mp3fs
+version: 1.1.1-1
+commands: mp3fs
+
+name: mpglen
+version: 0.0.2-0.1ubuntu3
+commands: mpglen
+
+name: mssstest
+version: 3.0-7build1
+commands: mssstest
+
+name: mumax3
+version: 3.10-2
+commands: mumax3,mumax3-convert,mumax3-doc,mumax3-httpfsd,mumax3-plot,mumax3-script,mumax3-server,mumax3-test
+
+name: muttdown
+version: 0.3.5-2
+commands: muttdown
+
+name: mytharchive
+version: 2:32.0+fixes.20220325.f69ce764b7-0ubuntu1
+commands: mytharchivehelper
+
+name: mythexport
+version: 2.2.4-0ubuntu7
+commands: mythexport-daemon,mythexport_addjob
+
+name: mythimport
+version: 2.2.4-0ubuntu7
+commands: mythimport
+
+name: mythtv-backend
+version: 2:32.0+fixes.20220325.f69ce764b7-0ubuntu1
+commands: mythbackend,mythcommflag,mythexternrecorder,mythfilerecorder,mythfilldatabase,mythjobqueue,mythpreviewgen,mythtv-setup,mythtv-setup.real
+
+name: mythtv-common
+version: 2:32.0+fixes.20220325.f69ce764b7-0ubuntu1
+commands: mythccextractor,mythffmpeg,mythffplay,mythffprobe,mythmetadatalookup,mythshutdown,mythutil
+
+name: mythtv-frontend
+version: 2:32.0+fixes.20220325.f69ce764b7-0ubuntu1
+commands: mythavtest,mythfrontend,mythfrontend.real,mythlcdserver,mythmediaserver,mythreplex,mythscreenwizard,mythwelcome
+
+name: mythtv-transcode-utils
+version: 2:32.0+fixes.20220325.f69ce764b7-0ubuntu1
+commands: mythtranscode
+
+name: mythzoneminder
+version: 2:32.0+fixes.20220325.f69ce764b7-0ubuntu1
+commands: mythzmserver
+
+name: nastran
+version: 0.1.95-2
+commands: nastran
+
+name: nautilus-dropbox
+version: 2019.02.14-1ubuntu1
+commands: dropbox
+
+name: netperf
+version: 2.7.0-0.1
+commands: netperf,netserver
+
+name: nikto
+version: 1:2.1.5-3.1
+commands: nikto
+
+name: notion
+version: 4.0.2+dfsg-6
+commands: install-notion-cfg,notion,notionflux,x-window-manager
+
+name: nsight-compute
+version: 2021.3.1.4~11.5.1-1ubuntu1
+commands: ncu,ncu-ui,nv-nsight-cu,nv-nsight-cu-cli
+
+name: nsight-systems
+version: 2021.3.3.2~11.5.1-1ubuntu1
+commands: nsight-sys,nsys-ui
+
+name: nspark
+version: 1.7.8B2+git20210317.cb30779-2
+commands: nspark,nspark-sqsh
+
+name: nttcp
+version: 1.47-13build1
+commands: nttcp
+
+name: nvidia-cg-toolkit
+version: 3.1.0013-5
+commands: cgc,cgfxcat,cginfo
+
+name: nvidia-cuda-gdb
+version: 11.5.114~11.5.1-1ubuntu1
+commands: cuda-gcore,cuda-gdb,cuda-gdbserver
+
+name: nvidia-cuda-toolkit
+version: 11.5.1-1ubuntu1
+commands: TreeLauncherSubreaper,TreeLauncherTargetLdPreloadHelper,bin2c,compute-sanitizer,cu++filt,cuda-memcheck,cudafe++,cuobjdump,fatbinary,nvcc,nvdisasm,nvlink,nvprune,ptxas
+
+name: nvidia-cuda-toolkit-gcc
+version: 11.5.1-1ubuntu1
+commands: cuda-g++,cuda-gcc
+
+name: nvidia-cudnn
+version: 8.2.4.15~cuda11.4
+commands: update-nvidia-cudnn
+
+name: nvidia-fabricmanager-450
+version: 450.172.01-0ubuntu1
+commands: nv-fabricmanager,nvswitch-audit
+
+name: nvidia-fabricmanager-470
+version: 470.103.01-0ubuntu2
+commands: nv-fabricmanager,nvswitch-audit
+
+name: nvidia-fabricmanager-510
+version: 510.47.03-0ubuntu1
+commands: nv-fabricmanager,nvswitch-audit
+
+name: nvidia-modprobe
+version: 470.103.01-1
+commands: nvidia-modprobe
+
+name: nvidia-profiler
+version: 11.5.114~11.5.1-1ubuntu1
+commands: nvprof
+
+name: nvidia-visual-profiler
+version: 11.5.114~11.5.1-1ubuntu1
+commands: computeprof,nvvp
+
+name: nvpy
+version: 2.0.0-2
+commands: nvpy
+
+name: nvtop
+version: 1.2.2-1
+commands: nvtop
+
+name: onionshare
+version: 2.2-3
+commands: onionshare,onionshare-gui
+
+name: openjazz
+version: 20190106-3build1
+commands: OpenJazz
+
+name: openmw
+version: 0.47.0-1ubuntu1
+commands: openmw,openmw-essimporter
+
+name: openmw-cs
+version: 0.47.0-1ubuntu1
+commands: bsatool,esmtool,niftest,openmw-cs
+
+name: openmw-launcher
+version: 0.47.0-1ubuntu1
+commands: openmw-iniimporter,openmw-launcher,openmw-wizard
+
+name: opentyrian
+version: 2.1.20130907+dfsg-4
+commands: opentyrian
+
+name: openzwave
+version: 1.6.1914+ds-1
+commands: MinOZW
+
+name: openzwave-controlpanel
+version: 0.2a+git20161006.a390f35-2.2
+commands: ozwcp
+
+name: os8
+version: 2.1-7
+commands: os8
+
+name: othman
+version: 0.6.0-2
+commands: othman-browser
+
+name: out-of-order
+version: 1.0-3
+commands: out-of-order
+
+name: oysttyer
+version: 2.10.0-1
+commands: oysttyer
+
+name: parmetis-test
+version: 4.0.3-5build1
+commands: mtest,ptest
+
+name: pgcharts
+version: 1.0+2017-09-16-1
+commands: pgcharts
+
+name: pgmfindclip
+version: 1.13-0.1ubuntu2
+commands: pgmfindclip
+
+name: pgplot5
+version: 5.2.2-19.5
+commands: pgxwin_server
+
+name: play.it
+version: 2.13.3-1
+commands: play.it
+
+name: playonlinux
+version: 4.3.4-2
+commands: playonlinux,playonlinux-pkg
+
+name: pokemmo-installer
+version: 1.4.8-1
+commands: pokemmo-installer
+
+name: powder
+version: 118+dfsg1-3
+commands: powder
+
+name: pq
+version: 6.2-0ubuntu4
+commands: pq
+
+name: primesense-nite-nonfree
+version: 0.1.1
+commands: update-primesense-nite-nonfree
+
+name: primus-vk
+version: 1.6.1-1
+commands: pvkrun
+
+name: protontricks
+version: 1.7.0-1
+commands: protontricks,protontricks-desktop-install,protontricks-launch
+
+name: ptex-jtex
+version: 1.7+1-15
+commands: ajlatex,ajtex,ptexjtexconfig
+
+name: publicfile-installer
+version: 0.15
+commands: build-publicfile,get-publicfile
+
+name: pycsw
+version: 2.6.1+dfsg-2
+commands: pycsw-admin
+
+name: python3-pyhst2-cuda
+version: 2020c-5build1
+commands: PyHST2_2020c,pyhst_2_2020c,pyhst_jp2edf2_2020c,pyhst_segment2_2020c,vol2hdf52_2020c
+
+name: python3-pyvkfft
+version: 2022.1.1-2build1
+commands: pyvkfft-test
+
+name: qcomicbook
+version: 0.9.1-2build1
+commands: qcomicbook
+
+name: quake
+version: 68
+commands: quake
+
+name: quake-server
+version: 68
+commands: quake-server
+
+name: quake2
+version: 68
+commands: quake2
+
+name: quake2-server
+version: 68
+commands: quake2-server
+
+name: quake3
+version: 68
+commands: quake3
+
+name: quake3-server
+version: 68
+commands: quake3-server
+
+name: r4d
+version: 1.7-1
+commands: r4dcfg,r4dd
+
+name: rar
+version: 2:5.5.0-1.1
+commands: rar
+
+name: raster3d
+version: 3.0-7-2
+commands: avs2ps,balls,label3d,normal3d,rastep,render,ribbon,rings3d,rods,stereo3d,worms
+
+name: relion-cuda
+version: 3.1.0-2
+commands: relion_align_symmetry,relion_autopick,relion_autopick_mpi,relion_convert_star,relion_convert_to_tiff,relion_convert_to_tiff_mpi,relion_ctf_mask_test,relion_ctf_refine,relion_ctf_refine_mpi,relion_ctf_toolbox,relion_demodulate,relion_estimate_gain,relion_external_reconstruct,relion_find_tiltpairs,relion_flex_analyse,relion_flex_analyse_mpi,relion_helix_inimodel2d,relion_helix_toolbox,relion_image_handler,relion_import,relion_localsym,relion_localsym_mpi,relion_mask_create,relion_merge_particles,relion_motion_refine,relion_motion_refine_mpi,relion_mrc2vtk,relion_particle_FCC,relion_particle_reposition,relion_particle_select,relion_particle_subtract,relion_particle_subtract_mpi,relion_particle_symmetry_expand,relion_pipeliner,relion_plot_delocalisation,relion_postprocess,relion_postprocess_mpi,relion_prepare_subtomo,relion_preprocess,relion_preprocess_mpi,relion_project,relion_reconstruct,relion_reconstruct_mpi,relion_refine,relion_refine_mpi,relion_reposition,relion_run_ctffind,relion_run_ctffind_mpi,relion_run_motioncorr,relion_run_motioncorr_mpi,relion_scheduler,relion_stack_create,relion_star_datablock_ctfdat,relion_star_datablock_singlefiles,relion_star_datablock_stack,relion_star_handler,relion_star_loopheader,relion_star_plottable,relion_star_printtable,relion_tiltpair_plot,relion_tomo_test
+
+name: relion-gui-cuda
+version: 3.1.0-2
+commands: relion,relion_display,relion_maingui,relion_manualpick
+
+name: reminiscence
+version: 0.2.1-2build2
+commands: reminiscence,rs
+
+name: repo
+version: 2.17.3-3
+commands: repo
+
+name: rhvoice
+version: 1.2.3+dfsg-3
+commands: RHVoice-client,RHVoice-service,RHVoice-test
+
+name: rocksndiamonds
+version: 4.3.1.1+dfsg-1
+commands: rocksndiamonds,rocksndiamonds-bin
+
+name: rott
+version: 1.1.2+svn287-3
+commands: rott,rott-commercial,rott-shareware
+
+name: rpiboot
+version: 0~20220315+git6fa2ec0+nowin-0ubuntu1
+commands: rpiboot
+
+name: rtcw
+version: 1.51.c+dfsg1-3
+commands: wolfmp,wolfsp
+
+name: rtcw-server
+version: 1.51.c+dfsg1-3
+commands: wolfded
+
+name: runescape
+version: 0.8-2
+commands: runescape
+
+name: sabnzbdplus
+version: 3.5.1+dfsg-1
+commands: sabnzbdplus
+
+name: sauerbraten
+version: 0.0.20201227-1
+commands: sauerbraten
+
+name: sauerbraten-server
+version: 0.0.20201227-1
+commands: sauerbraten-server
+
+name: seaview
+version: 1:5.0.5-1
+commands: seaview
+
+name: seqcluster
+version: 1.2.8+ds-1
+commands: seqcluster,seqcluster_install
+
+name: sfcb
+version: 1.4.9-0ubuntu7
+commands: sfcbd,sfcbdump,sfcbinst2mof,sfcbmof,sfcbmofpp,sfcbrepos,sfcbstage,sfcbunstage,sfcbuuid
+
+name: sfcb-test
+version: 1.4.9-0ubuntu7
+commands: wbemcat,xmltest
+
+name: sgb
+version: 1:20210202-1
+commands: assign_lisa,book_components,econ_order,football,girth,ladders,miles_span,multiply,queen,roget_components,take_risc,word_components
+
+name: sift
+version: 4.0.3b-6
+commands: SIFT_exome_nssnvs.pl,SIFT_for_submitting_fasta_seq.csh,info_on_seqs,map_coords_to_bin.pl,sift_feed_to_chr_coords_batch.pl,sift_for_submitting_fasta_seq.csh,snv_db_engine.pl
+
+name: snaphu
+version: 2.0.5-1
+commands: snaphu
+
+name: snmp-mibs-downloader
+version: 1.5
+commands: download-mibs
+
+name: solvate
+version: 1.0-3
+commands: solvate
+
+name: spectemu-common
+version: 0.94a-21
+commands: tapeout
+
+name: spectemu-x11
+version: 0.94a-21
+commands: xspect
+
+name: spellcast
+version: 1.0-22
+commands: spellcast
+
+name: spread-phy
+version: 1.0.7+dfsg-4
+commands: spread-phy
+
+name: sqlcl-package
+version: 0.1.1
+commands: make-sqlcl-package
+
+name: sqldeveloper-package
+version: 0.5.4
+commands: make-sqldeveloper-package
+
+name: starpu-contrib-tools
+version: 1.3.9+dfsg-1
+commands: starpu_calibrate_bus,starpu_codelet_histo_profile,starpu_codelet_profile,starpu_env,starpu_lp2paje,starpu_machine_display,starpu_mlr_analysis,starpu_mlr_analysis.Rmd,starpu_mpi_comm_matrix.py,starpu_paje_draw_histogram,starpu_paje_draw_histogram.R,starpu_paje_state_stats,starpu_paje_state_stats.R,starpu_paje_summary,starpu_paje_summary.Rmd,starpu_perfmodel_display,starpu_perfmodel_plot,starpu_perfmodel_recdump,starpu_sched_display,starpu_tasks_rec_complete,starpu_temanejo2.sh,starpu_trace_state_stats.py,starpu_workers_activity
+
+name: submux-dvd
+version: 0.5.2-0ubuntu2
+commands: submux-dvd,vob2sub
+
+name: svtools
+version: 0.6-5
+commands: mlcat,mlhead,mltac,mltail,svdir,svinfo,svinitd,svinitd-create,svsetup
+
+name: tegrarcm
+version: 1.8-2
+commands: tegrarcm
+
+name: testu01-bin
+version: 1.2.3+ds1-1
+commands: testu01-tcode
+
+name: thawab
+version: 4.1-2
+commands: thawab-gtk,thawab-server
+
+name: tiemu
+version: 3.04~git20110801-nogdb+dfsg1-2build1
+commands: tiemu
+
+name: tightvnc-java
+version: 1.3.10-2
+commands: jtightvncviewer
+
+name: titantools
+version: 4.0.11+notdfsg1-6
+commands: noshell,runas
+
+name: tome
+version: 2.41-ah~0.git.20200131-1ubuntu1
+commands: tome-gcu,tome-gtk2,tome-x11
+
+name: translate-shell
+version: 0.9.6.12-1
+commands: trans
+
+name: treeview
+version: 1.2.0+dfsg-1
+commands: treeview
+
+name: triangle-bin
+version: 1.6-4
+commands: showme,triangle,tricall
+
+name: trn4
+version: 4.0-test77-14
+commands: Pnews,Rnmail,nntplist,rn,trn,trn-artchk,trn4
+
+name: trnascan-se
+version: 2.0.9+ds-1
+commands: EukHighConfidenceFilter,covels-SE,coves-SE,eufindtRNA,fasta2gsi,sstofa,tRNAscan-SE,trnascan-1.4
+
+name: ugene
+version: 34.0+dfsg-2
+commands: ugene
+
+name: uhexen2
+version: 1.5.9+dfsg-1
+commands: glhexen2,glhwcl,h2ded,h2patch,hcc,hexen2,hwcl,hwmaster,hwsv
+
+name: unace-nonfree
+version: 2.5-9
+commands: unace
+
+name: unrar
+version: 1:6.1.5-1
+commands: unrar,unrar-nonfree
+
+name: uqm
+version: 0.6.2.dfsg-9.7
+commands: uqm
+
+name: uqm-russian
+version: 1.0.2-6
+commands: uqm_russian
+
+name: varscan
+version: 2.4.3+dfsg-4
+commands: varscan
+
+name: vcmi
+version: 0.99+dfsg+git20190113.f06c8a87-2build1
+commands: vcmibuilder,vcmiclient,vcmilauncher,vcmiserver
+
+name: vdjtools
+version: 1.2.1+git20190311-6
+commands: vdjtools
+
+name: vice
+version: 3.6.1+dfsg-2
+commands: c1541,cartconv,petcat,vsid,x128,x64,x64dtv,x64sc,xcbm2,xcbm5x0,xpet,xplus4,xscpu64,xvic
+
+name: videotrans
+version: 1.6.1-8
+commands: movie-compare-dvd,movie-fakewavspeed,movie-make-title,movie-make-title-simple,movie-progress,movie-rip-epg.data,movie-title,movie-to-dvd,movie-zoomcalc
+
+name: vienna-rna
+version: 2.4.17+dfsg-2build2
+commands: AnalyseDists,AnalyseSeqs,Kinfold,RNA2Dfold,RNALalifold,RNALfold,RNAPKplex,RNAaliduplex,RNAalifold,RNAcofold,RNAdistance,RNAdos,RNAduplex,RNAeval,RNAfold,RNAheat,RNAinverse,RNAlocmin,RNApaln,RNAparconv,RNApdist,RNAplex,RNAplfold,RNAplot,RNApvmin,RNAsnoop,RNAsubopt,RNAup,b2ct,ct2db,popt
+
+name: virtualbox
+version: 6.1.32-dfsg-1build1
+commands: VBoxBalloonCtrl,VBoxHeadless,VBoxManage,VBoxSDL,rdesktop-vrdp,vbox-img,vboxballoonctrl,vboxheadless,vboximg-mount,vboxmanage,vboxsdl,vboxwebsrv
+
+name: virtualbox-guest-utils
+version: 6.1.32-dfsg-1build1
+commands: VBoxControl,VBoxService,mount.vboxsf
+
+name: virtualbox-guest-utils-hwe
+version: 6.1.34-dfsg-1ubuntu1.22.04.1
+commands: VBoxControl,VBoxService,mount.vboxsf
+
+name: virtualbox-guest-x11
+version: 6.1.32-dfsg-1build1
+commands: VBoxClient
+
+name: virtualbox-guest-x11-hwe
+version: 6.1.34-dfsg-1ubuntu1.22.04.1
+commands: VBoxClient
+
+name: virtualbox-qt
+version: 6.1.32-dfsg-1build1
+commands: VirtualBox,VirtualBoxVM,virtualbox,virtualboxvm
+
+name: vmware-manager
+version: 0.2.0-4
+commands: vwm
+
+name: wap-wml-tools
+version: 0.0.4-7build1
+commands: rdfwml,wbmp2xpm,wmlc,wmld,wmlhtml,wmlv
+
+name: wdq2wav
+version: 1.0.0-1.1build1
+commands: wdq2wav
+
+name: weirdx
+version: 1.0.32-8
+commands: weirdx
+
+name: wolf4sdl
+version: 1.7+svn262+dfsg1-5build1
+commands: wolf4sdl,wolf4sdl-sdm,wolf4sdl-sod,wolf4sdl-wl1,wolf4sdl-wl6,wolf4sdl-wl6a,wolf4sdl-wl6a1
+
+name: x13as
+version: 1.1-b58-1
+commands: x13as
+
+name: xfractint
+version: 20.4.10-2.1
+commands: xfractint
+
+name: xml2rfc
+version: 3.12.2-1
+commands: xml2rfc
+
+name: xsnow
+version: 1:3.3.2-1
+commands: xsnow
+
+name: xtrs
+version: 4.9d-2build1
+commands: cassette,cmddump,hex2cmd,mkdisk,xtrs
+
+name: xvid4conf
+version: 1.12-dmo2ubuntu2
+commands: xvid4conf
+
+name: xvidenc
+version: 8.4.3~dfsg-0ubuntu1
+commands: xvidenc
+
+name: ydpdict
+version: 1.0.3-1
+commands: ydpdict
+
+name: zangband
+version: 1:2.7.5pre1-13
+commands: zangband
+

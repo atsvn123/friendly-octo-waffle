@@ -1,0 +1,17 @@
+/.
+/usr
+/usr/bin
+/usr/share
+/usr/share/doc
+/usr/share/doc/lld
+/usr/share/doc/lld/NEWS.Debian.gz
+/usr/share/doc/lld/changelog.gz
+/usr/share/doc/lld/copyright
+/usr/share/man
+/usr/share/man/man1
+/usr/bin/ld.lld
+/usr/bin/lld
+/usr/bin/lld-link
+/usr/bin/wasm-ld
+/usr/share/man/man1/ld.lld.1.gz
+/usr/share/man/man1/lld.1.gz

@@ -1,0 +1,32 @@
+# ── Original proprietary binaries ──────────────────────────────────────────
+# These are extracted from a commercial app and must never be committed.
+extracted/
+VCAM VIP.deb
+*.deb
+
+# ── Theos framework ─────────────────────────────────────────────────────────
+# Public project; each machine installs it independently via the Theos setup script.
+theos/
+
+# ── Theos build cache and output ────────────────────────────────────────────
+VCAMVIP_theos/.theos/
+VCAMVIP_theos/packages/
+
+# ── Stale versioned build scripts ───────────────────────────────────────────
+# Only build.sh (the current script) is meaningful; old build_vXXX.sh are noise.
+build_v*.sh
+
+# ── Server live data ────────────────────────────────────────────────────────
+vcam-server/data/users.json
+vcam-server/vcam-server.zip
+vcam-server/.env
+vcam-server/node_modules/
+
+# ── Snapshots (compiled binary archives) ────────────────────────────────────
+VCAM SNAPSHOTS/
+
+# ── OS / editor junk ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp

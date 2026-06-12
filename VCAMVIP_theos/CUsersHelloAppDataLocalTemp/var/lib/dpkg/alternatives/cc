@@ -1,0 +1,12 @@
+auto
+/usr/bin/cc
+cc.1.gz
+/usr/share/man/man1/cc.1.gz
+
+/usr/bin/clang
+10
+
+/usr/bin/gcc
+20
+/usr/share/man/man1/gcc.1.gz
+

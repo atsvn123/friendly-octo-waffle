@@ -1,0 +1,64 @@
+#!/bin/sh
+
+set -e
+
+remove_apt_files() {
+    /usr/bin/python3 -c '
+from uaclient.apt import clean_apt_files
+
+clean_apt_files()
+'
+
+}
+
+case "$1" in
+    purge|remove)
+        remove_apt_files
+        ;;
+esac
+
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/ubuntu-advantage/help_data.yaml 30~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/update-motd.d/88-esm-announce 27.14~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/init/ua-auto-attach.conf 20.2~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/cron.daily/ubuntu-advantage-tools 19.1~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/update-motd.d/80-livepatch 19.1~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/update-motd.d/80-esm 19.1~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/update-motd.d/99-esm 19.1~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+# Automatically added by dh_systemd_start/13.6ubuntu1
+if [ -z "${DPKG_ROOT:-}" ] && [ -d /run/systemd/system ]; then
+	deb-systemd-invoke stop 'ubuntu-advantage.service' >/dev/null || true
+fi
+# End automatically added section
+# Automatically added by dh_systemd_start/13.6ubuntu1
+if [ -z "${DPKG_ROOT:-}" ] && [ -d /run/systemd/system ]; then
+	deb-systemd-invoke stop 'ua-timer.timer' >/dev/null || true
+fi
+# End automatically added section
+
+# Automatically added by dh_python3
+if command -v py3clean >/dev/null 2>&1; then
+	py3clean -p ubuntu-advantage-tools:amd64 
+else
+	dpkg -L ubuntu-advantage-tools:amd64 | perl -ne 's,/([^/]*)\.py$,/__pycache__/\1.*, or next; unlink $_ or die $! foreach glob($_)'
+	find /usr/lib/python3/dist-packages/ -type d -name __pycache__ -empty -print0 | xargs --null --no-run-if-empty rmdir
+fi
+
+# End automatically added section
+
+
+exit 0
+

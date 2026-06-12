@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -e
+
+if test "$1" = "remove"; then
+    if command -v update-binfmts >/dev/null; then
+        update-binfmts --package llvm-14-runtime \
+            --remove llvm-14-runtime.binfmt /usr/bin/lli-14 || true
+        if test -f /var/lib/binfmts/llvm-14.binfmt; then
+            # Purge old file
+            update-binfmts --package llvm-14-runtime \
+                --remove llvm-14.binfmt /usr/bin/lli-14 || true
+        fi
+    fi
+fi
+
+
+

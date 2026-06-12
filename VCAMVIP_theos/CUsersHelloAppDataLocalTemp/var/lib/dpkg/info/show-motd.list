@@ -1,0 +1,10 @@
+/.
+/etc
+/etc/profile.d
+/etc/profile.d/update-motd.sh
+/usr
+/usr/share
+/usr/share/doc
+/usr/share/doc/show-motd
+/usr/share/doc/show-motd/copyright
+/usr/share/doc/show-motd/changelog.gz

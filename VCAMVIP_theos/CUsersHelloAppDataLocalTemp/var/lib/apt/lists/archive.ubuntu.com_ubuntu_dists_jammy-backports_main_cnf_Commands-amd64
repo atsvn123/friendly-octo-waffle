@@ -1,0 +1,37 @@
+suite: jammy-backports
+component: main
+arch: amd64
+
+
+name: elfutils
+version: 0.188-1~bpo22.04.1
+commands: eu-addr2line,eu-ar,eu-elfclassify,eu-elfcmp,eu-elfcompress,eu-elflint,eu-findtextrel,eu-make-debug-archive,eu-nm,eu-objdump,eu-ranlib,eu-readelf,eu-size,eu-stack,eu-strings,eu-strip,eu-unstrip
+
+name: libreoffice-calc
+version: 4:25.8.6-0ubuntu0.25.10.1~bpo22.04.1
+commands: localc
+
+name: libreoffice-common
+version: 4:25.8.6-0ubuntu0.25.10.1~bpo22.04.1
+commands: libreoffice,loffice,lofromtemplate,soffice,unopkg
+
+name: libreoffice-draw
+version: 4:25.8.6-0ubuntu0.25.10.1~bpo22.04.1
+commands: lodraw
+
+name: libreoffice-impress
+version: 4:25.8.6-0ubuntu0.25.10.1~bpo22.04.1
+commands: loimpress
+
+name: libreoffice-math
+version: 4:25.8.6-0ubuntu0.25.10.1~bpo22.04.1
+commands: lomath
+
+name: libreoffice-writer
+version: 4:25.8.6-0ubuntu0.25.10.1~bpo22.04.1
+commands: loweb,lowriter
+
+name: openvpn
+version: 2.6.12-0ubuntu0.24.04.3~bpo22.04.1
+commands: openvpn
+

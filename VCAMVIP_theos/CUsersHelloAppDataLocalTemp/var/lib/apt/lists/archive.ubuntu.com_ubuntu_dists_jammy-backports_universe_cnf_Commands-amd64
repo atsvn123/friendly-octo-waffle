@@ -1,0 +1,65 @@
+suite: jammy-backports
+component: universe
+arch: amd64
+
+
+name: borgmatic
+version: 1.7.9-0ubuntu1~bpo22.04.1
+commands: borgmatic,generate-borgmatic-config,upgrade-borgmatic-config,validate-borgmatic-config
+
+name: carla
+version: 2.5.8-0ubuntu1~bpo22.04.1
+commands: carla,carla-control,carla-database,carla-jack-multi,carla-jack-patchbayplugin,carla-jack-single,carla-osc-gui,carla-patchbay,carla-rack,carla-settings,carla-single
+
+name: cockpit-bridge
+version: 360-1~bpo22.04.1
+commands: cockpit-bridge
+
+name: debuginfod
+version: 0.188-1~bpo22.04.1
+commands: debuginfod,debuginfod-find
+
+name: emacs-mozc-bin
+version: 2.28.4715.102+dfsg-2.2~bpo22.04.1
+commands: mozc_emacs_helper
+
+name: gallery-dl
+version: 1.28.5-1~bpo22.04.1
+commands: gallery-dl
+
+name: libreoffice-base
+version: 4:25.8.6-0ubuntu0.25.10.1~bpo22.04.1
+commands: lobase
+
+name: limnoria
+version: 2024.8.26-1~bpo22.04.1
+commands: limnoria,limnoria-adduser,limnoria-botchk,limnoria-plugin-create,limnoria-plugin-doc,limnoria-reset-password,limnoria-test,limnoria-wizard,supybot,supybot-adduser,supybot-botchk,supybot-plugin-create,supybot-plugin-doc,supybot-reset-password,supybot-test,supybot-wizard
+
+name: nala
+version: 0.11.1~bpo22.04.1
+commands: nala
+
+name: opencpn
+version: 5.6.2+dfsg-1~bpo22.04.1
+commands: opencpn
+
+name: rednotebook
+version: 2.29.6+ds-2~bpo22.04.1
+commands: rednotebook
+
+name: rpki-client
+version: 9.0-1~bpo22.04.1
+commands: rpki-client
+
+name: studio-controls
+version: 2.3.9-0ubuntu2~bpo22.04.1
+commands: autojack,studio-cmd,studio-controls,studio-system
+
+name: xca
+version: 2.6.0-1~bpo22.04.1
+commands: xca
+
+name: yt-dlp
+version: 2025.07.21-1~bpo22.04.1
+commands: yt-dlp
+

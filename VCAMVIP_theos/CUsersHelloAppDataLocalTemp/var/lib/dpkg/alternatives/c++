@@ -1,0 +1,12 @@
+auto
+/usr/bin/c++
+c++.1.gz
+/usr/share/man/man1/c++.1.gz
+
+/usr/bin/clang++
+10
+
+/usr/bin/g++
+20
+/usr/share/man/man1/g++.1.gz
+

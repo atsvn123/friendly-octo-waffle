@@ -1,0 +1,4668 @@
+suite: jammy-security
+component: universe
+arch: amd64
+
+
+name: 2to3
+version: 3.10.6-1~22.04
+commands: 2to3
+
+name: activemq
+version: 5.16.1-1ubuntu0.1
+commands: activemq
+
+name: aerc
+version: 0.8.2-1ubuntu0.3
+commands: aerc
+
+name: age
+version: 1.0.0-1ubuntu0.1
+commands: age,age-keygen
+
+name: alertmanager-irc-relay
+version: 0.4.2-1ubuntu0.22.04.1
+commands: alertmanager-irc-relay
+
+name: amanda-client
+version: 1:3.5.1-8ubuntu1.4
+commands: amfetchdump,amoldrecover,amrecover,amrestore
+
+name: amanda-common
+version: 1:3.5.1-8ubuntu1.4
+commands: amaddclient,amaespipe,amarchiver,amcrypt,amcrypt-ossl,amcrypt-ossl-asym,amcryptsimple,amdevcheck,amdump_client,amgpgcrypt,amserverconfig,amservice,amvault
+
+name: amanda-server
+version: 1:3.5.1-8ubuntu1.4
+commands: activate-devpay,amadmin,amanda-rest-server,ambackup,amcheck,amcheckdb,amcheckdump,amcleanup,amcleanupdisk,amdump,amflush,amgetconf,amlabel,amoverview,amplot,amreindex,amreport,amrmtape,amssl,amstatus,amtape,amtapetype,amtoc
+
+name: amazon-ecr-credential-helper
+version: 0.5.0-1ubuntu0.1
+commands: docker-credential-ecr-login
+
+name: amfora
+version: 1.9.2-2ubuntu0.22.04.3
+commands: amfora
+
+name: anacrolix-dms
+version: 1.1.0-2ubuntu0.1
+commands: dms
+
+name: aom-tools
+version: 3.3.0-1ubuntu0.1
+commands: aomdec,aomenc
+
+name: apkverifier
+version: 0.0~git20191015.7330a51-6.1ubuntu3.22.04.2
+commands: apkverifier
+
+name: apparmor-notify
+version: 3.0.4-2ubuntu2.4
+commands: aa-notify
+
+name: apport-valgrind
+version: 2.20.11-0ubuntu82.10
+commands: apport-valgrind
+
+name: aptly
+version: 1.4.0+ds1-6ubuntu0.2
+commands: aptly
+
+name: atftp
+version: 0.7.git20210915-4build1
+commands: atftp
+
+name: atftpd
+version: 0.7.git20210915-4build1
+commands: atftpd,in.tftpd
+
+name: atril
+version: 1.26.0-1ubuntu1.2
+commands: atril,atril-previewer,atril-thumbnailer
+
+name: audiofile-tools
+version: 0.3.6-5+deb10u1build0.22.04.1
+commands: sfconvert,sfinfo
+
+name: avahi-discover
+version: 0.8-5ubuntu5.5
+commands: avahi-discover
+
+name: avahi-dnsconfd
+version: 0.8-5ubuntu5.5
+commands: avahi-dnsconfd
+
+name: avahi-ui-utils
+version: 0.8-5ubuntu5.5
+commands: bshell,bssh,bvnc
+
+name: aws-nuke
+version: 2.16.0-1ubuntu0.22.04.1
+commands: aws-nuke
+
+name: backintime-common
+version: 1.2.1-3ubuntu0.3
+commands: backintime,backintime-askpass
+
+name: backintime-qt
+version: 1.2.1-3ubuntu0.3
+commands: backintime-qt,backintime-qt_polkit
+
+name: badger
+version: 2.2007.2-3ubuntu0.22.04.1
+commands: badger
+
+name: balboa
+version: 2.0.0+ds-4ubuntu0.22.04.3
+commands: balboa
+
+name: balboa-backend-common
+version: 2.0.0+ds-4ubuntu0.22.04.3
+commands: balboa-backend-console
+
+name: balboa-backend-rocksdb
+version: 2.0.0+ds-4ubuntu0.22.04.3
+commands: balboa-rocksdb
+
+name: balloon
+version: 1.1.1-2ubuntu0.22.04.1
+commands: balloon
+
+name: bash-static
+version: 5.1-6ubuntu1.1
+commands: bash-static
+
+name: bat
+version: 0.19.0-1ubuntu0.1
+commands: batcat
+
+name: bettercap
+version: 2.32.0-1ubuntu0.22.04.3
+commands: bettercap
+
+name: bindgen
+version: 0.59.1-2ubuntu0.1
+commands: bindgen
+
+name: binutils-alpha-linux-gnu
+version: 2.38-4ubuntu2.12
+commands: alpha-linux-gnu-addr2line,alpha-linux-gnu-ar,alpha-linux-gnu-as,alpha-linux-gnu-c++filt,alpha-linux-gnu-elfedit,alpha-linux-gnu-gprof,alpha-linux-gnu-ld,alpha-linux-gnu-ld.bfd,alpha-linux-gnu-nm,alpha-linux-gnu-objcopy,alpha-linux-gnu-objdump,alpha-linux-gnu-ranlib,alpha-linux-gnu-readelf,alpha-linux-gnu-size,alpha-linux-gnu-strings,alpha-linux-gnu-strip
+
+name: binutils-arm-linux-gnueabi
+version: 2.38-4ubuntu2.12
+commands: arm-linux-gnueabi-addr2line,arm-linux-gnueabi-ar,arm-linux-gnueabi-as,arm-linux-gnueabi-c++filt,arm-linux-gnueabi-dwp,arm-linux-gnueabi-elfedit,arm-linux-gnueabi-gprof,arm-linux-gnueabi-ld,arm-linux-gnueabi-ld.bfd,arm-linux-gnueabi-ld.gold,arm-linux-gnueabi-nm,arm-linux-gnueabi-objcopy,arm-linux-gnueabi-objdump,arm-linux-gnueabi-ranlib,arm-linux-gnueabi-readelf,arm-linux-gnueabi-size,arm-linux-gnueabi-strings,arm-linux-gnueabi-strip
+
+name: binutils-hppa-linux-gnu
+version: 2.38-4ubuntu2.12
+commands: hppa-linux-gnu-addr2line,hppa-linux-gnu-ar,hppa-linux-gnu-as,hppa-linux-gnu-c++filt,hppa-linux-gnu-elfedit,hppa-linux-gnu-gprof,hppa-linux-gnu-ld,hppa-linux-gnu-ld.bfd,hppa-linux-gnu-nm,hppa-linux-gnu-objcopy,hppa-linux-gnu-objdump,hppa-linux-gnu-ranlib,hppa-linux-gnu-readelf,hppa-linux-gnu-size,hppa-linux-gnu-strings,hppa-linux-gnu-strip
+
+name: binutils-hppa64-linux-gnu
+version: 2.38-4ubuntu2.12
+commands: hppa64-linux-gnu-addr2line,hppa64-linux-gnu-ar,hppa64-linux-gnu-as,hppa64-linux-gnu-c++filt,hppa64-linux-gnu-elfedit,hppa64-linux-gnu-gprof,hppa64-linux-gnu-ld,hppa64-linux-gnu-ld.bfd,hppa64-linux-gnu-nm,hppa64-linux-gnu-objcopy,hppa64-linux-gnu-objdump,hppa64-linux-gnu-ranlib,hppa64-linux-gnu-readelf,hppa64-linux-gnu-size,hppa64-linux-gnu-strings,hppa64-linux-gnu-strip
+
+name: binutils-ia64-linux-gnu
+version: 2.38-4ubuntu2.12
+commands: ia64-linux-gnu-addr2line,ia64-linux-gnu-ar,ia64-linux-gnu-as,ia64-linux-gnu-c++filt,ia64-linux-gnu-elfedit,ia64-linux-gnu-gprof,ia64-linux-gnu-ld,ia64-linux-gnu-ld.bfd,ia64-linux-gnu-nm,ia64-linux-gnu-objcopy,ia64-linux-gnu-objdump,ia64-linux-gnu-ranlib,ia64-linux-gnu-readelf,ia64-linux-gnu-size,ia64-linux-gnu-strings,ia64-linux-gnu-strip
+
+name: binutils-m68k-linux-gnu
+version: 2.38-4ubuntu2.12
+commands: m68k-linux-gnu-addr2line,m68k-linux-gnu-ar,m68k-linux-gnu-as,m68k-linux-gnu-c++filt,m68k-linux-gnu-elfedit,m68k-linux-gnu-gprof,m68k-linux-gnu-ld,m68k-linux-gnu-ld.bfd,m68k-linux-gnu-nm,m68k-linux-gnu-objcopy,m68k-linux-gnu-objdump,m68k-linux-gnu-ranlib,m68k-linux-gnu-readelf,m68k-linux-gnu-size,m68k-linux-gnu-strings,m68k-linux-gnu-strip
+
+name: binutils-powerpc64-linux-gnu
+version: 2.38-4ubuntu2.12
+commands: powerpc64-linux-gnu-addr2line,powerpc64-linux-gnu-ar,powerpc64-linux-gnu-as,powerpc64-linux-gnu-c++filt,powerpc64-linux-gnu-dwp,powerpc64-linux-gnu-elfedit,powerpc64-linux-gnu-gprof,powerpc64-linux-gnu-ld,powerpc64-linux-gnu-ld.bfd,powerpc64-linux-gnu-ld.gold,powerpc64-linux-gnu-nm,powerpc64-linux-gnu-objcopy,powerpc64-linux-gnu-objdump,powerpc64-linux-gnu-ranlib,powerpc64-linux-gnu-readelf,powerpc64-linux-gnu-size,powerpc64-linux-gnu-strings,powerpc64-linux-gnu-strip
+
+name: binutils-sh4-linux-gnu
+version: 2.38-4ubuntu2.12
+commands: sh4-linux-gnu-addr2line,sh4-linux-gnu-ar,sh4-linux-gnu-as,sh4-linux-gnu-c++filt,sh4-linux-gnu-elfedit,sh4-linux-gnu-gprof,sh4-linux-gnu-ld,sh4-linux-gnu-ld.bfd,sh4-linux-gnu-nm,sh4-linux-gnu-objcopy,sh4-linux-gnu-objdump,sh4-linux-gnu-ranlib,sh4-linux-gnu-readelf,sh4-linux-gnu-size,sh4-linux-gnu-strings,sh4-linux-gnu-strip
+
+name: binutils-sparc64-linux-gnu
+version: 2.38-4ubuntu2.12
+commands: sparc64-linux-gnu-addr2line,sparc64-linux-gnu-ar,sparc64-linux-gnu-as,sparc64-linux-gnu-c++filt,sparc64-linux-gnu-dwp,sparc64-linux-gnu-elfedit,sparc64-linux-gnu-gprof,sparc64-linux-gnu-ld,sparc64-linux-gnu-ld.bfd,sparc64-linux-gnu-ld.gold,sparc64-linux-gnu-nm,sparc64-linux-gnu-objcopy,sparc64-linux-gnu-objdump,sparc64-linux-gnu-ranlib,sparc64-linux-gnu-readelf,sparc64-linux-gnu-size,sparc64-linux-gnu-strings,sparc64-linux-gnu-strip
+
+name: bluez-hcidump
+version: 5.64-0ubuntu1.4
+commands: hcidump
+
+name: bluez-meshd
+version: 5.64-0ubuntu1.4
+commands: mesh-cfgclient,meshctl
+
+name: bluez-tests
+version: 5.64-0ubuntu1.4
+commands: b1ee,bnep-tester,btvirt,gap-tester,hci-tester,hfp,l2cap-tester,mgmt-tester,rfcomm-tester,sco-tester,smp-tester,userchan-tester
+
+name: bombadillo
+version: 2.3.3-3ubuntu0.1
+commands: bombadillo
+
+name: booth
+version: 1.0-237-gdd88847-4ubuntu2.2
+commands: booth,booth-keygen,boothd,geostore
+
+name: breeze
+version: 4:5.24.7-0ubuntu0.2
+commands: breeze-settings5
+
+name: budgie-extras-daemon
+version: 1.4.0-1ubuntu3.1
+commands: budgie-extras-daemon
+
+name: budgie-quickchar
+version: 1.4.0-1ubuntu3.1
+commands: quickchar
+
+name: burrow
+version: 1.2.1-2ubuntu0.22.04.3
+commands: Burrow
+
+name: busybox
+version: 1:1.30.1-7ubuntu3.1
+commands: busybox
+
+name: c2go
+version: 0.26.10-1ubuntu0.22.04.1
+commands: c2go
+
+name: caca-utils
+version: 0.99.beta19-2.2ubuntu4.2
+commands: cacaclock,cacademo,cacafire,cacaplay,cacaserver,cacaview,img2txt
+
+name: cairo-perf-utils
+version: 1.16.0-5ubuntu2.1
+commands: cairo-analyse-trace,cairo-perf-chart,cairo-perf-compare-backends,cairo-perf-diff-files,cairo-perf-micro,cairo-perf-print,cairo-perf-trace,cairo-trace
+
+name: calamares-settings-lubuntu
+version: 1:22.04.4.3
+commands: calamares-logs-helper
+
+name: calamares-settings-ubuntustudio
+version: 1:22.04.4.3
+commands: calamares-logs-helper
+
+name: cargo
+version: 1.75.0+dfsg0ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: cargo
+
+name: cargo-1.76
+version: 1.76.0+dfsg0ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: cargo-1.76
+
+name: cargo-1.77
+version: 1.77.2+dfsg1ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: cargo-1.77
+
+name: cargo-1.78
+version: 1.78.0+dfsg1ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: cargo-1.78
+
+name: cargo-1.79
+version: 1.79.0+dfsg1ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: cargo-1.79
+
+name: cargo-1.80
+version: 1.80.1+dfsg0ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: cargo-1.80
+
+name: cargo-1.81
+version: 1.81.0+dfsg0ubuntu0-0ubuntu0.22.04.1
+commands: cargo-1.81
+
+name: cargo-1.82
+version: 1.82.0+dfsg0ubuntu0~jammy-0ubuntu0.22.04.1
+commands: cargo-1.82
+
+name: cargo-1.83
+version: 1.83.0+dfsg0ubuntu2~bpo2-0ubuntu2.22.04.1
+commands: cargo-1.83
+
+name: cargo-1.84
+version: 1.84.1+dfsg0ubuntu1~bpo10-0ubuntu4.22.04.1
+commands: cargo-1.84
+
+name: cargo-1.85
+version: 1.85.1+dfsg0ubuntu2~bpo0-0ubuntu1.22.04.1
+commands: cargo-1.85
+
+name: cargo-1.89
+version: 1.89.0+dfsg~24.04-0ubuntu0.22.04.2
+commands: cargo-1.89
+
+name: cargo-1.91
+version: 1.91.1+dfsg~22.04-0ubuntu0.22.04.3
+commands: cargo-1.91
+
+name: ceph-fuse
+version: 17.2.9-0ubuntu0.22.04.2
+commands: ceph-fuse,mount.fuse.ceph
+
+name: ceph-immutable-object-cache
+version: 17.2.9-0ubuntu0.22.04.2
+commands: ceph-immutable-object-cache
+
+name: cephadm
+version: 17.2.9-0ubuntu0.22.04.2
+commands: cephadm
+
+name: cephfs-shell
+version: 17.2.9-0ubuntu0.22.04.2
+commands: cephfs-shell
+
+name: certinfo
+version: 1.0.6+ds1-2ubuntu0.22.04.1
+commands: certinfo
+
+name: certspotter
+version: 0.10-1ubuntu0.22.04.3
+commands: certspotter,submitct
+
+name: charon-cmd
+version: 5.9.5-2ubuntu2.7
+commands: charon-cmd
+
+name: charon-systemd
+version: 5.9.5-2ubuntu2.7
+commands: charon-systemd
+
+name: chasquid
+version: 1.8-1ubuntu0.3
+commands: chasquid,chasquid-util,mda-lmtp,smtp-check
+
+name: clamav-milter
+version: 1.4.4+dfsg-0ubuntu0.22.04.1
+commands: clamav-milter
+
+name: clang-13
+version: 1:13.0.1-2ubuntu2.2
+commands: asan_symbolize-13,clang++-13,clang-13,clang-cpp-13
+
+name: clang-14
+version: 1:14.0.0-1ubuntu1.1
+commands: asan_symbolize-14,clang++-14,clang-14,clang-cpp-14
+
+name: clang-format-13
+version: 1:13.0.1-2ubuntu2.2
+commands: clang-format-13,clang-format-diff-13,git-clang-format-13
+
+name: clang-format-14
+version: 1:14.0.0-1ubuntu1.1
+commands: clang-format-14,clang-format-diff-14,git-clang-format-14
+
+name: clang-tidy-13
+version: 1:13.0.1-2ubuntu2.2
+commands: clang-tidy-13,clang-tidy-diff-13.py,run-clang-tidy-13,run-clang-tidy-13.py
+
+name: clang-tidy-14
+version: 1:14.0.0-1ubuntu1.1
+commands: clang-tidy-14,clang-tidy-diff-14.py,run-clang-tidy-14,run-clang-tidy-14.py
+
+name: clang-tools-13
+version: 1:13.0.1-2ubuntu2.2
+commands: analyze-build-13,c-index-test-13,clang-apply-replacements-13,clang-change-namespace-13,clang-check-13,clang-cl-13,clang-doc-13,clang-extdef-mapping-13,clang-include-fixer-13,clang-move-13,clang-offload-bundler-13,clang-offload-wrapper-13,clang-query-13,clang-refactor-13,clang-rename-13,clang-reorder-fields-13,clang-repl-13,clang-scan-deps-13,diagtool-13,find-all-symbols-13,hmaptool-13,hwasan_symbolize-13,intercept-build-13,modularize-13,pp-trace-13,sancov-13,scan-build-13,scan-build-py-13,scan-view-13
+
+name: clang-tools-14
+version: 1:14.0.0-1ubuntu1.1
+commands: analyze-build-14,c-index-test-14,clang-apply-replacements-14,clang-change-namespace-14,clang-check-14,clang-cl-14,clang-doc-14,clang-extdef-mapping-14,clang-include-fixer-14,clang-linker-wrapper-14,clang-move-14,clang-nvlink-wrapper-14,clang-offload-bundler-14,clang-offload-wrapper-14,clang-query-14,clang-refactor-14,clang-rename-14,clang-reorder-fields-14,clang-repl-14,clang-scan-deps-14,diagtool-14,find-all-symbols-14,hmaptool-14,hwasan_symbolize-14,intercept-build-14,modularize-14,pp-trace-14,sancov-14,scan-build-14,scan-build-py-14,scan-view-14
+
+name: clangd-13
+version: 1:13.0.1-2ubuntu2.2
+commands: clangd-13
+
+name: clangd-14
+version: 1:14.0.0-1ubuntu1.1
+commands: clangd-14
+
+name: clipman
+version: 1.2.0+git20200218.39fd4fe-2ubuntu0.22.04.1
+commands: clipman
+
+name: cloudsql-proxy
+version: 1.17.0-5ubuntu0.22.04.3
+commands: cloud_sql_proxy
+
+name: cobra
+version: 1.3.0-1ubuntu0.3
+commands: cobra
+
+name: connman
+version: 1.36-2.3ubuntu0.1
+commands: connmanctl,connmand,connmand-wait-online
+
+name: connman-vpn
+version: 1.36-2.3ubuntu0.1
+commands: connman-vpnd
+
+name: containers-storage
+version: 1.36.0+ds1-2ubuntu0.1
+commands: containers-storage
+
+name: corosync-notifyd
+version: 3.1.6-1ubuntu1.2
+commands: corosync-notifyd
+
+name: corosync-vqsim
+version: 3.1.6-1ubuntu1.2
+commands: corosync-vqsim
+
+name: cpp-10
+version: 10.5.0-1ubuntu1~22.04.3
+commands: cpp-10,x86_64-linux-gnu-cpp-10
+
+name: cpp-10-aarch64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-cpp-10
+
+name: cpp-10-alpha-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-cpp-10
+
+name: cpp-10-arm-linux-gnueabi
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-cpp-10
+
+name: cpp-10-arm-linux-gnueabihf
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-cpp-10
+
+name: cpp-10-hppa-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-cpp-10
+
+name: cpp-10-i686-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-cpp-10
+
+name: cpp-10-m68k-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-cpp-10
+
+name: cpp-10-powerpc-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-cpp-10
+
+name: cpp-10-powerpc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-cpp-10
+
+name: cpp-10-powerpc64le-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-cpp-10
+
+name: cpp-10-riscv64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-cpp-10
+
+name: cpp-10-s390x-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-cpp-10
+
+name: cpp-10-sh4-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-cpp-10
+
+name: cpp-10-sparc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-cpp-10
+
+name: cpp-10-x86-64-linux-gnux32
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-cpp-10
+
+name: cpp-11-alpha-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-cpp-11
+
+name: cpp-11-arm-linux-gnueabi
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-cpp-11
+
+name: cpp-11-hppa-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-cpp-11
+
+name: cpp-11-i686-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-cpp-11
+
+name: cpp-11-m68k-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-cpp-11
+
+name: cpp-11-powerpc-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-cpp-11
+
+name: cpp-11-powerpc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-cpp-11
+
+name: cpp-11-riscv64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-cpp-11
+
+name: cpp-11-sh4-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-cpp-11
+
+name: cpp-11-sparc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-cpp-11
+
+name: cpp-11-x86-64-linux-gnux32
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-cpp-11
+
+name: cpp-12-aarch64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-cpp-12
+
+name: cpp-12-alpha-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-cpp-12
+
+name: cpp-12-arm-linux-gnueabi
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-cpp-12
+
+name: cpp-12-arm-linux-gnueabihf
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-cpp-12
+
+name: cpp-12-hppa-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-cpp-12
+
+name: cpp-12-i686-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-cpp-12
+
+name: cpp-12-m68k-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-cpp-12
+
+name: cpp-12-powerpc-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-cpp-12
+
+name: cpp-12-powerpc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-cpp-12
+
+name: cpp-12-powerpc64le-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-cpp-12
+
+name: cpp-12-riscv64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-cpp-12
+
+name: cpp-12-s390x-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-cpp-12
+
+name: cpp-12-sh4-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-cpp-12
+
+name: cpp-12-sparc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-cpp-12
+
+name: cpp-12-x86-64-linux-gnux32
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-cpp-12
+
+name: cpp-9
+version: 9.5.0-1ubuntu1~22.04.1
+commands: cpp-9,x86_64-linux-gnu-cpp-9
+
+name: cpp-9-aarch64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: aarch64-linux-gnu-cpp-9
+
+name: cpp-9-alpha-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-cpp-9
+
+name: cpp-9-arm-linux-gnueabi
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabi-cpp-9
+
+name: cpp-9-arm-linux-gnueabihf
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabihf-cpp-9
+
+name: cpp-9-hppa-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-cpp-9
+
+name: cpp-9-i686-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: i686-linux-gnu-cpp-9
+
+name: cpp-9-m68k-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-cpp-9
+
+name: cpp-9-powerpc-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc-linux-gnu-cpp-9
+
+name: cpp-9-powerpc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-cpp-9
+
+name: cpp-9-powerpc64le-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc64le-linux-gnu-cpp-9
+
+name: cpp-9-riscv64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-cpp-9
+
+name: cpp-9-s390x-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: s390x-linux-gnu-cpp-9
+
+name: cpp-9-sh4-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-cpp-9
+
+name: cpp-9-sparc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-cpp-9
+
+name: cpp-9-x86-64-linux-gnux32
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-cpp-9
+
+name: crimson-osd
+version: 17.2.9-0ubuntu0.22.04.2
+commands: crimson-osd
+
+name: ctdb
+version: 2:4.15.13+dfsg-0ubuntu1.12
+commands: ctdb,ctdb_diagnostics,ctdbd,ctdbd_wrapper,ltdbtool,onnode,ping_pong
+
+name: cyrus-admin
+version: 3.4.3-3ubuntu0.3
+commands: cyradm,installsieve,sieveshell
+
+name: cyrus-common
+version: 3.4.3-3ubuntu0.3
+commands: cyrdeliver,cyrmaster,cyrus
+
+name: dataurl
+version: 0.0~git20191104.d1553a7-1.1ubuntu0.22.04.1
+commands: dataurl
+
+name: dbus-tests
+version: 1.12.20-2ubuntu4.1
+commands: dbus-test-tool
+
+name: debcargo
+version: 2.5.0-2ubuntu0.2
+commands: debcargo
+
+name: debuginfod
+version: 0.186-1ubuntu0.1
+commands: debuginfod,debuginfod-find
+
+name: deck
+version: 1.4.0-1ubuntu0.20.04.3
+commands: deck
+
+name: delve
+version: 1.8.1-1ubuntu0.1
+commands: dlv
+
+name: devhelp
+version: 41.2-2ubuntu1
+commands: devhelp
+
+name: dfrs
+version: 0.0.7-2ubuntu0.1
+commands: dfrs
+
+name: dh-apparmor
+version: 3.0.4-2ubuntu2.4
+commands: dh_apparmor
+
+name: dh-apport
+version: 2.20.11-0ubuntu82.10
+commands: dh_apport
+
+name: dh-make-golang
+version: 0.6.0-1ubuntu0.1
+commands: dh-make-golang
+
+name: dh-modaliases
+version: 1:0.9.6.2~0.22.04.8
+commands: dh_modaliases
+
+name: djvulibre-bin
+version: 3.5.28-2ubuntu0.22.04.2
+commands: any2djvu,bzz,c44,cjb2,cpaldjvu,csepdjvu,ddjvu,djvm,djvmcvt,djvudigital,djvudump,djvuextract,djvumake,djvups,djvused,djvutoxml,djvutxt,djvuxmlparser
+
+name: djvuserve
+version: 3.5.28-2ubuntu0.22.04.2
+commands: djvuserve
+
+name: dnsmasq-base-lua
+version: 2.90-0ubuntu0.22.04.3
+commands: dnsmasq
+
+name: dnss
+version: 0.0~git20200927.0.6aad832e-2ubuntu0.3
+commands: dnss
+
+name: docker.io
+version: 29.1.3-0ubuntu3~22.04.2
+commands: docker,docker-init,docker-proxy,dockerd
+
+name: dotnet-host-7.0
+version: 7.0.119-0ubuntu1~22.04.1
+commands: dotnet
+
+name: douceur
+version: 0.2.0-3ubuntu0.22.04.1
+commands: douceur
+
+name: dovecot-sieve
+version: 1:2.3.16+dfsg1-3ubuntu2.9
+commands: sieve-dump,sieve-filter,sieve-test,sievec
+
+name: doxygen2man
+version: 2.0.4-1ubuntu0.2
+commands: doxygen2man
+
+name: dpdk-dev
+version: 21.11.9-0ubuntu0.22.04.2
+commands: dpdk-dumpcap,dpdk-pdump,dpdk-proc-info,dpdk-telemetry.py,dpdk-test,dpdk-test-acl,dpdk-test-bbdev,dpdk-test-cmdline,dpdk-test-compress-perf,dpdk-test-crypto-perf,dpdk-test-eventdev,dpdk-test-fib,dpdk-test-flow-perf,dpdk-test-gpudev,dpdk-test-pipeline,dpdk-test-regex,dpdk-test-sad,dpdk-testpmd
+
+name: dropbear-bin
+version: 2020.81-5ubuntu0.1
+commands: dbclient,dropbear,dropbearconvert,dropbearkey
+
+name: duende
+version: 2.0.13-1.4+deb11u1build0.22.04.1
+commands: duende
+
+name: duf
+version: 0.6.2-1ubuntu0.1
+commands: duf
+
+name: e2fsck-static
+version: 1.46.5-2ubuntu1.1
+commands: e2fsck.static
+
+name: eapoltest
+version: 2:2.10-6ubuntu2.2
+commands: eapol_test
+
+name: easygen
+version: 5.1.9-2ubuntu0.22.04.3
+commands: easygen
+
+name: ecdsautils
+version: 0.3.2+git20151018-2+deb10u1build0.22.04.1
+commands: ecdsakeygen,ecdsasign,ecdsaverify
+
+name: efm-langserver
+version: 0.0.40-1ubuntu0.1
+commands: efm-langserver
+
+name: elan
+version: 1.3.1-3ubuntu0.1
+commands: elan,lean,leanc,leanchecker,leanmake,leanpkg
+
+name: elvish
+version: 0.17.0-1ubuntu0.1
+commands: elvish
+
+name: emacs-bin-common
+version: 1:27.1+1-3ubuntu5.2
+commands: ctags.emacs,ebrowse.emacs,emacsclient.emacs,etags.emacs
+
+name: emacs-gtk
+version: 1:27.1+1-3ubuntu5.2
+commands: editor,emacs,emacs-gtk
+
+name: emacs-lucid
+version: 1:27.1+1-3ubuntu5.2
+commands: editor,emacs,emacs-lucid
+
+name: emacs-nox
+version: 1:27.1+1-3ubuntu5.2
+commands: editor,emacs,emacs-nox
+
+name: epiphany-browser
+version: 42.1-1ubuntu1
+commands: epiphany,epiphany-browser,gnome-www-browser,x-www-browser
+
+name: erlang-common-test
+version: 1:24.2.1+dfsg-1ubuntu0.6
+commands: ct_run
+
+name: erlang-dialyzer
+version: 1:24.2.1+dfsg-1ubuntu0.6
+commands: dialyzer
+
+name: erlang-diameter
+version: 1:24.2.1+dfsg-1ubuntu0.6
+commands: diameterc
+
+name: esbuild
+version: 0.14.11-1ubuntu0.1
+commands: esbuild
+
+name: espeak-ng
+version: 1.50+dfsg-10ubuntu0.1
+commands: espeak-ng,speak-ng
+
+name: espeak-ng-espeak
+version: 1.50+dfsg-10ubuntu0.1
+commands: espeak,speak
+
+name: etcd-client
+version: 3.3.25+dfsg-7ubuntu0.22.04.2
+commands: etcdctl
+
+name: etcd-server
+version: 3.3.25+dfsg-7ubuntu0.22.04.2
+commands: etcd
+
+name: evolution
+version: 3.44.4-0ubuntu2.1
+commands: evolution
+
+name: exempi
+version: 2.5.2-1ubuntu0.22.04.1
+commands: exempi
+
+name: exfatprogs
+version: 1.1.3-1ubuntu0.1
+commands: dump.exfat,exfatlabel,fsck.exfat,mkfs.exfat,tune.exfat
+
+name: eximon4
+version: 4.95-4ubuntu2.9
+commands: eximon
+
+name: exiv2
+version: 0.27.5-3ubuntu1.3
+commands: exiv2
+
+name: expat
+version: 2.4.7-1ubuntu0.7
+commands: xmlwf
+
+name: fakemachine
+version: 0.0~git20210901.fc48786-1ubuntu0.1
+commands: fakemachine
+
+name: fd-find
+version: 8.3.1-1ubuntu0.1
+commands: fdfind
+
+name: fdroidcl
+version: 0.5.0-3ubuntu0.1
+commands: fdroidcl
+
+name: fever
+version: 1.3.3-1ubuntu0.3
+commands: fever
+
+name: ffcvt
+version: 1.7.6-1ubuntu0.22.04.1
+commands: ffcvt
+
+name: ffmpeg
+version: 7:4.4.2-0ubuntu0.22.04.1
+commands: ffmpeg,ffplay,ffprobe,qt-faststart
+
+name: filezilla
+version: 3.58.0-1ubuntu0.1
+commands: filezilla,fzputtygen,fzsftp
+
+name: flac
+version: 1.3.3-2ubuntu0.2
+commands: flac,metaflac
+
+name: flatpak
+version: 1.12.7-1ubuntu0.1
+commands: flatpak
+
+name: fontforge
+version: 1:20201107~dfsg-4+deb11u1build0.22.04.1
+commands: fontforge,fontimage,fontlint,sfddiff
+
+name: fontforge-extras
+version: 1:20201107~dfsg-4+deb11u1build0.22.04.1
+commands: acorn2sfd,dewoff,findtable,pcl2ttf,pfadecrypt,rmligamarks,showttf,stripttc,ttf2eps,woff
+
+name: fontforge-nox
+version: 1:20201107~dfsg-4+deb11u1build0.22.04.1
+commands: fontforge,fontimage,fontlint,sfddiff
+
+name: fort-validator
+version: 1.5.3-1ubuntu0.1
+commands: fort
+
+name: fossil
+version: 1:2.18-1ubuntu0.1
+commands: fossil
+
+name: fq
+version: 0.0.5-1ubuntu0.3
+commands: fq
+
+name: freerdp2-shadow-x11
+version: 2.6.1+dfsg1-3ubuntu2.10
+commands: freerdp-shadow-cli
+
+name: freerdp2-wayland
+version: 2.6.1+dfsg1-3ubuntu2.10
+commands: wlfreerdp
+
+name: freerdp2-x11
+version: 2.6.1+dfsg1-3ubuntu2.10
+commands: xfreerdp
+
+name: freetype2-demos
+version: 2.11.1+dfsg-1ubuntu0.3
+commands: ftbench,ftdiff,ftdump,ftgamma,ftgrid,ftlint,ftmulti,ftsdf,ftstring,ftvalid,ftview,ttdebug
+
+name: fuse2fs
+version: 1.46.5-2ubuntu1.1
+commands: fuse2fs
+
+name: fzf
+version: 0.29.0-1ubuntu0.1
+commands: fzf,fzf-tmux
+
+name: g++-10
+version: 10.5.0-1ubuntu1~22.04.3
+commands: g++-10,x86_64-linux-gnu-g++-10
+
+name: g++-10-aarch64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-g++-10
+
+name: g++-10-alpha-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-g++-10
+
+name: g++-10-arm-linux-gnueabi
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-g++-10
+
+name: g++-10-arm-linux-gnueabihf
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-g++-10
+
+name: g++-10-hppa-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-g++-10
+
+name: g++-10-m68k-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-g++-10
+
+name: g++-10-powerpc-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-g++-10
+
+name: g++-10-powerpc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-g++-10
+
+name: g++-10-powerpc64le-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-g++-10
+
+name: g++-10-riscv64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-g++-10
+
+name: g++-10-s390x-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-g++-10
+
+name: g++-10-sh4-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-g++-10
+
+name: g++-10-sparc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-g++-10
+
+name: g++-10-x86-64-linux-gnux32
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-g++-10
+
+name: g++-11-alpha-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-g++-11
+
+name: g++-11-arm-linux-gnueabi
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-g++-11
+
+name: g++-11-hppa-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-g++-11
+
+name: g++-11-i686-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-g++-11
+
+name: g++-11-m68k-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-g++-11
+
+name: g++-11-powerpc-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-g++-11
+
+name: g++-11-powerpc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-g++-11
+
+name: g++-11-riscv64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-g++-11
+
+name: g++-11-sh4-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-g++-11
+
+name: g++-11-sparc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-g++-11
+
+name: g++-11-x86-64-linux-gnux32
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-g++-11
+
+name: g++-12
+version: 12.3.0-1ubuntu1~22.04.3
+commands: g++-12,x86_64-linux-gnu-g++-12
+
+name: g++-12-aarch64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-g++-12
+
+name: g++-12-alpha-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-g++-12
+
+name: g++-12-arm-linux-gnueabi
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-g++-12
+
+name: g++-12-arm-linux-gnueabihf
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-g++-12
+
+name: g++-12-hppa-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-g++-12
+
+name: g++-12-i686-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-g++-12
+
+name: g++-12-m68k-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-g++-12
+
+name: g++-12-powerpc-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-g++-12
+
+name: g++-12-powerpc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-g++-12
+
+name: g++-12-powerpc64le-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-g++-12
+
+name: g++-12-riscv64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-g++-12
+
+name: g++-12-s390x-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-g++-12
+
+name: g++-12-sh4-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-g++-12
+
+name: g++-12-sparc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-g++-12
+
+name: g++-12-x86-64-linux-gnux32
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-g++-12
+
+name: g++-9
+version: 9.5.0-1ubuntu1~22.04.1
+commands: g++-9,x86_64-linux-gnu-g++-9
+
+name: g++-9-aarch64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: aarch64-linux-gnu-g++-9
+
+name: g++-9-alpha-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-g++-9
+
+name: g++-9-arm-linux-gnueabi
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabi-g++-9
+
+name: g++-9-arm-linux-gnueabihf
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabihf-g++-9
+
+name: g++-9-hppa-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-g++-9
+
+name: g++-9-i686-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: i686-linux-gnu-g++-9
+
+name: g++-9-m68k-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-g++-9
+
+name: g++-9-powerpc-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc-linux-gnu-g++-9
+
+name: g++-9-powerpc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-g++-9
+
+name: g++-9-powerpc64le-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc64le-linux-gnu-g++-9
+
+name: g++-9-riscv64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-g++-9
+
+name: g++-9-s390x-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: s390x-linux-gnu-g++-9
+
+name: g++-9-sh4-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-g++-9
+
+name: g++-9-sparc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-g++-9
+
+name: g++-9-x86-64-linux-gnux32
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-g++-9
+
+name: garagemq
+version: 0.0~git20200204.15e6a9d+ds-3ubuntu0.22.04.3
+commands: garagemq
+
+name: gcc-10
+version: 10.5.0-1ubuntu1~22.04.3
+commands: gcc-10,gcc-ar-10,gcc-nm-10,gcc-ranlib-10,gcov-10,gcov-dump-10,gcov-tool-10,lto-dump-10,x86_64-linux-gnu-gcc-10,x86_64-linux-gnu-gcc-ar-10,x86_64-linux-gnu-gcc-nm-10,x86_64-linux-gnu-gcc-ranlib-10,x86_64-linux-gnu-gcov-10,x86_64-linux-gnu-gcov-dump-10,x86_64-linux-gnu-gcov-tool-10,x86_64-linux-gnu-lto-dump-10
+
+name: gcc-10-aarch64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-gcc-10,aarch64-linux-gnu-gcc-ar-10,aarch64-linux-gnu-gcc-nm-10,aarch64-linux-gnu-gcc-ranlib-10,aarch64-linux-gnu-gcov-10,aarch64-linux-gnu-gcov-dump-10,aarch64-linux-gnu-gcov-tool-10,aarch64-linux-gnu-lto-dump-10
+
+name: gcc-10-alpha-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gcc-10,alpha-linux-gnu-gcc-ar-10,alpha-linux-gnu-gcc-nm-10,alpha-linux-gnu-gcc-ranlib-10,alpha-linux-gnu-gcov-10,alpha-linux-gnu-gcov-dump-10,alpha-linux-gnu-gcov-tool-10,alpha-linux-gnu-lto-dump-10
+
+name: gcc-10-arm-linux-gnueabi
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gcc-10,arm-linux-gnueabi-gcc-ar-10,arm-linux-gnueabi-gcc-nm-10,arm-linux-gnueabi-gcc-ranlib-10,arm-linux-gnueabi-gcov-10,arm-linux-gnueabi-gcov-dump-10,arm-linux-gnueabi-gcov-tool-10,arm-linux-gnueabi-lto-dump-10
+
+name: gcc-10-arm-linux-gnueabihf
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gcc-10,arm-linux-gnueabihf-gcc-ar-10,arm-linux-gnueabihf-gcc-nm-10,arm-linux-gnueabihf-gcc-ranlib-10,arm-linux-gnueabihf-gcov-10,arm-linux-gnueabihf-gcov-dump-10,arm-linux-gnueabihf-gcov-tool-10,arm-linux-gnueabihf-lto-dump-10
+
+name: gcc-10-hppa-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gcc-10,hppa-linux-gnu-gcc-ar-10,hppa-linux-gnu-gcc-nm-10,hppa-linux-gnu-gcc-ranlib-10,hppa-linux-gnu-gcov-10,hppa-linux-gnu-gcov-dump-10,hppa-linux-gnu-gcov-tool-10,hppa-linux-gnu-lto-dump-10
+
+name: gcc-10-hppa64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3
+commands: hppa64-linux-gnu-cpp-10,hppa64-linux-gnu-gcc-10,hppa64-linux-gnu-gcc-ar-10,hppa64-linux-gnu-gcc-nm-10,hppa64-linux-gnu-gcc-ranlib-10
+
+name: gcc-10-i686-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gcc-10,i686-linux-gnu-gcc-ar-10,i686-linux-gnu-gcc-nm-10,i686-linux-gnu-gcc-ranlib-10,i686-linux-gnu-gcov-10,i686-linux-gnu-gcov-dump-10,i686-linux-gnu-gcov-tool-10,i686-linux-gnu-lto-dump-10
+
+name: gcc-10-m68k-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gcc-10,m68k-linux-gnu-gcc-ar-10,m68k-linux-gnu-gcc-nm-10,m68k-linux-gnu-gcc-ranlib-10,m68k-linux-gnu-gcov-10,m68k-linux-gnu-gcov-dump-10,m68k-linux-gnu-gcov-tool-10,m68k-linux-gnu-lto-dump-10
+
+name: gcc-10-offload-nvptx
+version: 10.5.0-1ubuntu1~22.04.3
+commands: x86_64-linux-gnu-accel-nvptx-none-gcc-10
+
+name: gcc-10-powerpc-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gcc-10,powerpc-linux-gnu-gcc-ar-10,powerpc-linux-gnu-gcc-nm-10,powerpc-linux-gnu-gcc-ranlib-10,powerpc-linux-gnu-gcov-10,powerpc-linux-gnu-gcov-dump-10,powerpc-linux-gnu-gcov-tool-10,powerpc-linux-gnu-lto-dump-10
+
+name: gcc-10-powerpc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gcc-10,powerpc64-linux-gnu-gcc-ar-10,powerpc64-linux-gnu-gcc-nm-10,powerpc64-linux-gnu-gcc-ranlib-10,powerpc64-linux-gnu-gcov-10,powerpc64-linux-gnu-gcov-dump-10,powerpc64-linux-gnu-gcov-tool-10,powerpc64-linux-gnu-lto-dump-10
+
+name: gcc-10-powerpc64le-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gcc-10,powerpc64le-linux-gnu-gcc-ar-10,powerpc64le-linux-gnu-gcc-nm-10,powerpc64le-linux-gnu-gcc-ranlib-10,powerpc64le-linux-gnu-gcov-10,powerpc64le-linux-gnu-gcov-dump-10,powerpc64le-linux-gnu-gcov-tool-10,powerpc64le-linux-gnu-lto-dump-10
+
+name: gcc-10-riscv64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gcc-10,riscv64-linux-gnu-gcc-ar-10,riscv64-linux-gnu-gcc-nm-10,riscv64-linux-gnu-gcc-ranlib-10,riscv64-linux-gnu-gcov-10,riscv64-linux-gnu-gcov-dump-10,riscv64-linux-gnu-gcov-tool-10,riscv64-linux-gnu-lto-dump-10
+
+name: gcc-10-s390x-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gcc-10,s390x-linux-gnu-gcc-ar-10,s390x-linux-gnu-gcc-nm-10,s390x-linux-gnu-gcc-ranlib-10,s390x-linux-gnu-gcov-10,s390x-linux-gnu-gcov-dump-10,s390x-linux-gnu-gcov-tool-10,s390x-linux-gnu-lto-dump-10
+
+name: gcc-10-sh4-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gcc-10,sh4-linux-gnu-gcc-ar-10,sh4-linux-gnu-gcc-nm-10,sh4-linux-gnu-gcc-ranlib-10,sh4-linux-gnu-gcov-10,sh4-linux-gnu-gcov-dump-10,sh4-linux-gnu-gcov-tool-10,sh4-linux-gnu-lto-dump-10
+
+name: gcc-10-sparc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gcc-10,sparc64-linux-gnu-gcc-ar-10,sparc64-linux-gnu-gcc-nm-10,sparc64-linux-gnu-gcc-ranlib-10,sparc64-linux-gnu-gcov-10,sparc64-linux-gnu-gcov-dump-10,sparc64-linux-gnu-gcov-tool-10,sparc64-linux-gnu-lto-dump-10
+
+name: gcc-10-x86-64-linux-gnux32
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gcc-10,x86_64-linux-gnux32-gcc-ar-10,x86_64-linux-gnux32-gcc-nm-10,x86_64-linux-gnux32-gcc-ranlib-10,x86_64-linux-gnux32-gcov-10,x86_64-linux-gnux32-gcov-dump-10,x86_64-linux-gnux32-gcov-tool-10,x86_64-linux-gnux32-lto-dump-10
+
+name: gcc-11-alpha-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gcc-11,alpha-linux-gnu-gcc-ar-11,alpha-linux-gnu-gcc-nm-11,alpha-linux-gnu-gcc-ranlib-11,alpha-linux-gnu-gcov-11,alpha-linux-gnu-gcov-dump-11,alpha-linux-gnu-gcov-tool-11,alpha-linux-gnu-lto-dump-11
+
+name: gcc-11-arm-linux-gnueabi
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gcc-11,arm-linux-gnueabi-gcc-ar-11,arm-linux-gnueabi-gcc-nm-11,arm-linux-gnueabi-gcc-ranlib-11,arm-linux-gnueabi-gcov-11,arm-linux-gnueabi-gcov-dump-11,arm-linux-gnueabi-gcov-tool-11,arm-linux-gnueabi-lto-dump-11
+
+name: gcc-11-hppa-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gcc-11,hppa-linux-gnu-gcc-ar-11,hppa-linux-gnu-gcc-nm-11,hppa-linux-gnu-gcc-ranlib-11,hppa-linux-gnu-gcov-11,hppa-linux-gnu-gcov-dump-11,hppa-linux-gnu-gcov-tool-11,hppa-linux-gnu-lto-dump-11
+
+name: gcc-11-hppa64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3
+commands: hppa64-linux-gnu-cpp-11,hppa64-linux-gnu-gcc-11,hppa64-linux-gnu-gcc-ar-11,hppa64-linux-gnu-gcc-nm-11,hppa64-linux-gnu-gcc-ranlib-11
+
+name: gcc-11-i686-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gcc-11,i686-linux-gnu-gcc-ar-11,i686-linux-gnu-gcc-nm-11,i686-linux-gnu-gcc-ranlib-11,i686-linux-gnu-gcov-11,i686-linux-gnu-gcov-dump-11,i686-linux-gnu-gcov-tool-11,i686-linux-gnu-lto-dump-11
+
+name: gcc-11-m68k-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gcc-11,m68k-linux-gnu-gcc-ar-11,m68k-linux-gnu-gcc-nm-11,m68k-linux-gnu-gcc-ranlib-11,m68k-linux-gnu-gcov-11,m68k-linux-gnu-gcov-dump-11,m68k-linux-gnu-gcov-tool-11,m68k-linux-gnu-lto-dump-11
+
+name: gcc-11-offload-amdgcn
+version: 11.4.0-1ubuntu1~22.04.3
+commands: x86_64-linux-gnu-accel-amdgcn-amdhsa-gcc-11
+
+name: gcc-11-offload-nvptx
+version: 11.4.0-1ubuntu1~22.04.3
+commands: x86_64-linux-gnu-accel-nvptx-none-gcc-11
+
+name: gcc-11-powerpc-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gcc-11,powerpc-linux-gnu-gcc-ar-11,powerpc-linux-gnu-gcc-nm-11,powerpc-linux-gnu-gcc-ranlib-11,powerpc-linux-gnu-gcov-11,powerpc-linux-gnu-gcov-dump-11,powerpc-linux-gnu-gcov-tool-11,powerpc-linux-gnu-lto-dump-11
+
+name: gcc-11-powerpc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gcc-11,powerpc64-linux-gnu-gcc-ar-11,powerpc64-linux-gnu-gcc-nm-11,powerpc64-linux-gnu-gcc-ranlib-11,powerpc64-linux-gnu-gcov-11,powerpc64-linux-gnu-gcov-dump-11,powerpc64-linux-gnu-gcov-tool-11,powerpc64-linux-gnu-lto-dump-11
+
+name: gcc-11-riscv64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gcc-11,riscv64-linux-gnu-gcc-ar-11,riscv64-linux-gnu-gcc-nm-11,riscv64-linux-gnu-gcc-ranlib-11,riscv64-linux-gnu-gcov-11,riscv64-linux-gnu-gcov-dump-11,riscv64-linux-gnu-gcov-tool-11,riscv64-linux-gnu-lto-dump-11
+
+name: gcc-11-sh4-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gcc-11,sh4-linux-gnu-gcc-ar-11,sh4-linux-gnu-gcc-nm-11,sh4-linux-gnu-gcc-ranlib-11,sh4-linux-gnu-gcov-11,sh4-linux-gnu-gcov-dump-11,sh4-linux-gnu-gcov-tool-11,sh4-linux-gnu-lto-dump-11
+
+name: gcc-11-sparc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gcc-11,sparc64-linux-gnu-gcc-ar-11,sparc64-linux-gnu-gcc-nm-11,sparc64-linux-gnu-gcc-ranlib-11,sparc64-linux-gnu-gcov-11,sparc64-linux-gnu-gcov-dump-11,sparc64-linux-gnu-gcov-tool-11,sparc64-linux-gnu-lto-dump-11
+
+name: gcc-11-x86-64-linux-gnux32
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gcc-11,x86_64-linux-gnux32-gcc-ar-11,x86_64-linux-gnux32-gcc-nm-11,x86_64-linux-gnux32-gcc-ranlib-11,x86_64-linux-gnux32-gcov-11,x86_64-linux-gnux32-gcov-dump-11,x86_64-linux-gnux32-gcov-tool-11,x86_64-linux-gnux32-lto-dump-11
+
+name: gcc-12-aarch64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-gcc-12,aarch64-linux-gnu-gcc-ar-12,aarch64-linux-gnu-gcc-nm-12,aarch64-linux-gnu-gcc-ranlib-12,aarch64-linux-gnu-gcov-12,aarch64-linux-gnu-gcov-dump-12,aarch64-linux-gnu-gcov-tool-12,aarch64-linux-gnu-lto-dump-12
+
+name: gcc-12-alpha-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gcc-12,alpha-linux-gnu-gcc-ar-12,alpha-linux-gnu-gcc-nm-12,alpha-linux-gnu-gcc-ranlib-12,alpha-linux-gnu-gcov-12,alpha-linux-gnu-gcov-dump-12,alpha-linux-gnu-gcov-tool-12,alpha-linux-gnu-lto-dump-12
+
+name: gcc-12-arm-linux-gnueabi
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gcc-12,arm-linux-gnueabi-gcc-ar-12,arm-linux-gnueabi-gcc-nm-12,arm-linux-gnueabi-gcc-ranlib-12,arm-linux-gnueabi-gcov-12,arm-linux-gnueabi-gcov-dump-12,arm-linux-gnueabi-gcov-tool-12,arm-linux-gnueabi-lto-dump-12
+
+name: gcc-12-arm-linux-gnueabihf
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gcc-12,arm-linux-gnueabihf-gcc-ar-12,arm-linux-gnueabihf-gcc-nm-12,arm-linux-gnueabihf-gcc-ranlib-12,arm-linux-gnueabihf-gcov-12,arm-linux-gnueabihf-gcov-dump-12,arm-linux-gnueabihf-gcov-tool-12,arm-linux-gnueabihf-lto-dump-12
+
+name: gcc-12-hppa-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gcc-12,hppa-linux-gnu-gcc-ar-12,hppa-linux-gnu-gcc-nm-12,hppa-linux-gnu-gcc-ranlib-12,hppa-linux-gnu-gcov-12,hppa-linux-gnu-gcov-dump-12,hppa-linux-gnu-gcov-tool-12,hppa-linux-gnu-lto-dump-12
+
+name: gcc-12-hppa64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3
+commands: hppa64-linux-gnu-cpp-12,hppa64-linux-gnu-gcc-12,hppa64-linux-gnu-gcc-ar-12,hppa64-linux-gnu-gcc-nm-12,hppa64-linux-gnu-gcc-ranlib-12
+
+name: gcc-12-i686-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gcc-12,i686-linux-gnu-gcc-ar-12,i686-linux-gnu-gcc-nm-12,i686-linux-gnu-gcc-ranlib-12,i686-linux-gnu-gcov-12,i686-linux-gnu-gcov-dump-12,i686-linux-gnu-gcov-tool-12,i686-linux-gnu-lto-dump-12
+
+name: gcc-12-m68k-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gcc-12,m68k-linux-gnu-gcc-ar-12,m68k-linux-gnu-gcc-nm-12,m68k-linux-gnu-gcc-ranlib-12,m68k-linux-gnu-gcov-12,m68k-linux-gnu-gcov-dump-12,m68k-linux-gnu-gcov-tool-12,m68k-linux-gnu-lto-dump-12
+
+name: gcc-12-offload-amdgcn
+version: 12.3.0-1ubuntu1~22.04.3
+commands: x86_64-linux-gnu-accel-amdgcn-amdhsa-gcc-12
+
+name: gcc-12-offload-nvptx
+version: 12.3.0-1ubuntu1~22.04.3
+commands: x86_64-linux-gnu-accel-nvptx-none-gcc-12
+
+name: gcc-12-powerpc-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gcc-12,powerpc-linux-gnu-gcc-ar-12,powerpc-linux-gnu-gcc-nm-12,powerpc-linux-gnu-gcc-ranlib-12,powerpc-linux-gnu-gcov-12,powerpc-linux-gnu-gcov-dump-12,powerpc-linux-gnu-gcov-tool-12,powerpc-linux-gnu-lto-dump-12
+
+name: gcc-12-powerpc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gcc-12,powerpc64-linux-gnu-gcc-ar-12,powerpc64-linux-gnu-gcc-nm-12,powerpc64-linux-gnu-gcc-ranlib-12,powerpc64-linux-gnu-gcov-12,powerpc64-linux-gnu-gcov-dump-12,powerpc64-linux-gnu-gcov-tool-12,powerpc64-linux-gnu-lto-dump-12
+
+name: gcc-12-powerpc64le-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gcc-12,powerpc64le-linux-gnu-gcc-ar-12,powerpc64le-linux-gnu-gcc-nm-12,powerpc64le-linux-gnu-gcc-ranlib-12,powerpc64le-linux-gnu-gcov-12,powerpc64le-linux-gnu-gcov-dump-12,powerpc64le-linux-gnu-gcov-tool-12,powerpc64le-linux-gnu-lto-dump-12
+
+name: gcc-12-riscv64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gcc-12,riscv64-linux-gnu-gcc-ar-12,riscv64-linux-gnu-gcc-nm-12,riscv64-linux-gnu-gcc-ranlib-12,riscv64-linux-gnu-gcov-12,riscv64-linux-gnu-gcov-dump-12,riscv64-linux-gnu-gcov-tool-12,riscv64-linux-gnu-lto-dump-12
+
+name: gcc-12-s390x-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gcc-12,s390x-linux-gnu-gcc-ar-12,s390x-linux-gnu-gcc-nm-12,s390x-linux-gnu-gcc-ranlib-12,s390x-linux-gnu-gcov-12,s390x-linux-gnu-gcov-dump-12,s390x-linux-gnu-gcov-tool-12,s390x-linux-gnu-lto-dump-12
+
+name: gcc-12-sh4-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gcc-12,sh4-linux-gnu-gcc-ar-12,sh4-linux-gnu-gcc-nm-12,sh4-linux-gnu-gcc-ranlib-12,sh4-linux-gnu-gcov-12,sh4-linux-gnu-gcov-dump-12,sh4-linux-gnu-gcov-tool-12,sh4-linux-gnu-lto-dump-12
+
+name: gcc-12-sparc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gcc-12,sparc64-linux-gnu-gcc-ar-12,sparc64-linux-gnu-gcc-nm-12,sparc64-linux-gnu-gcc-ranlib-12,sparc64-linux-gnu-gcov-12,sparc64-linux-gnu-gcov-dump-12,sparc64-linux-gnu-gcov-tool-12,sparc64-linux-gnu-lto-dump-12
+
+name: gcc-12-x86-64-linux-gnux32
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gcc-12,x86_64-linux-gnux32-gcc-ar-12,x86_64-linux-gnux32-gcc-nm-12,x86_64-linux-gnux32-gcc-ranlib-12,x86_64-linux-gnux32-gcov-12,x86_64-linux-gnux32-gcov-dump-12,x86_64-linux-gnux32-gcov-tool-12,x86_64-linux-gnux32-lto-dump-12
+
+name: gcc-9
+version: 9.5.0-1ubuntu1~22.04.1
+commands: gcc-9,gcc-ar-9,gcc-nm-9,gcc-ranlib-9,gcov-9,gcov-dump-9,gcov-tool-9,x86_64-linux-gnu-gcc-9,x86_64-linux-gnu-gcc-ar-9,x86_64-linux-gnu-gcc-nm-9,x86_64-linux-gnu-gcc-ranlib-9,x86_64-linux-gnu-gcov-9,x86_64-linux-gnu-gcov-dump-9,x86_64-linux-gnu-gcov-tool-9
+
+name: gcc-9-aarch64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: aarch64-linux-gnu-gcc-9,aarch64-linux-gnu-gcc-ar-9,aarch64-linux-gnu-gcc-nm-9,aarch64-linux-gnu-gcc-ranlib-9,aarch64-linux-gnu-gcov-9,aarch64-linux-gnu-gcov-dump-9,aarch64-linux-gnu-gcov-tool-9
+
+name: gcc-9-alpha-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gcc-9,alpha-linux-gnu-gcc-ar-9,alpha-linux-gnu-gcc-nm-9,alpha-linux-gnu-gcc-ranlib-9,alpha-linux-gnu-gcov-9,alpha-linux-gnu-gcov-dump-9,alpha-linux-gnu-gcov-tool-9
+
+name: gcc-9-arm-linux-gnueabi
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabi-gcc-9,arm-linux-gnueabi-gcc-ar-9,arm-linux-gnueabi-gcc-nm-9,arm-linux-gnueabi-gcc-ranlib-9,arm-linux-gnueabi-gcov-9,arm-linux-gnueabi-gcov-dump-9,arm-linux-gnueabi-gcov-tool-9
+
+name: gcc-9-arm-linux-gnueabihf
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabihf-gcc-9,arm-linux-gnueabihf-gcc-ar-9,arm-linux-gnueabihf-gcc-nm-9,arm-linux-gnueabihf-gcc-ranlib-9,arm-linux-gnueabihf-gcov-9,arm-linux-gnueabihf-gcov-dump-9,arm-linux-gnueabihf-gcov-tool-9
+
+name: gcc-9-hppa-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gcc-9,hppa-linux-gnu-gcc-ar-9,hppa-linux-gnu-gcc-nm-9,hppa-linux-gnu-gcc-ranlib-9,hppa-linux-gnu-gcov-9,hppa-linux-gnu-gcov-dump-9,hppa-linux-gnu-gcov-tool-9
+
+name: gcc-9-hppa64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1
+commands: hppa64-linux-gnu-cpp-9,hppa64-linux-gnu-gcc-9,hppa64-linux-gnu-gcc-ar-9,hppa64-linux-gnu-gcc-nm-9,hppa64-linux-gnu-gcc-ranlib-9
+
+name: gcc-9-i686-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: i686-linux-gnu-gcc-9,i686-linux-gnu-gcc-ar-9,i686-linux-gnu-gcc-nm-9,i686-linux-gnu-gcc-ranlib-9,i686-linux-gnu-gcov-9,i686-linux-gnu-gcov-dump-9,i686-linux-gnu-gcov-tool-9
+
+name: gcc-9-m68k-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gcc-9,m68k-linux-gnu-gcc-ar-9,m68k-linux-gnu-gcc-nm-9,m68k-linux-gnu-gcc-ranlib-9,m68k-linux-gnu-gcov-9,m68k-linux-gnu-gcov-dump-9,m68k-linux-gnu-gcov-tool-9
+
+name: gcc-9-offload-nvptx
+version: 9.5.0-1ubuntu1~22.04.1
+commands: x86_64-linux-gnu-accel-nvptx-none-gcc-9
+
+name: gcc-9-powerpc-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc-linux-gnu-gcc-9,powerpc-linux-gnu-gcc-ar-9,powerpc-linux-gnu-gcc-nm-9,powerpc-linux-gnu-gcc-ranlib-9,powerpc-linux-gnu-gcov-9,powerpc-linux-gnu-gcov-dump-9,powerpc-linux-gnu-gcov-tool-9
+
+name: gcc-9-powerpc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gcc-9,powerpc64-linux-gnu-gcc-ar-9,powerpc64-linux-gnu-gcc-nm-9,powerpc64-linux-gnu-gcc-ranlib-9,powerpc64-linux-gnu-gcov-9,powerpc64-linux-gnu-gcov-dump-9,powerpc64-linux-gnu-gcov-tool-9
+
+name: gcc-9-powerpc64le-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc64le-linux-gnu-gcc-9,powerpc64le-linux-gnu-gcc-ar-9,powerpc64le-linux-gnu-gcc-nm-9,powerpc64le-linux-gnu-gcc-ranlib-9,powerpc64le-linux-gnu-gcov-9,powerpc64le-linux-gnu-gcov-dump-9,powerpc64le-linux-gnu-gcov-tool-9
+
+name: gcc-9-riscv64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gcc-9,riscv64-linux-gnu-gcc-ar-9,riscv64-linux-gnu-gcc-nm-9,riscv64-linux-gnu-gcc-ranlib-9,riscv64-linux-gnu-gcov-9,riscv64-linux-gnu-gcov-dump-9,riscv64-linux-gnu-gcov-tool-9
+
+name: gcc-9-s390x-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: s390x-linux-gnu-gcc-9,s390x-linux-gnu-gcc-ar-9,s390x-linux-gnu-gcc-nm-9,s390x-linux-gnu-gcc-ranlib-9,s390x-linux-gnu-gcov-9,s390x-linux-gnu-gcov-dump-9,s390x-linux-gnu-gcov-tool-9
+
+name: gcc-9-sh4-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gcc-9,sh4-linux-gnu-gcc-ar-9,sh4-linux-gnu-gcc-nm-9,sh4-linux-gnu-gcc-ranlib-9,sh4-linux-gnu-gcov-9,sh4-linux-gnu-gcov-dump-9,sh4-linux-gnu-gcov-tool-9
+
+name: gcc-9-sparc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gcc-9,sparc64-linux-gnu-gcc-ar-9,sparc64-linux-gnu-gcc-nm-9,sparc64-linux-gnu-gcc-ranlib-9,sparc64-linux-gnu-gcov-9,sparc64-linux-gnu-gcov-dump-9,sparc64-linux-gnu-gcov-tool-9
+
+name: gcc-9-x86-64-linux-gnux32
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gcc-9,x86_64-linux-gnux32-gcc-ar-9,x86_64-linux-gnux32-gcc-nm-9,x86_64-linux-gnux32-gcc-ranlib-9,x86_64-linux-gnux32-gcov-9,x86_64-linux-gnux32-gcov-dump-9,x86_64-linux-gnux32-gcov-tool-9
+
+name: gccbrig-10
+version: 10.5.0-1ubuntu1~22.04.3
+commands: gccbrig-10,x86_64-linux-gnu-gccbrig-10
+
+name: gccbrig-10-i686-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gccbrig-10
+
+name: gccbrig-10-x86-64-linux-gnux32
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gccbrig-10
+
+name: gccbrig-11
+version: 11.4.0-1ubuntu1~22.04.3
+commands: gccbrig-11,x86_64-linux-gnu-gccbrig-11
+
+name: gccbrig-11-i686-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gccbrig-11
+
+name: gccbrig-11-x86-64-linux-gnux32
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gccbrig-11
+
+name: gccbrig-9
+version: 9.5.0-1ubuntu1~22.04.1
+commands: gccbrig-9,x86_64-linux-gnu-gccbrig-9
+
+name: gccbrig-9-i686-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: i686-linux-gnu-gccbrig-9
+
+name: gccbrig-9-x86-64-linux-gnux32
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gccbrig-9
+
+name: gccgo-10
+version: 10.5.0-1ubuntu1~22.04.3
+commands: gccgo-10,go-10,gofmt-10,x86_64-linux-gnu-gccgo-10,x86_64-linux-gnu-go-10,x86_64-linux-gnu-gofmt-10
+
+name: gccgo-10-alpha-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gccgo-10
+
+name: gccgo-10-arm-linux-gnueabi
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gccgo-10
+
+name: gccgo-10-arm-linux-gnueabihf
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gccgo-10
+
+name: gccgo-10-powerpc-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gccgo-10
+
+name: gccgo-10-powerpc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gccgo-10
+
+name: gccgo-10-powerpc64le-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gccgo-10
+
+name: gccgo-10-riscv64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gccgo-10
+
+name: gccgo-10-s390x-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gccgo-10
+
+name: gccgo-10-sparc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gccgo-10
+
+name: gccgo-10-x86-64-linux-gnux32
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gccgo-10
+
+name: gccgo-11
+version: 11.4.0-1ubuntu1~22.04.3
+commands: gccgo-11,go-11,gofmt-11,x86_64-linux-gnu-gccgo-11,x86_64-linux-gnu-go-11,x86_64-linux-gnu-gofmt-11
+
+name: gccgo-11-aarch64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-gccgo-11
+
+name: gccgo-11-alpha-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gccgo-11
+
+name: gccgo-11-arm-linux-gnueabi
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gccgo-11
+
+name: gccgo-11-arm-linux-gnueabihf
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gccgo-11
+
+name: gccgo-11-i686-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gccgo-11
+
+name: gccgo-11-powerpc-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gccgo-11
+
+name: gccgo-11-powerpc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gccgo-11
+
+name: gccgo-11-powerpc64le-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gccgo-11
+
+name: gccgo-11-riscv64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gccgo-11
+
+name: gccgo-11-s390x-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gccgo-11
+
+name: gccgo-11-sparc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gccgo-11
+
+name: gccgo-11-x86-64-linux-gnux32
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gccgo-11
+
+name: gccgo-12
+version: 12.3.0-1ubuntu1~22.04.3
+commands: gccgo-12,go-12,gofmt-12,x86_64-linux-gnu-gccgo-12,x86_64-linux-gnu-go-12,x86_64-linux-gnu-gofmt-12
+
+name: gccgo-12-aarch64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-gccgo-12
+
+name: gccgo-12-alpha-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gccgo-12
+
+name: gccgo-12-arm-linux-gnueabi
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gccgo-12
+
+name: gccgo-12-arm-linux-gnueabihf
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gccgo-12
+
+name: gccgo-12-i686-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gccgo-12
+
+name: gccgo-12-powerpc-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gccgo-12
+
+name: gccgo-12-powerpc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gccgo-12
+
+name: gccgo-12-powerpc64le-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gccgo-12
+
+name: gccgo-12-riscv64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gccgo-12
+
+name: gccgo-12-s390x-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gccgo-12
+
+name: gccgo-12-sparc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gccgo-12
+
+name: gccgo-12-x86-64-linux-gnux32
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gccgo-12
+
+name: gccgo-9
+version: 9.5.0-1ubuntu1~22.04.1
+commands: gccgo-9,go-9,gofmt-9,x86_64-linux-gnu-gccgo-9,x86_64-linux-gnu-go-9,x86_64-linux-gnu-gofmt-9
+
+name: gccgo-9-aarch64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: aarch64-linux-gnu-gccgo-9
+
+name: gccgo-9-alpha-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gccgo-9
+
+name: gccgo-9-arm-linux-gnueabi
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabi-gccgo-9
+
+name: gccgo-9-arm-linux-gnueabihf
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabihf-gccgo-9
+
+name: gccgo-9-i686-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: i686-linux-gnu-gccgo-9
+
+name: gccgo-9-powerpc-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc-linux-gnu-gccgo-9
+
+name: gccgo-9-powerpc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gccgo-9
+
+name: gccgo-9-powerpc64le-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc64le-linux-gnu-gccgo-9
+
+name: gccgo-9-riscv64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gccgo-9
+
+name: gccgo-9-s390x-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: s390x-linux-gnu-gccgo-9
+
+name: gccgo-9-sh4-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gccgo-9
+
+name: gccgo-9-sparc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gccgo-9
+
+name: gccgo-9-x86-64-linux-gnux32
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gccgo-9
+
+name: gdb-multiarch
+version: 12.1-0ubuntu1~22.04.2
+commands: gdb-multiarch
+
+name: gdbserver
+version: 12.1-0ubuntu1~22.04.2
+commands: gdbserver
+
+name: gdc-10
+version: 10.5.0-1ubuntu1~22.04.3
+commands: gdc-10,x86_64-linux-gnu-gdc-10
+
+name: gdc-10-alpha-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gdc-10
+
+name: gdc-10-arm-linux-gnueabi
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gdc-10
+
+name: gdc-10-arm-linux-gnueabihf
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gdc-10
+
+name: gdc-10-hppa-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gdc-10
+
+name: gdc-10-m68k-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gdc-10
+
+name: gdc-10-powerpc-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gdc-10
+
+name: gdc-10-powerpc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gdc-10
+
+name: gdc-10-powerpc64le-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gdc-10
+
+name: gdc-10-riscv64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gdc-10
+
+name: gdc-10-s390x-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gdc-10
+
+name: gdc-10-sh4-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gdc-10
+
+name: gdc-10-sparc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gdc-10
+
+name: gdc-10-x86-64-linux-gnux32
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gdc-10
+
+name: gdc-11
+version: 11.4.0-1ubuntu1~22.04.3
+commands: gdc-11,x86_64-linux-gnu-gdc-11
+
+name: gdc-11-aarch64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-gdc-11
+
+name: gdc-11-alpha-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gdc-11
+
+name: gdc-11-arm-linux-gnueabi
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gdc-11
+
+name: gdc-11-arm-linux-gnueabihf
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gdc-11
+
+name: gdc-11-hppa-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gdc-11
+
+name: gdc-11-i686-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gdc-11
+
+name: gdc-11-m68k-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gdc-11
+
+name: gdc-11-powerpc-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gdc-11
+
+name: gdc-11-powerpc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gdc-11
+
+name: gdc-11-powerpc64le-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gdc-11
+
+name: gdc-11-riscv64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gdc-11
+
+name: gdc-11-s390x-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gdc-11
+
+name: gdc-11-sh4-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gdc-11
+
+name: gdc-11-sparc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gdc-11
+
+name: gdc-11-x86-64-linux-gnux32
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gdc-11
+
+name: gdc-12
+version: 12.3.0-1ubuntu1~22.04.3
+commands: gdc-12,x86_64-linux-gnu-gdc-12
+
+name: gdc-12-aarch64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-gdc-12
+
+name: gdc-12-arm-linux-gnueabi
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gdc-12
+
+name: gdc-12-arm-linux-gnueabihf
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gdc-12
+
+name: gdc-12-hppa-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gdc-12
+
+name: gdc-12-i686-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gdc-12
+
+name: gdc-12-powerpc-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gdc-12
+
+name: gdc-12-powerpc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gdc-12
+
+name: gdc-12-powerpc64le-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gdc-12
+
+name: gdc-12-riscv64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gdc-12
+
+name: gdc-12-s390x-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gdc-12
+
+name: gdc-12-x86-64-linux-gnux32
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gdc-12
+
+name: gdc-9
+version: 9.5.0-1ubuntu1~22.04.1
+commands: gdc-9,x86_64-linux-gnu-gdc-9
+
+name: gdc-9-aarch64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: aarch64-linux-gnu-gdc-9
+
+name: gdc-9-alpha-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gdc-9
+
+name: gdc-9-arm-linux-gnueabi
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabi-gdc-9
+
+name: gdc-9-arm-linux-gnueabihf
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabihf-gdc-9
+
+name: gdc-9-hppa-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gdc-9
+
+name: gdc-9-i686-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: i686-linux-gnu-gdc-9
+
+name: gdc-9-m68k-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gdc-9
+
+name: gdc-9-powerpc-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc-linux-gnu-gdc-9
+
+name: gdc-9-powerpc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gdc-9
+
+name: gdc-9-powerpc64le-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc64le-linux-gnu-gdc-9
+
+name: gdc-9-riscv64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gdc-9
+
+name: gdc-9-s390x-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: s390x-linux-gnu-gdc-9
+
+name: gdc-9-sh4-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gdc-9
+
+name: gdc-9-sparc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gdc-9
+
+name: gdc-9-x86-64-linux-gnux32
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gdc-9
+
+name: gdu
+version: 5.13.2-1ubuntu0.22.04.3
+commands: gdu
+
+name: genxdr
+version: 2.0.1-7ubuntu0.1
+commands: genxdr
+
+name: gfortran-10
+version: 10.5.0-1ubuntu1~22.04.3
+commands: gfortran-10,x86_64-linux-gnu-gfortran-10
+
+name: gfortran-10-alpha-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gfortran-10
+
+name: gfortran-10-arm-linux-gnueabi
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gfortran-10
+
+name: gfortran-10-arm-linux-gnueabihf
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gfortran-10
+
+name: gfortran-10-hppa-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gfortran-10
+
+name: gfortran-10-m68k-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gfortran-10
+
+name: gfortran-10-powerpc-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gfortran-10
+
+name: gfortran-10-powerpc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gfortran-10
+
+name: gfortran-10-powerpc64le-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gfortran-10
+
+name: gfortran-10-riscv64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gfortran-10
+
+name: gfortran-10-s390x-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gfortran-10
+
+name: gfortran-10-sh4-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gfortran-10
+
+name: gfortran-10-sparc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gfortran-10
+
+name: gfortran-10-x86-64-linux-gnux32
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gfortran-10
+
+name: gfortran-11-aarch64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-gfortran-11
+
+name: gfortran-11-alpha-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gfortran-11
+
+name: gfortran-11-arm-linux-gnueabi
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gfortran-11
+
+name: gfortran-11-arm-linux-gnueabihf
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gfortran-11
+
+name: gfortran-11-hppa-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gfortran-11
+
+name: gfortran-11-i686-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gfortran-11
+
+name: gfortran-11-m68k-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gfortran-11
+
+name: gfortran-11-powerpc-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gfortran-11
+
+name: gfortran-11-powerpc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gfortran-11
+
+name: gfortran-11-powerpc64le-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gfortran-11
+
+name: gfortran-11-riscv64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gfortran-11
+
+name: gfortran-11-s390x-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gfortran-11
+
+name: gfortran-11-sh4-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gfortran-11
+
+name: gfortran-11-sparc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gfortran-11
+
+name: gfortran-11-x86-64-linux-gnux32
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gfortran-11
+
+name: gfortran-12
+version: 12.3.0-1ubuntu1~22.04.3
+commands: gfortran-12,x86_64-linux-gnu-gfortran-12
+
+name: gfortran-12-aarch64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-gfortran-12
+
+name: gfortran-12-alpha-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gfortran-12
+
+name: gfortran-12-arm-linux-gnueabi
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gfortran-12
+
+name: gfortran-12-arm-linux-gnueabihf
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gfortran-12
+
+name: gfortran-12-hppa-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gfortran-12
+
+name: gfortran-12-i686-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gfortran-12
+
+name: gfortran-12-m68k-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gfortran-12
+
+name: gfortran-12-powerpc-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gfortran-12
+
+name: gfortran-12-powerpc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gfortran-12
+
+name: gfortran-12-powerpc64le-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gfortran-12
+
+name: gfortran-12-riscv64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gfortran-12
+
+name: gfortran-12-s390x-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gfortran-12
+
+name: gfortran-12-sh4-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gfortran-12
+
+name: gfortran-12-sparc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gfortran-12
+
+name: gfortran-12-x86-64-linux-gnux32
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gfortran-12
+
+name: gfortran-9
+version: 9.5.0-1ubuntu1~22.04.1
+commands: gfortran-9,x86_64-linux-gnu-gfortran-9
+
+name: gfortran-9-aarch64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: aarch64-linux-gnu-gfortran-9
+
+name: gfortran-9-alpha-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gfortran-9
+
+name: gfortran-9-arm-linux-gnueabi
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabi-gfortran-9
+
+name: gfortran-9-arm-linux-gnueabihf
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabihf-gfortran-9
+
+name: gfortran-9-hppa-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gfortran-9
+
+name: gfortran-9-i686-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: i686-linux-gnu-gfortran-9
+
+name: gfortran-9-m68k-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gfortran-9
+
+name: gfortran-9-powerpc-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc-linux-gnu-gfortran-9
+
+name: gfortran-9-powerpc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gfortran-9
+
+name: gfortran-9-powerpc64le-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc64le-linux-gnu-gfortran-9
+
+name: gfortran-9-riscv64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gfortran-9
+
+name: gfortran-9-s390x-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: s390x-linux-gnu-gfortran-9
+
+name: gfortran-9-sh4-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gfortran-9
+
+name: gfortran-9-sparc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gfortran-9
+
+name: gfortran-9-x86-64-linux-gnux32
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gfortran-9
+
+name: ggd-utils
+version: 1.0.0+ds-1ubuntu0.22.04.1
+commands: check-sort-order
+
+name: giflib-tools
+version: 5.1.9-2ubuntu0.1
+commands: gif2rgb,gifbuild,gifclrmp,gifecho,giffilter,giffix,gifinto,gifsponge,giftext,giftool
+
+name: gifwrap
+version: 0.0.6+dfsg-1ubuntu0.3
+commands: gifwrap
+
+name: gimp
+version: 2.10.30-1ubuntu0.1
+commands: gimp,gimp-2.10,gimp-console,gimp-console-2.10,gimp-test-clipboard-2.0
+
+name: git-cvs
+version: 1:2.34.1-1ubuntu1.17
+commands: git-cvsserver
+
+name: git-lfs
+version: 3.0.2-1ubuntu0.3
+commands: git-lfs
+
+name: gitbatch
+version: 0.5.0-3ubuntu0.22.04.3
+commands: gitbatch
+
+name: gitk
+version: 1:2.34.1-1ubuntu1.17
+commands: gitk
+
+name: gitlab-shell
+version: 13.19.1-2ubuntu0.20.04.3
+commands: check,gitlab-shell,gitlab-shell-authorized-keys-check,gitlab-shell-authorized-principals-check,gitlab-sshd
+
+name: gm2-10
+version: 10.5.0-1ubuntu1~22.04.3
+commands: gm2-10,x86_64-linux-gnu-gm2-10
+
+name: gm2-10-alpha-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gm2-10
+
+name: gm2-10-arm-linux-gnueabi
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gm2-10
+
+name: gm2-10-arm-linux-gnueabihf
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gm2-10
+
+name: gm2-10-hppa-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gm2-10
+
+name: gm2-10-m68k-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gm2-10
+
+name: gm2-10-powerpc64le-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gm2-10
+
+name: gm2-10-riscv64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gm2-10
+
+name: gm2-10-s390x-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gm2-10
+
+name: gm2-10-sparc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gm2-10
+
+name: gm2-10-x86-64-linux-gnux32
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gm2-10
+
+name: gm2-11
+version: 11.4.0-1ubuntu1~22.04.3
+commands: gm2-11,x86_64-linux-gnu-gm2-11
+
+name: gm2-11-aarch64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-gm2-11
+
+name: gm2-11-alpha-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gm2-11
+
+name: gm2-11-arm-linux-gnueabi
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gm2-11
+
+name: gm2-11-arm-linux-gnueabihf
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gm2-11
+
+name: gm2-11-hppa-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gm2-11
+
+name: gm2-11-i686-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gm2-11
+
+name: gm2-11-m68k-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gm2-11
+
+name: gm2-11-powerpc64le-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gm2-11
+
+name: gm2-11-riscv64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gm2-11
+
+name: gm2-11-s390x-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gm2-11
+
+name: gm2-11-sparc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gm2-11
+
+name: gm2-11-x86-64-linux-gnux32
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gm2-11
+
+name: gm2-12
+version: 12.3.0-1ubuntu1~22.04.3
+commands: gm2-12,x86_64-linux-gnu-gm2-12
+
+name: gm2-12-aarch64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-gm2-12
+
+name: gm2-12-alpha-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gm2-12
+
+name: gm2-12-arm-linux-gnueabi
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gm2-12
+
+name: gm2-12-arm-linux-gnueabihf
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gm2-12
+
+name: gm2-12-hppa-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gm2-12
+
+name: gm2-12-i686-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gm2-12
+
+name: gm2-12-m68k-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gm2-12
+
+name: gm2-12-powerpc64le-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gm2-12
+
+name: gm2-12-riscv64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gm2-12
+
+name: gm2-12-s390x-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gm2-12
+
+name: gm2-12-sparc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gm2-12
+
+name: gm2-12-x86-64-linux-gnux32
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gm2-12
+
+name: gm2-9
+version: 9.5.0-1ubuntu1~22.04.1
+commands: gm2-9,x86_64-linux-gnu-gm2-9
+
+name: gm2-9-aarch64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: aarch64-linux-gnu-gm2-9
+
+name: gm2-9-alpha-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gm2-9
+
+name: gm2-9-arm-linux-gnueabi
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabi-gm2-9
+
+name: gm2-9-arm-linux-gnueabihf
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabihf-gm2-9
+
+name: gm2-9-hppa-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gm2-9
+
+name: gm2-9-i686-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: i686-linux-gnu-gm2-9
+
+name: gm2-9-m68k-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gm2-9
+
+name: gm2-9-powerpc64le-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc64le-linux-gnu-gm2-9
+
+name: gm2-9-riscv64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gm2-9
+
+name: gm2-9-s390x-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: s390x-linux-gnu-gm2-9
+
+name: gm2-9-sparc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gm2-9
+
+name: gm2-9-x86-64-linux-gnux32
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gm2-9
+
+name: gnat-10
+version: 10.5.0-1ubuntu1~22.04.3
+commands: gnat,gnat-10,gnatbind,gnatbind-10,gnatchop,gnatchop-10,gnatclean,gnatclean-10,gnatfind,gnatfind-10,gnatgcc,gnathtml,gnathtml-10,gnatkr,gnatkr-10,gnatlink,gnatlink-10,gnatls,gnatls-10,gnatmake,gnatmake-10,gnatname,gnatname-10,gnatprep,gnatprep-10,gnatxref,gnatxref-10,x86_64-linux-gnu-gnat,x86_64-linux-gnu-gnat-10,x86_64-linux-gnu-gnatbind,x86_64-linux-gnu-gnatbind-10,x86_64-linux-gnu-gnatchop,x86_64-linux-gnu-gnatchop-10,x86_64-linux-gnu-gnatclean,x86_64-linux-gnu-gnatclean-10,x86_64-linux-gnu-gnatfind,x86_64-linux-gnu-gnatfind-10,x86_64-linux-gnu-gnatgcc,x86_64-linux-gnu-gnathtml,x86_64-linux-gnu-gnathtml-10,x86_64-linux-gnu-gnatkr,x86_64-linux-gnu-gnatkr-10,x86_64-linux-gnu-gnatlink,x86_64-linux-gnu-gnatlink-10,x86_64-linux-gnu-gnatls,x86_64-linux-gnu-gnatls-10,x86_64-linux-gnu-gnatmake,x86_64-linux-gnu-gnatmake-10,x86_64-linux-gnu-gnatname,x86_64-linux-gnu-gnatname-10,x86_64-linux-gnu-gnatprep,x86_64-linux-gnu-gnatprep-10,x86_64-linux-gnu-gnatxref,x86_64-linux-gnu-gnatxref-10
+
+name: gnat-10-aarch64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-gnat,aarch64-linux-gnu-gnat-10,aarch64-linux-gnu-gnatbind,aarch64-linux-gnu-gnatbind-10,aarch64-linux-gnu-gnatchop,aarch64-linux-gnu-gnatchop-10,aarch64-linux-gnu-gnatclean,aarch64-linux-gnu-gnatclean-10,aarch64-linux-gnu-gnatfind,aarch64-linux-gnu-gnatfind-10,aarch64-linux-gnu-gnatgcc,aarch64-linux-gnu-gnathtml,aarch64-linux-gnu-gnathtml-10,aarch64-linux-gnu-gnatkr,aarch64-linux-gnu-gnatkr-10,aarch64-linux-gnu-gnatlink,aarch64-linux-gnu-gnatlink-10,aarch64-linux-gnu-gnatls,aarch64-linux-gnu-gnatls-10,aarch64-linux-gnu-gnatmake,aarch64-linux-gnu-gnatmake-10,aarch64-linux-gnu-gnatname,aarch64-linux-gnu-gnatname-10,aarch64-linux-gnu-gnatprep,aarch64-linux-gnu-gnatprep-10,aarch64-linux-gnu-gnatxref,aarch64-linux-gnu-gnatxref-10
+
+name: gnat-10-alpha-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gnat,alpha-linux-gnu-gnat-10,alpha-linux-gnu-gnatbind,alpha-linux-gnu-gnatbind-10,alpha-linux-gnu-gnatchop,alpha-linux-gnu-gnatchop-10,alpha-linux-gnu-gnatclean,alpha-linux-gnu-gnatclean-10,alpha-linux-gnu-gnatfind,alpha-linux-gnu-gnatfind-10,alpha-linux-gnu-gnatgcc,alpha-linux-gnu-gnathtml,alpha-linux-gnu-gnathtml-10,alpha-linux-gnu-gnatkr,alpha-linux-gnu-gnatkr-10,alpha-linux-gnu-gnatlink,alpha-linux-gnu-gnatlink-10,alpha-linux-gnu-gnatls,alpha-linux-gnu-gnatls-10,alpha-linux-gnu-gnatmake,alpha-linux-gnu-gnatmake-10,alpha-linux-gnu-gnatname,alpha-linux-gnu-gnatname-10,alpha-linux-gnu-gnatprep,alpha-linux-gnu-gnatprep-10,alpha-linux-gnu-gnatxref,alpha-linux-gnu-gnatxref-10
+
+name: gnat-10-arm-linux-gnueabi
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gnat,arm-linux-gnueabi-gnat-10,arm-linux-gnueabi-gnatbind,arm-linux-gnueabi-gnatbind-10,arm-linux-gnueabi-gnatchop,arm-linux-gnueabi-gnatchop-10,arm-linux-gnueabi-gnatclean,arm-linux-gnueabi-gnatclean-10,arm-linux-gnueabi-gnatfind,arm-linux-gnueabi-gnatfind-10,arm-linux-gnueabi-gnatgcc,arm-linux-gnueabi-gnathtml,arm-linux-gnueabi-gnathtml-10,arm-linux-gnueabi-gnatkr,arm-linux-gnueabi-gnatkr-10,arm-linux-gnueabi-gnatlink,arm-linux-gnueabi-gnatlink-10,arm-linux-gnueabi-gnatls,arm-linux-gnueabi-gnatls-10,arm-linux-gnueabi-gnatmake,arm-linux-gnueabi-gnatmake-10,arm-linux-gnueabi-gnatname,arm-linux-gnueabi-gnatname-10,arm-linux-gnueabi-gnatprep,arm-linux-gnueabi-gnatprep-10,arm-linux-gnueabi-gnatxref,arm-linux-gnueabi-gnatxref-10
+
+name: gnat-10-arm-linux-gnueabihf
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gnat,arm-linux-gnueabihf-gnat-10,arm-linux-gnueabihf-gnatbind,arm-linux-gnueabihf-gnatbind-10,arm-linux-gnueabihf-gnatchop,arm-linux-gnueabihf-gnatchop-10,arm-linux-gnueabihf-gnatclean,arm-linux-gnueabihf-gnatclean-10,arm-linux-gnueabihf-gnatfind,arm-linux-gnueabihf-gnatfind-10,arm-linux-gnueabihf-gnatgcc,arm-linux-gnueabihf-gnathtml,arm-linux-gnueabihf-gnathtml-10,arm-linux-gnueabihf-gnatkr,arm-linux-gnueabihf-gnatkr-10,arm-linux-gnueabihf-gnatlink,arm-linux-gnueabihf-gnatlink-10,arm-linux-gnueabihf-gnatls,arm-linux-gnueabihf-gnatls-10,arm-linux-gnueabihf-gnatmake,arm-linux-gnueabihf-gnatmake-10,arm-linux-gnueabihf-gnatname,arm-linux-gnueabihf-gnatname-10,arm-linux-gnueabihf-gnatprep,arm-linux-gnueabihf-gnatprep-10,arm-linux-gnueabihf-gnatxref,arm-linux-gnueabihf-gnatxref-10
+
+name: gnat-10-hppa-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gnat,hppa-linux-gnu-gnat-10,hppa-linux-gnu-gnatbind,hppa-linux-gnu-gnatbind-10,hppa-linux-gnu-gnatchop,hppa-linux-gnu-gnatchop-10,hppa-linux-gnu-gnatclean,hppa-linux-gnu-gnatclean-10,hppa-linux-gnu-gnatfind,hppa-linux-gnu-gnatfind-10,hppa-linux-gnu-gnatgcc,hppa-linux-gnu-gnathtml,hppa-linux-gnu-gnathtml-10,hppa-linux-gnu-gnatkr,hppa-linux-gnu-gnatkr-10,hppa-linux-gnu-gnatlink,hppa-linux-gnu-gnatlink-10,hppa-linux-gnu-gnatls,hppa-linux-gnu-gnatls-10,hppa-linux-gnu-gnatmake,hppa-linux-gnu-gnatmake-10,hppa-linux-gnu-gnatname,hppa-linux-gnu-gnatname-10,hppa-linux-gnu-gnatprep,hppa-linux-gnu-gnatprep-10,hppa-linux-gnu-gnatxref,hppa-linux-gnu-gnatxref-10
+
+name: gnat-10-i686-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gnat,i686-linux-gnu-gnat-10,i686-linux-gnu-gnatbind,i686-linux-gnu-gnatbind-10,i686-linux-gnu-gnatchop,i686-linux-gnu-gnatchop-10,i686-linux-gnu-gnatclean,i686-linux-gnu-gnatclean-10,i686-linux-gnu-gnatfind,i686-linux-gnu-gnatfind-10,i686-linux-gnu-gnatgcc,i686-linux-gnu-gnathtml,i686-linux-gnu-gnathtml-10,i686-linux-gnu-gnatkr,i686-linux-gnu-gnatkr-10,i686-linux-gnu-gnatlink,i686-linux-gnu-gnatlink-10,i686-linux-gnu-gnatls,i686-linux-gnu-gnatls-10,i686-linux-gnu-gnatmake,i686-linux-gnu-gnatmake-10,i686-linux-gnu-gnatname,i686-linux-gnu-gnatname-10,i686-linux-gnu-gnatprep,i686-linux-gnu-gnatprep-10,i686-linux-gnu-gnatxref,i686-linux-gnu-gnatxref-10
+
+name: gnat-10-m68k-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gnat,m68k-linux-gnu-gnat-10,m68k-linux-gnu-gnatbind,m68k-linux-gnu-gnatbind-10,m68k-linux-gnu-gnatchop,m68k-linux-gnu-gnatchop-10,m68k-linux-gnu-gnatclean,m68k-linux-gnu-gnatclean-10,m68k-linux-gnu-gnatfind,m68k-linux-gnu-gnatfind-10,m68k-linux-gnu-gnatgcc,m68k-linux-gnu-gnathtml,m68k-linux-gnu-gnathtml-10,m68k-linux-gnu-gnatkr,m68k-linux-gnu-gnatkr-10,m68k-linux-gnu-gnatlink,m68k-linux-gnu-gnatlink-10,m68k-linux-gnu-gnatls,m68k-linux-gnu-gnatls-10,m68k-linux-gnu-gnatmake,m68k-linux-gnu-gnatmake-10,m68k-linux-gnu-gnatname,m68k-linux-gnu-gnatname-10,m68k-linux-gnu-gnatprep,m68k-linux-gnu-gnatprep-10,m68k-linux-gnu-gnatxref,m68k-linux-gnu-gnatxref-10
+
+name: gnat-10-powerpc-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gnat,powerpc-linux-gnu-gnat-10,powerpc-linux-gnu-gnatbind,powerpc-linux-gnu-gnatbind-10,powerpc-linux-gnu-gnatchop,powerpc-linux-gnu-gnatchop-10,powerpc-linux-gnu-gnatclean,powerpc-linux-gnu-gnatclean-10,powerpc-linux-gnu-gnatfind,powerpc-linux-gnu-gnatfind-10,powerpc-linux-gnu-gnatgcc,powerpc-linux-gnu-gnathtml,powerpc-linux-gnu-gnathtml-10,powerpc-linux-gnu-gnatkr,powerpc-linux-gnu-gnatkr-10,powerpc-linux-gnu-gnatlink,powerpc-linux-gnu-gnatlink-10,powerpc-linux-gnu-gnatls,powerpc-linux-gnu-gnatls-10,powerpc-linux-gnu-gnatmake,powerpc-linux-gnu-gnatmake-10,powerpc-linux-gnu-gnatname,powerpc-linux-gnu-gnatname-10,powerpc-linux-gnu-gnatprep,powerpc-linux-gnu-gnatprep-10,powerpc-linux-gnu-gnatxref,powerpc-linux-gnu-gnatxref-10
+
+name: gnat-10-powerpc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gnat,powerpc64-linux-gnu-gnat-10,powerpc64-linux-gnu-gnatbind,powerpc64-linux-gnu-gnatbind-10,powerpc64-linux-gnu-gnatchop,powerpc64-linux-gnu-gnatchop-10,powerpc64-linux-gnu-gnatclean,powerpc64-linux-gnu-gnatclean-10,powerpc64-linux-gnu-gnatfind,powerpc64-linux-gnu-gnatfind-10,powerpc64-linux-gnu-gnatgcc,powerpc64-linux-gnu-gnathtml,powerpc64-linux-gnu-gnathtml-10,powerpc64-linux-gnu-gnatkr,powerpc64-linux-gnu-gnatkr-10,powerpc64-linux-gnu-gnatlink,powerpc64-linux-gnu-gnatlink-10,powerpc64-linux-gnu-gnatls,powerpc64-linux-gnu-gnatls-10,powerpc64-linux-gnu-gnatmake,powerpc64-linux-gnu-gnatmake-10,powerpc64-linux-gnu-gnatname,powerpc64-linux-gnu-gnatname-10,powerpc64-linux-gnu-gnatprep,powerpc64-linux-gnu-gnatprep-10,powerpc64-linux-gnu-gnatxref,powerpc64-linux-gnu-gnatxref-10
+
+name: gnat-10-powerpc64le-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gnat,powerpc64le-linux-gnu-gnat-10,powerpc64le-linux-gnu-gnatbind,powerpc64le-linux-gnu-gnatbind-10,powerpc64le-linux-gnu-gnatchop,powerpc64le-linux-gnu-gnatchop-10,powerpc64le-linux-gnu-gnatclean,powerpc64le-linux-gnu-gnatclean-10,powerpc64le-linux-gnu-gnatfind,powerpc64le-linux-gnu-gnatfind-10,powerpc64le-linux-gnu-gnatgcc,powerpc64le-linux-gnu-gnathtml,powerpc64le-linux-gnu-gnathtml-10,powerpc64le-linux-gnu-gnatkr,powerpc64le-linux-gnu-gnatkr-10,powerpc64le-linux-gnu-gnatlink,powerpc64le-linux-gnu-gnatlink-10,powerpc64le-linux-gnu-gnatls,powerpc64le-linux-gnu-gnatls-10,powerpc64le-linux-gnu-gnatmake,powerpc64le-linux-gnu-gnatmake-10,powerpc64le-linux-gnu-gnatname,powerpc64le-linux-gnu-gnatname-10,powerpc64le-linux-gnu-gnatprep,powerpc64le-linux-gnu-gnatprep-10,powerpc64le-linux-gnu-gnatxref,powerpc64le-linux-gnu-gnatxref-10
+
+name: gnat-10-riscv64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gnat,riscv64-linux-gnu-gnat-10,riscv64-linux-gnu-gnatbind,riscv64-linux-gnu-gnatbind-10,riscv64-linux-gnu-gnatchop,riscv64-linux-gnu-gnatchop-10,riscv64-linux-gnu-gnatclean,riscv64-linux-gnu-gnatclean-10,riscv64-linux-gnu-gnatfind,riscv64-linux-gnu-gnatfind-10,riscv64-linux-gnu-gnatgcc,riscv64-linux-gnu-gnathtml,riscv64-linux-gnu-gnathtml-10,riscv64-linux-gnu-gnatkr,riscv64-linux-gnu-gnatkr-10,riscv64-linux-gnu-gnatlink,riscv64-linux-gnu-gnatlink-10,riscv64-linux-gnu-gnatls,riscv64-linux-gnu-gnatls-10,riscv64-linux-gnu-gnatmake,riscv64-linux-gnu-gnatmake-10,riscv64-linux-gnu-gnatname,riscv64-linux-gnu-gnatname-10,riscv64-linux-gnu-gnatprep,riscv64-linux-gnu-gnatprep-10,riscv64-linux-gnu-gnatxref,riscv64-linux-gnu-gnatxref-10
+
+name: gnat-10-s390x-linux-gnu
+version: 10.5.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gnat,s390x-linux-gnu-gnat-10,s390x-linux-gnu-gnatbind,s390x-linux-gnu-gnatbind-10,s390x-linux-gnu-gnatchop,s390x-linux-gnu-gnatchop-10,s390x-linux-gnu-gnatclean,s390x-linux-gnu-gnatclean-10,s390x-linux-gnu-gnatfind,s390x-linux-gnu-gnatfind-10,s390x-linux-gnu-gnatgcc,s390x-linux-gnu-gnathtml,s390x-linux-gnu-gnathtml-10,s390x-linux-gnu-gnatkr,s390x-linux-gnu-gnatkr-10,s390x-linux-gnu-gnatlink,s390x-linux-gnu-gnatlink-10,s390x-linux-gnu-gnatls,s390x-linux-gnu-gnatls-10,s390x-linux-gnu-gnatmake,s390x-linux-gnu-gnatmake-10,s390x-linux-gnu-gnatname,s390x-linux-gnu-gnatname-10,s390x-linux-gnu-gnatprep,s390x-linux-gnu-gnatprep-10,s390x-linux-gnu-gnatxref,s390x-linux-gnu-gnatxref-10
+
+name: gnat-10-sh4-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gnat,sh4-linux-gnu-gnat-10,sh4-linux-gnu-gnatbind,sh4-linux-gnu-gnatbind-10,sh4-linux-gnu-gnatchop,sh4-linux-gnu-gnatchop-10,sh4-linux-gnu-gnatclean,sh4-linux-gnu-gnatclean-10,sh4-linux-gnu-gnatfind,sh4-linux-gnu-gnatfind-10,sh4-linux-gnu-gnatgcc,sh4-linux-gnu-gnathtml,sh4-linux-gnu-gnathtml-10,sh4-linux-gnu-gnatkr,sh4-linux-gnu-gnatkr-10,sh4-linux-gnu-gnatlink,sh4-linux-gnu-gnatlink-10,sh4-linux-gnu-gnatls,sh4-linux-gnu-gnatls-10,sh4-linux-gnu-gnatmake,sh4-linux-gnu-gnatmake-10,sh4-linux-gnu-gnatname,sh4-linux-gnu-gnatname-10,sh4-linux-gnu-gnatprep,sh4-linux-gnu-gnatprep-10,sh4-linux-gnu-gnatxref,sh4-linux-gnu-gnatxref-10
+
+name: gnat-10-sparc64-linux-gnu
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gnat,sparc64-linux-gnu-gnat-10,sparc64-linux-gnu-gnatbind,sparc64-linux-gnu-gnatbind-10,sparc64-linux-gnu-gnatchop,sparc64-linux-gnu-gnatchop-10,sparc64-linux-gnu-gnatclean,sparc64-linux-gnu-gnatclean-10,sparc64-linux-gnu-gnatfind,sparc64-linux-gnu-gnatfind-10,sparc64-linux-gnu-gnatgcc,sparc64-linux-gnu-gnathtml,sparc64-linux-gnu-gnathtml-10,sparc64-linux-gnu-gnatkr,sparc64-linux-gnu-gnatkr-10,sparc64-linux-gnu-gnatlink,sparc64-linux-gnu-gnatlink-10,sparc64-linux-gnu-gnatls,sparc64-linux-gnu-gnatls-10,sparc64-linux-gnu-gnatmake,sparc64-linux-gnu-gnatmake-10,sparc64-linux-gnu-gnatname,sparc64-linux-gnu-gnatname-10,sparc64-linux-gnu-gnatprep,sparc64-linux-gnu-gnatprep-10,sparc64-linux-gnu-gnatxref,sparc64-linux-gnu-gnatxref-10
+
+name: gnat-10-x86-64-linux-gnux32
+version: 10.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gnat,x86_64-linux-gnux32-gnat-10,x86_64-linux-gnux32-gnatbind,x86_64-linux-gnux32-gnatbind-10,x86_64-linux-gnux32-gnatchop,x86_64-linux-gnux32-gnatchop-10,x86_64-linux-gnux32-gnatclean,x86_64-linux-gnux32-gnatclean-10,x86_64-linux-gnux32-gnatfind,x86_64-linux-gnux32-gnatfind-10,x86_64-linux-gnux32-gnatgcc,x86_64-linux-gnux32-gnathtml,x86_64-linux-gnux32-gnathtml-10,x86_64-linux-gnux32-gnatkr,x86_64-linux-gnux32-gnatkr-10,x86_64-linux-gnux32-gnatlink,x86_64-linux-gnux32-gnatlink-10,x86_64-linux-gnux32-gnatls,x86_64-linux-gnux32-gnatls-10,x86_64-linux-gnux32-gnatmake,x86_64-linux-gnux32-gnatmake-10,x86_64-linux-gnux32-gnatname,x86_64-linux-gnux32-gnatname-10,x86_64-linux-gnux32-gnatprep,x86_64-linux-gnux32-gnatprep-10,x86_64-linux-gnux32-gnatxref,x86_64-linux-gnux32-gnatxref-10
+
+name: gnat-11
+version: 11.4.0-1ubuntu1~22.04.3
+commands: gnat,gnat-11,gnatbind,gnatbind-11,gnatchop,gnatchop-11,gnatclean,gnatclean-11,gnatfind,gnatfind-11,gnatgcc,gnathtml,gnathtml-11,gnatkr,gnatkr-11,gnatlink,gnatlink-11,gnatls,gnatls-11,gnatmake,gnatmake-11,gnatname,gnatname-11,gnatprep,gnatprep-11,gnatxref,gnatxref-11,x86_64-linux-gnu-gnat,x86_64-linux-gnu-gnat-11,x86_64-linux-gnu-gnatbind,x86_64-linux-gnu-gnatbind-11,x86_64-linux-gnu-gnatchop,x86_64-linux-gnu-gnatchop-11,x86_64-linux-gnu-gnatclean,x86_64-linux-gnu-gnatclean-11,x86_64-linux-gnu-gnatfind,x86_64-linux-gnu-gnatfind-11,x86_64-linux-gnu-gnatgcc,x86_64-linux-gnu-gnathtml,x86_64-linux-gnu-gnathtml-11,x86_64-linux-gnu-gnatkr,x86_64-linux-gnu-gnatkr-11,x86_64-linux-gnu-gnatlink,x86_64-linux-gnu-gnatlink-11,x86_64-linux-gnu-gnatls,x86_64-linux-gnu-gnatls-11,x86_64-linux-gnu-gnatmake,x86_64-linux-gnu-gnatmake-11,x86_64-linux-gnu-gnatname,x86_64-linux-gnu-gnatname-11,x86_64-linux-gnu-gnatprep,x86_64-linux-gnu-gnatprep-11,x86_64-linux-gnu-gnatxref,x86_64-linux-gnu-gnatxref-11
+
+name: gnat-11-aarch64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-gnat,aarch64-linux-gnu-gnat-11,aarch64-linux-gnu-gnatbind,aarch64-linux-gnu-gnatbind-11,aarch64-linux-gnu-gnatchop,aarch64-linux-gnu-gnatchop-11,aarch64-linux-gnu-gnatclean,aarch64-linux-gnu-gnatclean-11,aarch64-linux-gnu-gnatfind,aarch64-linux-gnu-gnatfind-11,aarch64-linux-gnu-gnatgcc,aarch64-linux-gnu-gnathtml,aarch64-linux-gnu-gnathtml-11,aarch64-linux-gnu-gnatkr,aarch64-linux-gnu-gnatkr-11,aarch64-linux-gnu-gnatlink,aarch64-linux-gnu-gnatlink-11,aarch64-linux-gnu-gnatls,aarch64-linux-gnu-gnatls-11,aarch64-linux-gnu-gnatmake,aarch64-linux-gnu-gnatmake-11,aarch64-linux-gnu-gnatname,aarch64-linux-gnu-gnatname-11,aarch64-linux-gnu-gnatprep,aarch64-linux-gnu-gnatprep-11,aarch64-linux-gnu-gnatxref,aarch64-linux-gnu-gnatxref-11
+
+name: gnat-11-alpha-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gnat,alpha-linux-gnu-gnat-11,alpha-linux-gnu-gnatbind,alpha-linux-gnu-gnatbind-11,alpha-linux-gnu-gnatchop,alpha-linux-gnu-gnatchop-11,alpha-linux-gnu-gnatclean,alpha-linux-gnu-gnatclean-11,alpha-linux-gnu-gnatfind,alpha-linux-gnu-gnatfind-11,alpha-linux-gnu-gnatgcc,alpha-linux-gnu-gnathtml,alpha-linux-gnu-gnathtml-11,alpha-linux-gnu-gnatkr,alpha-linux-gnu-gnatkr-11,alpha-linux-gnu-gnatlink,alpha-linux-gnu-gnatlink-11,alpha-linux-gnu-gnatls,alpha-linux-gnu-gnatls-11,alpha-linux-gnu-gnatmake,alpha-linux-gnu-gnatmake-11,alpha-linux-gnu-gnatname,alpha-linux-gnu-gnatname-11,alpha-linux-gnu-gnatprep,alpha-linux-gnu-gnatprep-11,alpha-linux-gnu-gnatxref,alpha-linux-gnu-gnatxref-11
+
+name: gnat-11-arm-linux-gnueabi
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gnat,arm-linux-gnueabi-gnat-11,arm-linux-gnueabi-gnatbind,arm-linux-gnueabi-gnatbind-11,arm-linux-gnueabi-gnatchop,arm-linux-gnueabi-gnatchop-11,arm-linux-gnueabi-gnatclean,arm-linux-gnueabi-gnatclean-11,arm-linux-gnueabi-gnatfind,arm-linux-gnueabi-gnatfind-11,arm-linux-gnueabi-gnatgcc,arm-linux-gnueabi-gnathtml,arm-linux-gnueabi-gnathtml-11,arm-linux-gnueabi-gnatkr,arm-linux-gnueabi-gnatkr-11,arm-linux-gnueabi-gnatlink,arm-linux-gnueabi-gnatlink-11,arm-linux-gnueabi-gnatls,arm-linux-gnueabi-gnatls-11,arm-linux-gnueabi-gnatmake,arm-linux-gnueabi-gnatmake-11,arm-linux-gnueabi-gnatname,arm-linux-gnueabi-gnatname-11,arm-linux-gnueabi-gnatprep,arm-linux-gnueabi-gnatprep-11,arm-linux-gnueabi-gnatxref,arm-linux-gnueabi-gnatxref-11
+
+name: gnat-11-arm-linux-gnueabihf
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gnat,arm-linux-gnueabihf-gnat-11,arm-linux-gnueabihf-gnatbind,arm-linux-gnueabihf-gnatbind-11,arm-linux-gnueabihf-gnatchop,arm-linux-gnueabihf-gnatchop-11,arm-linux-gnueabihf-gnatclean,arm-linux-gnueabihf-gnatclean-11,arm-linux-gnueabihf-gnatfind,arm-linux-gnueabihf-gnatfind-11,arm-linux-gnueabihf-gnatgcc,arm-linux-gnueabihf-gnathtml,arm-linux-gnueabihf-gnathtml-11,arm-linux-gnueabihf-gnatkr,arm-linux-gnueabihf-gnatkr-11,arm-linux-gnueabihf-gnatlink,arm-linux-gnueabihf-gnatlink-11,arm-linux-gnueabihf-gnatls,arm-linux-gnueabihf-gnatls-11,arm-linux-gnueabihf-gnatmake,arm-linux-gnueabihf-gnatmake-11,arm-linux-gnueabihf-gnatname,arm-linux-gnueabihf-gnatname-11,arm-linux-gnueabihf-gnatprep,arm-linux-gnueabihf-gnatprep-11,arm-linux-gnueabihf-gnatxref,arm-linux-gnueabihf-gnatxref-11
+
+name: gnat-11-hppa-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gnat,hppa-linux-gnu-gnat-11,hppa-linux-gnu-gnatbind,hppa-linux-gnu-gnatbind-11,hppa-linux-gnu-gnatchop,hppa-linux-gnu-gnatchop-11,hppa-linux-gnu-gnatclean,hppa-linux-gnu-gnatclean-11,hppa-linux-gnu-gnatfind,hppa-linux-gnu-gnatfind-11,hppa-linux-gnu-gnatgcc,hppa-linux-gnu-gnathtml,hppa-linux-gnu-gnathtml-11,hppa-linux-gnu-gnatkr,hppa-linux-gnu-gnatkr-11,hppa-linux-gnu-gnatlink,hppa-linux-gnu-gnatlink-11,hppa-linux-gnu-gnatls,hppa-linux-gnu-gnatls-11,hppa-linux-gnu-gnatmake,hppa-linux-gnu-gnatmake-11,hppa-linux-gnu-gnatname,hppa-linux-gnu-gnatname-11,hppa-linux-gnu-gnatprep,hppa-linux-gnu-gnatprep-11,hppa-linux-gnu-gnatxref,hppa-linux-gnu-gnatxref-11
+
+name: gnat-11-i686-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gnat,i686-linux-gnu-gnat-11,i686-linux-gnu-gnatbind,i686-linux-gnu-gnatbind-11,i686-linux-gnu-gnatchop,i686-linux-gnu-gnatchop-11,i686-linux-gnu-gnatclean,i686-linux-gnu-gnatclean-11,i686-linux-gnu-gnatfind,i686-linux-gnu-gnatfind-11,i686-linux-gnu-gnatgcc,i686-linux-gnu-gnathtml,i686-linux-gnu-gnathtml-11,i686-linux-gnu-gnatkr,i686-linux-gnu-gnatkr-11,i686-linux-gnu-gnatlink,i686-linux-gnu-gnatlink-11,i686-linux-gnu-gnatls,i686-linux-gnu-gnatls-11,i686-linux-gnu-gnatmake,i686-linux-gnu-gnatmake-11,i686-linux-gnu-gnatname,i686-linux-gnu-gnatname-11,i686-linux-gnu-gnatprep,i686-linux-gnu-gnatprep-11,i686-linux-gnu-gnatxref,i686-linux-gnu-gnatxref-11
+
+name: gnat-11-powerpc-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gnat,powerpc-linux-gnu-gnat-11,powerpc-linux-gnu-gnatbind,powerpc-linux-gnu-gnatbind-11,powerpc-linux-gnu-gnatchop,powerpc-linux-gnu-gnatchop-11,powerpc-linux-gnu-gnatclean,powerpc-linux-gnu-gnatclean-11,powerpc-linux-gnu-gnatfind,powerpc-linux-gnu-gnatfind-11,powerpc-linux-gnu-gnatgcc,powerpc-linux-gnu-gnathtml,powerpc-linux-gnu-gnathtml-11,powerpc-linux-gnu-gnatkr,powerpc-linux-gnu-gnatkr-11,powerpc-linux-gnu-gnatlink,powerpc-linux-gnu-gnatlink-11,powerpc-linux-gnu-gnatls,powerpc-linux-gnu-gnatls-11,powerpc-linux-gnu-gnatmake,powerpc-linux-gnu-gnatmake-11,powerpc-linux-gnu-gnatname,powerpc-linux-gnu-gnatname-11,powerpc-linux-gnu-gnatprep,powerpc-linux-gnu-gnatprep-11,powerpc-linux-gnu-gnatxref,powerpc-linux-gnu-gnatxref-11
+
+name: gnat-11-powerpc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gnat,powerpc64-linux-gnu-gnat-11,powerpc64-linux-gnu-gnatbind,powerpc64-linux-gnu-gnatbind-11,powerpc64-linux-gnu-gnatchop,powerpc64-linux-gnu-gnatchop-11,powerpc64-linux-gnu-gnatclean,powerpc64-linux-gnu-gnatclean-11,powerpc64-linux-gnu-gnatfind,powerpc64-linux-gnu-gnatfind-11,powerpc64-linux-gnu-gnatgcc,powerpc64-linux-gnu-gnathtml,powerpc64-linux-gnu-gnathtml-11,powerpc64-linux-gnu-gnatkr,powerpc64-linux-gnu-gnatkr-11,powerpc64-linux-gnu-gnatlink,powerpc64-linux-gnu-gnatlink-11,powerpc64-linux-gnu-gnatls,powerpc64-linux-gnu-gnatls-11,powerpc64-linux-gnu-gnatmake,powerpc64-linux-gnu-gnatmake-11,powerpc64-linux-gnu-gnatname,powerpc64-linux-gnu-gnatname-11,powerpc64-linux-gnu-gnatprep,powerpc64-linux-gnu-gnatprep-11,powerpc64-linux-gnu-gnatxref,powerpc64-linux-gnu-gnatxref-11
+
+name: gnat-11-powerpc64le-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gnat,powerpc64le-linux-gnu-gnat-11,powerpc64le-linux-gnu-gnatbind,powerpc64le-linux-gnu-gnatbind-11,powerpc64le-linux-gnu-gnatchop,powerpc64le-linux-gnu-gnatchop-11,powerpc64le-linux-gnu-gnatclean,powerpc64le-linux-gnu-gnatclean-11,powerpc64le-linux-gnu-gnatfind,powerpc64le-linux-gnu-gnatfind-11,powerpc64le-linux-gnu-gnatgcc,powerpc64le-linux-gnu-gnathtml,powerpc64le-linux-gnu-gnathtml-11,powerpc64le-linux-gnu-gnatkr,powerpc64le-linux-gnu-gnatkr-11,powerpc64le-linux-gnu-gnatlink,powerpc64le-linux-gnu-gnatlink-11,powerpc64le-linux-gnu-gnatls,powerpc64le-linux-gnu-gnatls-11,powerpc64le-linux-gnu-gnatmake,powerpc64le-linux-gnu-gnatmake-11,powerpc64le-linux-gnu-gnatname,powerpc64le-linux-gnu-gnatname-11,powerpc64le-linux-gnu-gnatprep,powerpc64le-linux-gnu-gnatprep-11,powerpc64le-linux-gnu-gnatxref,powerpc64le-linux-gnu-gnatxref-11
+
+name: gnat-11-riscv64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gnat,riscv64-linux-gnu-gnat-11,riscv64-linux-gnu-gnatbind,riscv64-linux-gnu-gnatbind-11,riscv64-linux-gnu-gnatchop,riscv64-linux-gnu-gnatchop-11,riscv64-linux-gnu-gnatclean,riscv64-linux-gnu-gnatclean-11,riscv64-linux-gnu-gnatfind,riscv64-linux-gnu-gnatfind-11,riscv64-linux-gnu-gnatgcc,riscv64-linux-gnu-gnathtml,riscv64-linux-gnu-gnathtml-11,riscv64-linux-gnu-gnatkr,riscv64-linux-gnu-gnatkr-11,riscv64-linux-gnu-gnatlink,riscv64-linux-gnu-gnatlink-11,riscv64-linux-gnu-gnatls,riscv64-linux-gnu-gnatls-11,riscv64-linux-gnu-gnatmake,riscv64-linux-gnu-gnatmake-11,riscv64-linux-gnu-gnatname,riscv64-linux-gnu-gnatname-11,riscv64-linux-gnu-gnatprep,riscv64-linux-gnu-gnatprep-11,riscv64-linux-gnu-gnatxref,riscv64-linux-gnu-gnatxref-11
+
+name: gnat-11-s390x-linux-gnu
+version: 11.4.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gnat,s390x-linux-gnu-gnat-11,s390x-linux-gnu-gnatbind,s390x-linux-gnu-gnatbind-11,s390x-linux-gnu-gnatchop,s390x-linux-gnu-gnatchop-11,s390x-linux-gnu-gnatclean,s390x-linux-gnu-gnatclean-11,s390x-linux-gnu-gnatfind,s390x-linux-gnu-gnatfind-11,s390x-linux-gnu-gnatgcc,s390x-linux-gnu-gnathtml,s390x-linux-gnu-gnathtml-11,s390x-linux-gnu-gnatkr,s390x-linux-gnu-gnatkr-11,s390x-linux-gnu-gnatlink,s390x-linux-gnu-gnatlink-11,s390x-linux-gnu-gnatls,s390x-linux-gnu-gnatls-11,s390x-linux-gnu-gnatmake,s390x-linux-gnu-gnatmake-11,s390x-linux-gnu-gnatname,s390x-linux-gnu-gnatname-11,s390x-linux-gnu-gnatprep,s390x-linux-gnu-gnatprep-11,s390x-linux-gnu-gnatxref,s390x-linux-gnu-gnatxref-11
+
+name: gnat-11-sh4-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gnat,sh4-linux-gnu-gnat-11,sh4-linux-gnu-gnatbind,sh4-linux-gnu-gnatbind-11,sh4-linux-gnu-gnatchop,sh4-linux-gnu-gnatchop-11,sh4-linux-gnu-gnatclean,sh4-linux-gnu-gnatclean-11,sh4-linux-gnu-gnatfind,sh4-linux-gnu-gnatfind-11,sh4-linux-gnu-gnatgcc,sh4-linux-gnu-gnathtml,sh4-linux-gnu-gnathtml-11,sh4-linux-gnu-gnatkr,sh4-linux-gnu-gnatkr-11,sh4-linux-gnu-gnatlink,sh4-linux-gnu-gnatlink-11,sh4-linux-gnu-gnatls,sh4-linux-gnu-gnatls-11,sh4-linux-gnu-gnatmake,sh4-linux-gnu-gnatmake-11,sh4-linux-gnu-gnatname,sh4-linux-gnu-gnatname-11,sh4-linux-gnu-gnatprep,sh4-linux-gnu-gnatprep-11,sh4-linux-gnu-gnatxref,sh4-linux-gnu-gnatxref-11
+
+name: gnat-11-sparc64-linux-gnu
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gnat,sparc64-linux-gnu-gnat-11,sparc64-linux-gnu-gnatbind,sparc64-linux-gnu-gnatbind-11,sparc64-linux-gnu-gnatchop,sparc64-linux-gnu-gnatchop-11,sparc64-linux-gnu-gnatclean,sparc64-linux-gnu-gnatclean-11,sparc64-linux-gnu-gnatfind,sparc64-linux-gnu-gnatfind-11,sparc64-linux-gnu-gnatgcc,sparc64-linux-gnu-gnathtml,sparc64-linux-gnu-gnathtml-11,sparc64-linux-gnu-gnatkr,sparc64-linux-gnu-gnatkr-11,sparc64-linux-gnu-gnatlink,sparc64-linux-gnu-gnatlink-11,sparc64-linux-gnu-gnatls,sparc64-linux-gnu-gnatls-11,sparc64-linux-gnu-gnatmake,sparc64-linux-gnu-gnatmake-11,sparc64-linux-gnu-gnatname,sparc64-linux-gnu-gnatname-11,sparc64-linux-gnu-gnatprep,sparc64-linux-gnu-gnatprep-11,sparc64-linux-gnu-gnatxref,sparc64-linux-gnu-gnatxref-11
+
+name: gnat-11-x86-64-linux-gnux32
+version: 11.4.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gnat,x86_64-linux-gnux32-gnat-11,x86_64-linux-gnux32-gnatbind,x86_64-linux-gnux32-gnatbind-11,x86_64-linux-gnux32-gnatchop,x86_64-linux-gnux32-gnatchop-11,x86_64-linux-gnux32-gnatclean,x86_64-linux-gnux32-gnatclean-11,x86_64-linux-gnux32-gnatfind,x86_64-linux-gnux32-gnatfind-11,x86_64-linux-gnux32-gnatgcc,x86_64-linux-gnux32-gnathtml,x86_64-linux-gnux32-gnathtml-11,x86_64-linux-gnux32-gnatkr,x86_64-linux-gnux32-gnatkr-11,x86_64-linux-gnux32-gnatlink,x86_64-linux-gnux32-gnatlink-11,x86_64-linux-gnux32-gnatls,x86_64-linux-gnux32-gnatls-11,x86_64-linux-gnux32-gnatmake,x86_64-linux-gnux32-gnatmake-11,x86_64-linux-gnux32-gnatname,x86_64-linux-gnux32-gnatname-11,x86_64-linux-gnux32-gnatprep,x86_64-linux-gnux32-gnatprep-11,x86_64-linux-gnux32-gnatxref,x86_64-linux-gnux32-gnatxref-11
+
+name: gnat-12
+version: 12.3.0-1ubuntu1~22.04.3
+commands: gnat,gnat-12,gnatbind,gnatbind-12,gnatchop,gnatchop-12,gnatclean,gnatclean-12,gnatgcc,gnathtml,gnathtml-12,gnatkr,gnatkr-12,gnatlink,gnatlink-12,gnatls,gnatls-12,gnatmake,gnatmake-12,gnatname,gnatname-12,gnatprep,gnatprep-12,x86_64-linux-gnu-gnat,x86_64-linux-gnu-gnat-12,x86_64-linux-gnu-gnatbind,x86_64-linux-gnu-gnatbind-12,x86_64-linux-gnu-gnatchop,x86_64-linux-gnu-gnatchop-12,x86_64-linux-gnu-gnatclean,x86_64-linux-gnu-gnatclean-12,x86_64-linux-gnu-gnatgcc,x86_64-linux-gnu-gnathtml,x86_64-linux-gnu-gnathtml-12,x86_64-linux-gnu-gnatkr,x86_64-linux-gnu-gnatkr-12,x86_64-linux-gnu-gnatlink,x86_64-linux-gnu-gnatlink-12,x86_64-linux-gnu-gnatls,x86_64-linux-gnu-gnatls-12,x86_64-linux-gnu-gnatmake,x86_64-linux-gnu-gnatmake-12,x86_64-linux-gnu-gnatname,x86_64-linux-gnu-gnatname-12,x86_64-linux-gnu-gnatprep,x86_64-linux-gnu-gnatprep-12
+
+name: gnat-12-aarch64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: aarch64-linux-gnu-gnat,aarch64-linux-gnu-gnat-12,aarch64-linux-gnu-gnatbind,aarch64-linux-gnu-gnatbind-12,aarch64-linux-gnu-gnatchop,aarch64-linux-gnu-gnatchop-12,aarch64-linux-gnu-gnatclean,aarch64-linux-gnu-gnatclean-12,aarch64-linux-gnu-gnatgcc,aarch64-linux-gnu-gnathtml,aarch64-linux-gnu-gnathtml-12,aarch64-linux-gnu-gnatkr,aarch64-linux-gnu-gnatkr-12,aarch64-linux-gnu-gnatlink,aarch64-linux-gnu-gnatlink-12,aarch64-linux-gnu-gnatls,aarch64-linux-gnu-gnatls-12,aarch64-linux-gnu-gnatmake,aarch64-linux-gnu-gnatmake-12,aarch64-linux-gnu-gnatname,aarch64-linux-gnu-gnatname-12,aarch64-linux-gnu-gnatprep,aarch64-linux-gnu-gnatprep-12
+
+name: gnat-12-alpha-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gnat,alpha-linux-gnu-gnat-12,alpha-linux-gnu-gnatbind,alpha-linux-gnu-gnatbind-12,alpha-linux-gnu-gnatchop,alpha-linux-gnu-gnatchop-12,alpha-linux-gnu-gnatclean,alpha-linux-gnu-gnatclean-12,alpha-linux-gnu-gnatgcc,alpha-linux-gnu-gnathtml,alpha-linux-gnu-gnathtml-12,alpha-linux-gnu-gnatkr,alpha-linux-gnu-gnatkr-12,alpha-linux-gnu-gnatlink,alpha-linux-gnu-gnatlink-12,alpha-linux-gnu-gnatls,alpha-linux-gnu-gnatls-12,alpha-linux-gnu-gnatmake,alpha-linux-gnu-gnatmake-12,alpha-linux-gnu-gnatname,alpha-linux-gnu-gnatname-12,alpha-linux-gnu-gnatprep,alpha-linux-gnu-gnatprep-12
+
+name: gnat-12-arm-linux-gnueabi
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabi-gnat,arm-linux-gnueabi-gnat-12,arm-linux-gnueabi-gnatbind,arm-linux-gnueabi-gnatbind-12,arm-linux-gnueabi-gnatchop,arm-linux-gnueabi-gnatchop-12,arm-linux-gnueabi-gnatclean,arm-linux-gnueabi-gnatclean-12,arm-linux-gnueabi-gnatgcc,arm-linux-gnueabi-gnathtml,arm-linux-gnueabi-gnathtml-12,arm-linux-gnueabi-gnatkr,arm-linux-gnueabi-gnatkr-12,arm-linux-gnueabi-gnatlink,arm-linux-gnueabi-gnatlink-12,arm-linux-gnueabi-gnatls,arm-linux-gnueabi-gnatls-12,arm-linux-gnueabi-gnatmake,arm-linux-gnueabi-gnatmake-12,arm-linux-gnueabi-gnatname,arm-linux-gnueabi-gnatname-12,arm-linux-gnueabi-gnatprep,arm-linux-gnueabi-gnatprep-12
+
+name: gnat-12-arm-linux-gnueabihf
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: arm-linux-gnueabihf-gnat,arm-linux-gnueabihf-gnat-12,arm-linux-gnueabihf-gnatbind,arm-linux-gnueabihf-gnatbind-12,arm-linux-gnueabihf-gnatchop,arm-linux-gnueabihf-gnatchop-12,arm-linux-gnueabihf-gnatclean,arm-linux-gnueabihf-gnatclean-12,arm-linux-gnueabihf-gnatgcc,arm-linux-gnueabihf-gnathtml,arm-linux-gnueabihf-gnathtml-12,arm-linux-gnueabihf-gnatkr,arm-linux-gnueabihf-gnatkr-12,arm-linux-gnueabihf-gnatlink,arm-linux-gnueabihf-gnatlink-12,arm-linux-gnueabihf-gnatls,arm-linux-gnueabihf-gnatls-12,arm-linux-gnueabihf-gnatmake,arm-linux-gnueabihf-gnatmake-12,arm-linux-gnueabihf-gnatname,arm-linux-gnueabihf-gnatname-12,arm-linux-gnueabihf-gnatprep,arm-linux-gnueabihf-gnatprep-12
+
+name: gnat-12-hppa-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gnat,hppa-linux-gnu-gnat-12,hppa-linux-gnu-gnatbind,hppa-linux-gnu-gnatbind-12,hppa-linux-gnu-gnatchop,hppa-linux-gnu-gnatchop-12,hppa-linux-gnu-gnatclean,hppa-linux-gnu-gnatclean-12,hppa-linux-gnu-gnatgcc,hppa-linux-gnu-gnathtml,hppa-linux-gnu-gnathtml-12,hppa-linux-gnu-gnatkr,hppa-linux-gnu-gnatkr-12,hppa-linux-gnu-gnatlink,hppa-linux-gnu-gnatlink-12,hppa-linux-gnu-gnatls,hppa-linux-gnu-gnatls-12,hppa-linux-gnu-gnatmake,hppa-linux-gnu-gnatmake-12,hppa-linux-gnu-gnatname,hppa-linux-gnu-gnatname-12,hppa-linux-gnu-gnatprep,hppa-linux-gnu-gnatprep-12
+
+name: gnat-12-i686-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: i686-linux-gnu-gnat,i686-linux-gnu-gnat-12,i686-linux-gnu-gnatbind,i686-linux-gnu-gnatbind-12,i686-linux-gnu-gnatchop,i686-linux-gnu-gnatchop-12,i686-linux-gnu-gnatclean,i686-linux-gnu-gnatclean-12,i686-linux-gnu-gnatgcc,i686-linux-gnu-gnathtml,i686-linux-gnu-gnathtml-12,i686-linux-gnu-gnatkr,i686-linux-gnu-gnatkr-12,i686-linux-gnu-gnatlink,i686-linux-gnu-gnatlink-12,i686-linux-gnu-gnatls,i686-linux-gnu-gnatls-12,i686-linux-gnu-gnatmake,i686-linux-gnu-gnatmake-12,i686-linux-gnu-gnatname,i686-linux-gnu-gnatname-12,i686-linux-gnu-gnatprep,i686-linux-gnu-gnatprep-12
+
+name: gnat-12-m68k-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gnat,m68k-linux-gnu-gnat-12,m68k-linux-gnu-gnatbind,m68k-linux-gnu-gnatbind-12,m68k-linux-gnu-gnatchop,m68k-linux-gnu-gnatchop-12,m68k-linux-gnu-gnatclean,m68k-linux-gnu-gnatclean-12,m68k-linux-gnu-gnatgcc,m68k-linux-gnu-gnathtml,m68k-linux-gnu-gnathtml-12,m68k-linux-gnu-gnatkr,m68k-linux-gnu-gnatkr-12,m68k-linux-gnu-gnatlink,m68k-linux-gnu-gnatlink-12,m68k-linux-gnu-gnatls,m68k-linux-gnu-gnatls-12,m68k-linux-gnu-gnatmake,m68k-linux-gnu-gnatmake-12,m68k-linux-gnu-gnatname,m68k-linux-gnu-gnatname-12,m68k-linux-gnu-gnatprep,m68k-linux-gnu-gnatprep-12
+
+name: gnat-12-powerpc-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc-linux-gnu-gnat,powerpc-linux-gnu-gnat-12,powerpc-linux-gnu-gnatbind,powerpc-linux-gnu-gnatbind-12,powerpc-linux-gnu-gnatchop,powerpc-linux-gnu-gnatchop-12,powerpc-linux-gnu-gnatclean,powerpc-linux-gnu-gnatclean-12,powerpc-linux-gnu-gnatgcc,powerpc-linux-gnu-gnathtml,powerpc-linux-gnu-gnathtml-12,powerpc-linux-gnu-gnatkr,powerpc-linux-gnu-gnatkr-12,powerpc-linux-gnu-gnatlink,powerpc-linux-gnu-gnatlink-12,powerpc-linux-gnu-gnatls,powerpc-linux-gnu-gnatls-12,powerpc-linux-gnu-gnatmake,powerpc-linux-gnu-gnatmake-12,powerpc-linux-gnu-gnatname,powerpc-linux-gnu-gnatname-12,powerpc-linux-gnu-gnatprep,powerpc-linux-gnu-gnatprep-12
+
+name: gnat-12-powerpc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gnat,powerpc64-linux-gnu-gnat-12,powerpc64-linux-gnu-gnatbind,powerpc64-linux-gnu-gnatbind-12,powerpc64-linux-gnu-gnatchop,powerpc64-linux-gnu-gnatchop-12,powerpc64-linux-gnu-gnatclean,powerpc64-linux-gnu-gnatclean-12,powerpc64-linux-gnu-gnatgcc,powerpc64-linux-gnu-gnathtml,powerpc64-linux-gnu-gnathtml-12,powerpc64-linux-gnu-gnatkr,powerpc64-linux-gnu-gnatkr-12,powerpc64-linux-gnu-gnatlink,powerpc64-linux-gnu-gnatlink-12,powerpc64-linux-gnu-gnatls,powerpc64-linux-gnu-gnatls-12,powerpc64-linux-gnu-gnatmake,powerpc64-linux-gnu-gnatmake-12,powerpc64-linux-gnu-gnatname,powerpc64-linux-gnu-gnatname-12,powerpc64-linux-gnu-gnatprep,powerpc64-linux-gnu-gnatprep-12
+
+name: gnat-12-powerpc64le-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: powerpc64le-linux-gnu-gnat,powerpc64le-linux-gnu-gnat-12,powerpc64le-linux-gnu-gnatbind,powerpc64le-linux-gnu-gnatbind-12,powerpc64le-linux-gnu-gnatchop,powerpc64le-linux-gnu-gnatchop-12,powerpc64le-linux-gnu-gnatclean,powerpc64le-linux-gnu-gnatclean-12,powerpc64le-linux-gnu-gnatgcc,powerpc64le-linux-gnu-gnathtml,powerpc64le-linux-gnu-gnathtml-12,powerpc64le-linux-gnu-gnatkr,powerpc64le-linux-gnu-gnatkr-12,powerpc64le-linux-gnu-gnatlink,powerpc64le-linux-gnu-gnatlink-12,powerpc64le-linux-gnu-gnatls,powerpc64le-linux-gnu-gnatls-12,powerpc64le-linux-gnu-gnatmake,powerpc64le-linux-gnu-gnatmake-12,powerpc64le-linux-gnu-gnatname,powerpc64le-linux-gnu-gnatname-12,powerpc64le-linux-gnu-gnatprep,powerpc64le-linux-gnu-gnatprep-12
+
+name: gnat-12-riscv64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gnat,riscv64-linux-gnu-gnat-12,riscv64-linux-gnu-gnatbind,riscv64-linux-gnu-gnatbind-12,riscv64-linux-gnu-gnatchop,riscv64-linux-gnu-gnatchop-12,riscv64-linux-gnu-gnatclean,riscv64-linux-gnu-gnatclean-12,riscv64-linux-gnu-gnatgcc,riscv64-linux-gnu-gnathtml,riscv64-linux-gnu-gnathtml-12,riscv64-linux-gnu-gnatkr,riscv64-linux-gnu-gnatkr-12,riscv64-linux-gnu-gnatlink,riscv64-linux-gnu-gnatlink-12,riscv64-linux-gnu-gnatls,riscv64-linux-gnu-gnatls-12,riscv64-linux-gnu-gnatmake,riscv64-linux-gnu-gnatmake-12,riscv64-linux-gnu-gnatname,riscv64-linux-gnu-gnatname-12,riscv64-linux-gnu-gnatprep,riscv64-linux-gnu-gnatprep-12
+
+name: gnat-12-s390x-linux-gnu
+version: 12.3.0-1ubuntu1~22.04.3cross1
+commands: s390x-linux-gnu-gnat,s390x-linux-gnu-gnat-12,s390x-linux-gnu-gnatbind,s390x-linux-gnu-gnatbind-12,s390x-linux-gnu-gnatchop,s390x-linux-gnu-gnatchop-12,s390x-linux-gnu-gnatclean,s390x-linux-gnu-gnatclean-12,s390x-linux-gnu-gnatgcc,s390x-linux-gnu-gnathtml,s390x-linux-gnu-gnathtml-12,s390x-linux-gnu-gnatkr,s390x-linux-gnu-gnatkr-12,s390x-linux-gnu-gnatlink,s390x-linux-gnu-gnatlink-12,s390x-linux-gnu-gnatls,s390x-linux-gnu-gnatls-12,s390x-linux-gnu-gnatmake,s390x-linux-gnu-gnatmake-12,s390x-linux-gnu-gnatname,s390x-linux-gnu-gnatname-12,s390x-linux-gnu-gnatprep,s390x-linux-gnu-gnatprep-12
+
+name: gnat-12-sh4-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gnat,sh4-linux-gnu-gnat-12,sh4-linux-gnu-gnatbind,sh4-linux-gnu-gnatbind-12,sh4-linux-gnu-gnatchop,sh4-linux-gnu-gnatchop-12,sh4-linux-gnu-gnatclean,sh4-linux-gnu-gnatclean-12,sh4-linux-gnu-gnatgcc,sh4-linux-gnu-gnathtml,sh4-linux-gnu-gnathtml-12,sh4-linux-gnu-gnatkr,sh4-linux-gnu-gnatkr-12,sh4-linux-gnu-gnatlink,sh4-linux-gnu-gnatlink-12,sh4-linux-gnu-gnatls,sh4-linux-gnu-gnatls-12,sh4-linux-gnu-gnatmake,sh4-linux-gnu-gnatmake-12,sh4-linux-gnu-gnatname,sh4-linux-gnu-gnatname-12,sh4-linux-gnu-gnatprep,sh4-linux-gnu-gnatprep-12
+
+name: gnat-12-sparc64-linux-gnu
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gnat,sparc64-linux-gnu-gnat-12,sparc64-linux-gnu-gnatbind,sparc64-linux-gnu-gnatbind-12,sparc64-linux-gnu-gnatchop,sparc64-linux-gnu-gnatchop-12,sparc64-linux-gnu-gnatclean,sparc64-linux-gnu-gnatclean-12,sparc64-linux-gnu-gnatgcc,sparc64-linux-gnu-gnathtml,sparc64-linux-gnu-gnathtml-12,sparc64-linux-gnu-gnatkr,sparc64-linux-gnu-gnatkr-12,sparc64-linux-gnu-gnatlink,sparc64-linux-gnu-gnatlink-12,sparc64-linux-gnu-gnatls,sparc64-linux-gnu-gnatls-12,sparc64-linux-gnu-gnatmake,sparc64-linux-gnu-gnatmake-12,sparc64-linux-gnu-gnatname,sparc64-linux-gnu-gnatname-12,sparc64-linux-gnu-gnatprep,sparc64-linux-gnu-gnatprep-12
+
+name: gnat-12-x86-64-linux-gnux32
+version: 12.3.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gnat,x86_64-linux-gnux32-gnat-12,x86_64-linux-gnux32-gnatbind,x86_64-linux-gnux32-gnatbind-12,x86_64-linux-gnux32-gnatchop,x86_64-linux-gnux32-gnatchop-12,x86_64-linux-gnux32-gnatclean,x86_64-linux-gnux32-gnatclean-12,x86_64-linux-gnux32-gnatgcc,x86_64-linux-gnux32-gnathtml,x86_64-linux-gnux32-gnathtml-12,x86_64-linux-gnux32-gnatkr,x86_64-linux-gnux32-gnatkr-12,x86_64-linux-gnux32-gnatlink,x86_64-linux-gnux32-gnatlink-12,x86_64-linux-gnux32-gnatls,x86_64-linux-gnux32-gnatls-12,x86_64-linux-gnux32-gnatmake,x86_64-linux-gnux32-gnatmake-12,x86_64-linux-gnux32-gnatname,x86_64-linux-gnux32-gnatname-12,x86_64-linux-gnux32-gnatprep,x86_64-linux-gnux32-gnatprep-12
+
+name: gnat-9
+version: 9.5.0-1ubuntu1~22.04.1
+commands: gnat,gnat-9,gnatbind,gnatbind-9,gnatchop,gnatchop-9,gnatclean,gnatclean-9,gnatfind,gnatfind-9,gnatgcc,gnathtml,gnathtml-9,gnatkr,gnatkr-9,gnatlink,gnatlink-9,gnatls,gnatls-9,gnatmake,gnatmake-9,gnatname,gnatname-9,gnatprep,gnatprep-9,gnatxref,gnatxref-9,x86_64-linux-gnu-gnat,x86_64-linux-gnu-gnat-9,x86_64-linux-gnu-gnatbind,x86_64-linux-gnu-gnatbind-9,x86_64-linux-gnu-gnatchop,x86_64-linux-gnu-gnatchop-9,x86_64-linux-gnu-gnatclean,x86_64-linux-gnu-gnatclean-9,x86_64-linux-gnu-gnatfind,x86_64-linux-gnu-gnatfind-9,x86_64-linux-gnu-gnatgcc,x86_64-linux-gnu-gnathtml,x86_64-linux-gnu-gnathtml-9,x86_64-linux-gnu-gnatkr,x86_64-linux-gnu-gnatkr-9,x86_64-linux-gnu-gnatlink,x86_64-linux-gnu-gnatlink-9,x86_64-linux-gnu-gnatls,x86_64-linux-gnu-gnatls-9,x86_64-linux-gnu-gnatmake,x86_64-linux-gnu-gnatmake-9,x86_64-linux-gnu-gnatname,x86_64-linux-gnu-gnatname-9,x86_64-linux-gnu-gnatprep,x86_64-linux-gnu-gnatprep-9,x86_64-linux-gnu-gnatxref,x86_64-linux-gnu-gnatxref-9
+
+name: gnat-9-aarch64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: aarch64-linux-gnu-gnat,aarch64-linux-gnu-gnat-9,aarch64-linux-gnu-gnatbind,aarch64-linux-gnu-gnatbind-9,aarch64-linux-gnu-gnatchop,aarch64-linux-gnu-gnatchop-9,aarch64-linux-gnu-gnatclean,aarch64-linux-gnu-gnatclean-9,aarch64-linux-gnu-gnatfind,aarch64-linux-gnu-gnatfind-9,aarch64-linux-gnu-gnatgcc,aarch64-linux-gnu-gnathtml,aarch64-linux-gnu-gnathtml-9,aarch64-linux-gnu-gnatkr,aarch64-linux-gnu-gnatkr-9,aarch64-linux-gnu-gnatlink,aarch64-linux-gnu-gnatlink-9,aarch64-linux-gnu-gnatls,aarch64-linux-gnu-gnatls-9,aarch64-linux-gnu-gnatmake,aarch64-linux-gnu-gnatmake-9,aarch64-linux-gnu-gnatname,aarch64-linux-gnu-gnatname-9,aarch64-linux-gnu-gnatprep,aarch64-linux-gnu-gnatprep-9,aarch64-linux-gnu-gnatxref,aarch64-linux-gnu-gnatxref-9
+
+name: gnat-9-alpha-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: alpha-linux-gnu-gnat,alpha-linux-gnu-gnat-9,alpha-linux-gnu-gnatbind,alpha-linux-gnu-gnatbind-9,alpha-linux-gnu-gnatchop,alpha-linux-gnu-gnatchop-9,alpha-linux-gnu-gnatclean,alpha-linux-gnu-gnatclean-9,alpha-linux-gnu-gnatfind,alpha-linux-gnu-gnatfind-9,alpha-linux-gnu-gnatgcc,alpha-linux-gnu-gnathtml,alpha-linux-gnu-gnathtml-9,alpha-linux-gnu-gnatkr,alpha-linux-gnu-gnatkr-9,alpha-linux-gnu-gnatlink,alpha-linux-gnu-gnatlink-9,alpha-linux-gnu-gnatls,alpha-linux-gnu-gnatls-9,alpha-linux-gnu-gnatmake,alpha-linux-gnu-gnatmake-9,alpha-linux-gnu-gnatname,alpha-linux-gnu-gnatname-9,alpha-linux-gnu-gnatprep,alpha-linux-gnu-gnatprep-9,alpha-linux-gnu-gnatxref,alpha-linux-gnu-gnatxref-9
+
+name: gnat-9-arm-linux-gnueabi
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabi-gnat,arm-linux-gnueabi-gnat-9,arm-linux-gnueabi-gnatbind,arm-linux-gnueabi-gnatbind-9,arm-linux-gnueabi-gnatchop,arm-linux-gnueabi-gnatchop-9,arm-linux-gnueabi-gnatclean,arm-linux-gnueabi-gnatclean-9,arm-linux-gnueabi-gnatfind,arm-linux-gnueabi-gnatfind-9,arm-linux-gnueabi-gnatgcc,arm-linux-gnueabi-gnathtml,arm-linux-gnueabi-gnathtml-9,arm-linux-gnueabi-gnatkr,arm-linux-gnueabi-gnatkr-9,arm-linux-gnueabi-gnatlink,arm-linux-gnueabi-gnatlink-9,arm-linux-gnueabi-gnatls,arm-linux-gnueabi-gnatls-9,arm-linux-gnueabi-gnatmake,arm-linux-gnueabi-gnatmake-9,arm-linux-gnueabi-gnatname,arm-linux-gnueabi-gnatname-9,arm-linux-gnueabi-gnatprep,arm-linux-gnueabi-gnatprep-9,arm-linux-gnueabi-gnatxref,arm-linux-gnueabi-gnatxref-9
+
+name: gnat-9-arm-linux-gnueabihf
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: arm-linux-gnueabihf-gnat,arm-linux-gnueabihf-gnat-9,arm-linux-gnueabihf-gnatbind,arm-linux-gnueabihf-gnatbind-9,arm-linux-gnueabihf-gnatchop,arm-linux-gnueabihf-gnatchop-9,arm-linux-gnueabihf-gnatclean,arm-linux-gnueabihf-gnatclean-9,arm-linux-gnueabihf-gnatfind,arm-linux-gnueabihf-gnatfind-9,arm-linux-gnueabihf-gnatgcc,arm-linux-gnueabihf-gnathtml,arm-linux-gnueabihf-gnathtml-9,arm-linux-gnueabihf-gnatkr,arm-linux-gnueabihf-gnatkr-9,arm-linux-gnueabihf-gnatlink,arm-linux-gnueabihf-gnatlink-9,arm-linux-gnueabihf-gnatls,arm-linux-gnueabihf-gnatls-9,arm-linux-gnueabihf-gnatmake,arm-linux-gnueabihf-gnatmake-9,arm-linux-gnueabihf-gnatname,arm-linux-gnueabihf-gnatname-9,arm-linux-gnueabihf-gnatprep,arm-linux-gnueabihf-gnatprep-9,arm-linux-gnueabihf-gnatxref,arm-linux-gnueabihf-gnatxref-9
+
+name: gnat-9-hppa-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: hppa-linux-gnu-gnat,hppa-linux-gnu-gnat-9,hppa-linux-gnu-gnatbind,hppa-linux-gnu-gnatbind-9,hppa-linux-gnu-gnatchop,hppa-linux-gnu-gnatchop-9,hppa-linux-gnu-gnatclean,hppa-linux-gnu-gnatclean-9,hppa-linux-gnu-gnatfind,hppa-linux-gnu-gnatfind-9,hppa-linux-gnu-gnatgcc,hppa-linux-gnu-gnathtml,hppa-linux-gnu-gnathtml-9,hppa-linux-gnu-gnatkr,hppa-linux-gnu-gnatkr-9,hppa-linux-gnu-gnatlink,hppa-linux-gnu-gnatlink-9,hppa-linux-gnu-gnatls,hppa-linux-gnu-gnatls-9,hppa-linux-gnu-gnatmake,hppa-linux-gnu-gnatmake-9,hppa-linux-gnu-gnatname,hppa-linux-gnu-gnatname-9,hppa-linux-gnu-gnatprep,hppa-linux-gnu-gnatprep-9,hppa-linux-gnu-gnatxref,hppa-linux-gnu-gnatxref-9
+
+name: gnat-9-i686-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: i686-linux-gnu-gnat,i686-linux-gnu-gnat-9,i686-linux-gnu-gnatbind,i686-linux-gnu-gnatbind-9,i686-linux-gnu-gnatchop,i686-linux-gnu-gnatchop-9,i686-linux-gnu-gnatclean,i686-linux-gnu-gnatclean-9,i686-linux-gnu-gnatfind,i686-linux-gnu-gnatfind-9,i686-linux-gnu-gnatgcc,i686-linux-gnu-gnathtml,i686-linux-gnu-gnathtml-9,i686-linux-gnu-gnatkr,i686-linux-gnu-gnatkr-9,i686-linux-gnu-gnatlink,i686-linux-gnu-gnatlink-9,i686-linux-gnu-gnatls,i686-linux-gnu-gnatls-9,i686-linux-gnu-gnatmake,i686-linux-gnu-gnatmake-9,i686-linux-gnu-gnatname,i686-linux-gnu-gnatname-9,i686-linux-gnu-gnatprep,i686-linux-gnu-gnatprep-9,i686-linux-gnu-gnatxref,i686-linux-gnu-gnatxref-9
+
+name: gnat-9-m68k-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: m68k-linux-gnu-gnat,m68k-linux-gnu-gnat-9,m68k-linux-gnu-gnatbind,m68k-linux-gnu-gnatbind-9,m68k-linux-gnu-gnatchop,m68k-linux-gnu-gnatchop-9,m68k-linux-gnu-gnatclean,m68k-linux-gnu-gnatclean-9,m68k-linux-gnu-gnatfind,m68k-linux-gnu-gnatfind-9,m68k-linux-gnu-gnatgcc,m68k-linux-gnu-gnathtml,m68k-linux-gnu-gnathtml-9,m68k-linux-gnu-gnatkr,m68k-linux-gnu-gnatkr-9,m68k-linux-gnu-gnatlink,m68k-linux-gnu-gnatlink-9,m68k-linux-gnu-gnatls,m68k-linux-gnu-gnatls-9,m68k-linux-gnu-gnatmake,m68k-linux-gnu-gnatmake-9,m68k-linux-gnu-gnatname,m68k-linux-gnu-gnatname-9,m68k-linux-gnu-gnatprep,m68k-linux-gnu-gnatprep-9,m68k-linux-gnu-gnatxref,m68k-linux-gnu-gnatxref-9
+
+name: gnat-9-powerpc-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc-linux-gnu-gnat,powerpc-linux-gnu-gnat-9,powerpc-linux-gnu-gnatbind,powerpc-linux-gnu-gnatbind-9,powerpc-linux-gnu-gnatchop,powerpc-linux-gnu-gnatchop-9,powerpc-linux-gnu-gnatclean,powerpc-linux-gnu-gnatclean-9,powerpc-linux-gnu-gnatfind,powerpc-linux-gnu-gnatfind-9,powerpc-linux-gnu-gnatgcc,powerpc-linux-gnu-gnathtml,powerpc-linux-gnu-gnathtml-9,powerpc-linux-gnu-gnatkr,powerpc-linux-gnu-gnatkr-9,powerpc-linux-gnu-gnatlink,powerpc-linux-gnu-gnatlink-9,powerpc-linux-gnu-gnatls,powerpc-linux-gnu-gnatls-9,powerpc-linux-gnu-gnatmake,powerpc-linux-gnu-gnatmake-9,powerpc-linux-gnu-gnatname,powerpc-linux-gnu-gnatname-9,powerpc-linux-gnu-gnatprep,powerpc-linux-gnu-gnatprep-9,powerpc-linux-gnu-gnatxref,powerpc-linux-gnu-gnatxref-9
+
+name: gnat-9-powerpc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: powerpc64-linux-gnu-gnat,powerpc64-linux-gnu-gnat-9,powerpc64-linux-gnu-gnatbind,powerpc64-linux-gnu-gnatbind-9,powerpc64-linux-gnu-gnatchop,powerpc64-linux-gnu-gnatchop-9,powerpc64-linux-gnu-gnatclean,powerpc64-linux-gnu-gnatclean-9,powerpc64-linux-gnu-gnatfind,powerpc64-linux-gnu-gnatfind-9,powerpc64-linux-gnu-gnatgcc,powerpc64-linux-gnu-gnathtml,powerpc64-linux-gnu-gnathtml-9,powerpc64-linux-gnu-gnatkr,powerpc64-linux-gnu-gnatkr-9,powerpc64-linux-gnu-gnatlink,powerpc64-linux-gnu-gnatlink-9,powerpc64-linux-gnu-gnatls,powerpc64-linux-gnu-gnatls-9,powerpc64-linux-gnu-gnatmake,powerpc64-linux-gnu-gnatmake-9,powerpc64-linux-gnu-gnatname,powerpc64-linux-gnu-gnatname-9,powerpc64-linux-gnu-gnatprep,powerpc64-linux-gnu-gnatprep-9,powerpc64-linux-gnu-gnatxref,powerpc64-linux-gnu-gnatxref-9
+
+name: gnat-9-powerpc64le-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: powerpc64le-linux-gnu-gnat,powerpc64le-linux-gnu-gnat-9,powerpc64le-linux-gnu-gnatbind,powerpc64le-linux-gnu-gnatbind-9,powerpc64le-linux-gnu-gnatchop,powerpc64le-linux-gnu-gnatchop-9,powerpc64le-linux-gnu-gnatclean,powerpc64le-linux-gnu-gnatclean-9,powerpc64le-linux-gnu-gnatfind,powerpc64le-linux-gnu-gnatfind-9,powerpc64le-linux-gnu-gnatgcc,powerpc64le-linux-gnu-gnathtml,powerpc64le-linux-gnu-gnathtml-9,powerpc64le-linux-gnu-gnatkr,powerpc64le-linux-gnu-gnatkr-9,powerpc64le-linux-gnu-gnatlink,powerpc64le-linux-gnu-gnatlink-9,powerpc64le-linux-gnu-gnatls,powerpc64le-linux-gnu-gnatls-9,powerpc64le-linux-gnu-gnatmake,powerpc64le-linux-gnu-gnatmake-9,powerpc64le-linux-gnu-gnatname,powerpc64le-linux-gnu-gnatname-9,powerpc64le-linux-gnu-gnatprep,powerpc64le-linux-gnu-gnatprep-9,powerpc64le-linux-gnu-gnatxref,powerpc64le-linux-gnu-gnatxref-9
+
+name: gnat-9-riscv64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: riscv64-linux-gnu-gnat,riscv64-linux-gnu-gnat-9,riscv64-linux-gnu-gnatbind,riscv64-linux-gnu-gnatbind-9,riscv64-linux-gnu-gnatchop,riscv64-linux-gnu-gnatchop-9,riscv64-linux-gnu-gnatclean,riscv64-linux-gnu-gnatclean-9,riscv64-linux-gnu-gnatfind,riscv64-linux-gnu-gnatfind-9,riscv64-linux-gnu-gnatgcc,riscv64-linux-gnu-gnathtml,riscv64-linux-gnu-gnathtml-9,riscv64-linux-gnu-gnatkr,riscv64-linux-gnu-gnatkr-9,riscv64-linux-gnu-gnatlink,riscv64-linux-gnu-gnatlink-9,riscv64-linux-gnu-gnatls,riscv64-linux-gnu-gnatls-9,riscv64-linux-gnu-gnatmake,riscv64-linux-gnu-gnatmake-9,riscv64-linux-gnu-gnatname,riscv64-linux-gnu-gnatname-9,riscv64-linux-gnu-gnatprep,riscv64-linux-gnu-gnatprep-9,riscv64-linux-gnu-gnatxref,riscv64-linux-gnu-gnatxref-9
+
+name: gnat-9-s390x-linux-gnu
+version: 9.5.0-1ubuntu1~22.04.1cross1
+commands: s390x-linux-gnu-gnat,s390x-linux-gnu-gnat-9,s390x-linux-gnu-gnatbind,s390x-linux-gnu-gnatbind-9,s390x-linux-gnu-gnatchop,s390x-linux-gnu-gnatchop-9,s390x-linux-gnu-gnatclean,s390x-linux-gnu-gnatclean-9,s390x-linux-gnu-gnatfind,s390x-linux-gnu-gnatfind-9,s390x-linux-gnu-gnatgcc,s390x-linux-gnu-gnathtml,s390x-linux-gnu-gnathtml-9,s390x-linux-gnu-gnatkr,s390x-linux-gnu-gnatkr-9,s390x-linux-gnu-gnatlink,s390x-linux-gnu-gnatlink-9,s390x-linux-gnu-gnatls,s390x-linux-gnu-gnatls-9,s390x-linux-gnu-gnatmake,s390x-linux-gnu-gnatmake-9,s390x-linux-gnu-gnatname,s390x-linux-gnu-gnatname-9,s390x-linux-gnu-gnatprep,s390x-linux-gnu-gnatprep-9,s390x-linux-gnu-gnatxref,s390x-linux-gnu-gnatxref-9
+
+name: gnat-9-sh4-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sh4-linux-gnu-gnat,sh4-linux-gnu-gnat-9,sh4-linux-gnu-gnatbind,sh4-linux-gnu-gnatbind-9,sh4-linux-gnu-gnatchop,sh4-linux-gnu-gnatchop-9,sh4-linux-gnu-gnatclean,sh4-linux-gnu-gnatclean-9,sh4-linux-gnu-gnatfind,sh4-linux-gnu-gnatfind-9,sh4-linux-gnu-gnatgcc,sh4-linux-gnu-gnathtml,sh4-linux-gnu-gnathtml-9,sh4-linux-gnu-gnatkr,sh4-linux-gnu-gnatkr-9,sh4-linux-gnu-gnatlink,sh4-linux-gnu-gnatlink-9,sh4-linux-gnu-gnatls,sh4-linux-gnu-gnatls-9,sh4-linux-gnu-gnatmake,sh4-linux-gnu-gnatmake-9,sh4-linux-gnu-gnatname,sh4-linux-gnu-gnatname-9,sh4-linux-gnu-gnatprep,sh4-linux-gnu-gnatprep-9,sh4-linux-gnu-gnatxref,sh4-linux-gnu-gnatxref-9
+
+name: gnat-9-sparc64-linux-gnu
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: sparc64-linux-gnu-gnat,sparc64-linux-gnu-gnat-9,sparc64-linux-gnu-gnatbind,sparc64-linux-gnu-gnatbind-9,sparc64-linux-gnu-gnatchop,sparc64-linux-gnu-gnatchop-9,sparc64-linux-gnu-gnatclean,sparc64-linux-gnu-gnatclean-9,sparc64-linux-gnu-gnatfind,sparc64-linux-gnu-gnatfind-9,sparc64-linux-gnu-gnatgcc,sparc64-linux-gnu-gnathtml,sparc64-linux-gnu-gnathtml-9,sparc64-linux-gnu-gnatkr,sparc64-linux-gnu-gnatkr-9,sparc64-linux-gnu-gnatlink,sparc64-linux-gnu-gnatlink-9,sparc64-linux-gnu-gnatls,sparc64-linux-gnu-gnatls-9,sparc64-linux-gnu-gnatmake,sparc64-linux-gnu-gnatmake-9,sparc64-linux-gnu-gnatname,sparc64-linux-gnu-gnatname-9,sparc64-linux-gnu-gnatprep,sparc64-linux-gnu-gnatprep-9,sparc64-linux-gnu-gnatxref,sparc64-linux-gnu-gnatxref-9
+
+name: gnat-9-x86-64-linux-gnux32
+version: 9.5.0-1ubuntu1~22.04cross1
+commands: x86_64-linux-gnux32-gnat,x86_64-linux-gnux32-gnat-9,x86_64-linux-gnux32-gnatbind,x86_64-linux-gnux32-gnatbind-9,x86_64-linux-gnux32-gnatchop,x86_64-linux-gnux32-gnatchop-9,x86_64-linux-gnux32-gnatclean,x86_64-linux-gnux32-gnatclean-9,x86_64-linux-gnux32-gnatfind,x86_64-linux-gnux32-gnatfind-9,x86_64-linux-gnux32-gnatgcc,x86_64-linux-gnux32-gnathtml,x86_64-linux-gnux32-gnathtml-9,x86_64-linux-gnux32-gnatkr,x86_64-linux-gnux32-gnatkr-9,x86_64-linux-gnux32-gnatlink,x86_64-linux-gnux32-gnatlink-9,x86_64-linux-gnux32-gnatls,x86_64-linux-gnux32-gnatls-9,x86_64-linux-gnux32-gnatmake,x86_64-linux-gnux32-gnatmake-9,x86_64-linux-gnux32-gnatname,x86_64-linux-gnux32-gnatname-9,x86_64-linux-gnux32-gnatprep,x86_64-linux-gnux32-gnatprep-9,x86_64-linux-gnux32-gnatxref,x86_64-linux-gnux32-gnatxref-9
+
+name: gnome-shell-extension-prefs
+version: 42.9-0ubuntu2.2
+commands: gnome-extensions-app,gnome-shell-extension-prefs
+
+name: gnuchess
+version: 6.2.7-1+deb11u1build0.22.04.1
+commands: gnuchess,gnuchessu,gnuchessx
+
+name: gnupg2
+version: 2.2.27-3ubuntu2.5
+commands: gpg2
+
+name: gnutls-bin
+version: 3.7.3-4ubuntu1.9
+commands: certtool,danetool,gnutls-cli,gnutls-cli-debug,gnutls-serv,ocsptool,p11tool,psktool,srptool
+
+name: go-cve-dictionary
+version: 0.3.1-4ubuntu0.22.04.3
+commands: go-cve-dictionary
+
+name: go-dqlite
+version: 1.10.1-1ubuntu0.1
+commands: dqlite,dqlite-benchmark,dqlite-demo
+
+name: go-exploitdb
+version: 0.0~git20181130.7c961e7-2ubuntu0.22.04.3
+commands: go-exploitdb
+
+name: go-mmproxy
+version: 2.1-1ubuntu0.22.04.1
+commands: go-mmproxy
+
+name: go-org
+version: 1.6.0-1ubuntu0.1
+commands: go-org
+
+name: go-qrcode
+version: 0.0~git20200617.da1b656-3ubuntu0.1
+commands: qrcode
+
+name: go-rpmdb
+version: 0.0~git20210911.73bd0ce-1ubuntu0.1
+commands: rpmdb
+
+name: go-sendxmpp
+version: 0.2.0-1ubuntu0.1
+commands: go-sendxmpp
+
+name: gobgpd
+version: 2.25.0-3ubuntu0.1
+commands: gobgp,gobgpd
+
+name: gocryptfs
+version: 1.8.0-1ubuntu0.1
+commands: gocryptfs,gocryptfs-xray,statfs,statvsfstat
+
+name: gojq
+version: 0.12.6-1ubuntu0.1
+commands: gojq
+
+name: golang-chroma
+version: 0.9.4-1ubuntu0.1
+commands: chroma,chromad
+
+name: golang-docker-credential-helpers
+version: 0.6.4+ds1-1ubuntu0.22.04.1
+commands: docker-credential-pass,docker-credential-secretservice
+
+name: golang-github-dcso-bloom-cli
+version: 0.2.4-2ubuntu0.1
+commands: bloom
+
+name: golang-github-dnstap-golang-dnstap-cli
+version: 0.4.0-3ubuntu0.1
+commands: dnstap
+
+name: golang-github-mozillazg-go-pinyin-dev
+version: 0.18.0+ds.1-2ubuntu0.1
+commands: pinyin
+
+name: golang-github-opencontainers-runc-dev
+version: 1.1.7-0ubuntu1~22.04.6
+commands: recvtty,runc,sd-helper,seccompagent
+
+name: golang-github-pelletier-go-toml
+version: 1.9.4-1ubuntu0.1
+commands: jsontoml,tomljson,tomll
+
+name: golang-github-sebest-xff
+version: 0.0~git20160910.6c115e0-2ubuntu0.22.04.1
+commands: negroni,nethttp
+
+name: golang-golang-x-tools
+version: 1:0.1.9+ds-2ubuntu2.2
+commands: benchcmp,callgraph,compilebench,digraph,file2fuzz,findtypeparams,fiximports,getgo,go-contrib-init,godex,godoc,goimports,golang-authtest,golang-bundle,golang-cookieauth,golang-eg,golang-fieldalignment,golang-findcall,golang-gitauth,golang-guru,golang-ifaceassert,golang-lostcancel,golang-netrcauth,golang-nilness,golang-shadow,golang-stress,golang-stringintconv,golang-unmarshal,gomvpkg,gopackages,gorename,gotype,goyacc,html2article,present,present2md,splitdwarf,ssadump,stringer,toolstash
+
+name: golang-truststore
+version: 0.9.6-2ubuntu0.1
+commands: truststore
+
+name: golint
+version: 0.0+git20200130.910be7a-1ubuntu0.22.04.3
+commands: golint
+
+name: gopass
+version: 1.5.0-1ubuntu0.22.04.1
+commands: gopass
+
+name: gopls
+version: 1:0.1.9+ds-2ubuntu2.2
+commands: gopls
+
+name: gorst
+version: 0.0~git20181029.ca9f730-2ubuntu1.22.04.2
+commands: gorst
+
+name: gost
+version: 0.1.0+git20181204.5afeda5e-1.1ubuntu0.22.04.3
+commands: gost
+
+name: gosu
+version: 1.14-1ubuntu0.1
+commands: gosu
+
+name: goval-dictionary
+version: 0.2.0-4ubuntu0.1
+commands: goval-dictionary
+
+name: goxkcdpwgen
+version: 0.0~git20181107.de898c7-3ubuntu0.22.04.1
+commands: goxkcdpwgen
+
+name: gpgv-static
+version: 2.2.27-3ubuntu2.5
+commands: gpgv-static
+
+name: gpgv2
+version: 2.2.27-3ubuntu2.5
+commands: gpgv2
+
+name: gpsd-clients
+version: 3.22-4ubuntu2.1
+commands: gegps,gps2udp,gpscat,gpscsv,gpsdecode,gpsfake,gpspipe,gpsplot,gpsprof,gpsrinex,gpssubframe,gpxlogger,lcdgps,xgps,xgpsspeed,zerk
+
+name: graphicsmagick
+version: 1.4+really1.3.38-1ubuntu0.1
+commands: gm
+
+name: graphicsmagick-imagemagick-compat
+version: 1.4+really1.3.38-1ubuntu0.1
+commands: animate,composite,conjure,convert,display,identify,import,mogrify,montage
+
+name: graphicsmagick-libmagick-dev-compat
+version: 1.4+really1.3.38-1ubuntu0.1
+commands: Magick++-config,Magick-config,Wand-config
+
+name: graphite-web
+version: 1.1.8-1ubuntu0.22.04.1
+commands: graphite-build-search-index,graphite-manage
+
+name: gross
+version: 1.0.2-4ubuntu0.22.04.1
+commands: grossd
+
+name: gstreamer1.0-plugins-bad-apps
+version: 1.20.3-0ubuntu1.1
+commands: gst-transcoder-1.0
+
+name: gtk-4-examples
+version: 4.6.9+ds-0ubuntu0.22.04.2
+commands: gtk4-demo,gtk4-demo-application,gtk4-icon-browser,gtk4-print-editor,gtk4-widget-factory
+
+name: gtk2.0-examples
+version: 2.24.33-2ubuntu2.1
+commands: gtk-demo
+
+name: hart-payload-generator
+version: 2022.10-0ubuntu1~22.04.1
+commands: hss-payload-generator
+
+name: hjson-go
+version: 3.1.0-2ubuntu0.1
+commands: hjson-cli
+
+name: hostapd
+version: 2:2.10-6ubuntu2.2
+commands: hostapd,hostapd_cli
+
+name: hub
+version: 2.14.2~ds1-1ubuntu0.22.04.3
+commands: hub
+
+name: hugo
+version: 0.92.2-1ubuntu0.1
+commands: hugo
+
+name: hyperfine
+version: 1.12.0-3ubuntu0.1
+commands: hyperfine
+
+name: idle
+version: 3.10.6-1~22.04
+commands: idle
+
+name: idle-python2.7
+version: 2.7.18-13ubuntu1.5
+commands: idle-python2.7
+
+name: idle-python3.10
+version: 3.10.12-1~22.04.15
+commands: idle-python3.10
+
+name: ignition
+version: 2.13.0+ds1-2ubuntu0.3
+commands: ignition-validate
+
+name: imagemagick-6.q16
+version: 8:6.9.11.60+dfsg-1.3ubuntu0.22.04.5
+commands: animate,animate-im6,animate-im6.q16,compare,compare-im6,compare-im6.q16,composite,composite-im6,composite-im6.q16,conjure,conjure-im6,conjure-im6.q16,convert,convert-im6,convert-im6.q16,display,display-im6,display-im6.q16,identify,identify-im6,identify-im6.q16,import,import-im6,import-im6.q16,mogrify,mogrify-im6,mogrify-im6.q16,montage,montage-im6,montage-im6.q16,stream,stream-im6,stream-im6.q16
+
+name: imagemagick-6.q16hdri
+version: 8:6.9.11.60+dfsg-1.3ubuntu0.22.04.5
+commands: animate,animate-im6,animate-im6.q16hdri,compare,compare-im6,compare-im6.q16hdri,composite,composite-im6,composite-im6.q16hdri,conjure,conjure-im6,conjure-im6.q16hdri,convert,convert-im6,convert-im6.q16hdri,display,display-im6,display-im6.q16hdri,identify,identify-im6,identify-im6.q16hdri,import,import-im6,import-im6.q16hdri,mogrify,mogrify-im6,mogrify-im6.q16hdri,montage,montage-im6,montage-im6.q16hdri,stream,stream-im6,stream-im6.q16hdri
+
+name: inetutils-ftp
+version: 2:2.2-2ubuntu0.2
+commands: ftp,inetutils-ftp,pftp
+
+name: inetutils-ftpd
+version: 2:2.2-2ubuntu0.2
+commands: ftpd
+
+name: inetutils-inetd
+version: 2:2.2-2ubuntu0.2
+commands: inetutils-inetd
+
+name: inetutils-ping
+version: 2:2.2-2ubuntu0.2
+commands: ping,ping6
+
+name: inetutils-syslogd
+version: 2:2.2-2ubuntu0.2
+commands: syslogd
+
+name: inetutils-talk
+version: 2:2.2-2ubuntu0.2
+commands: inetutils-talk,talk
+
+name: inetutils-talkd
+version: 2:2.2-2ubuntu0.2
+commands: talkd
+
+name: inetutils-telnet
+version: 2:2.2-2ubuntu0.2
+commands: inetutils-telnet,telnet
+
+name: inetutils-telnetd
+version: 2:2.2-2ubuntu0.2
+commands: telnetd
+
+name: inetutils-tools
+version: 2:2.2-2ubuntu0.2
+commands: inetutils-dnsdomainname,inetutils-hostname,inetutils-ifconfig,inetutils-logger
+
+name: inetutils-traceroute
+version: 2:2.2-2ubuntu0.2
+commands: inetutils-traceroute,traceroute
+
+name: influxdb
+version: 1.6.7~rc0-1ubuntu0.22.04.3
+commands: influxd
+
+name: influxdb-client
+version: 1.6.7~rc0-1ubuntu0.22.04.3
+commands: influx
+
+name: internetarchive
+version: 1.9.9-1ubuntu0.1
+commands: ia
+
+name: iperf3
+version: 3.9-1+deb11u1ubuntu0.1
+commands: iperf3
+
+name: iputils-clockdiff
+version: 3:20211215-1ubuntu0.1
+commands: clockdiff
+
+name: isag
+version: 12.5.2-2ubuntu0.2
+commands: isag
+
+name: isc-dhcp-client-ddns
+version: 4.4.1-2.3ubuntu2.3
+commands: dhclient
+
+name: isc-dhcp-relay
+version: 4.4.1-2.3ubuntu2.3
+commands: dhcrelay
+
+name: isc-dhcp-server-ldap
+version: 4.4.1-2.3ubuntu2.3
+commands: dhcpd
+
+name: jbigkit-bin
+version: 2.1-3.1ubuntu0.22.04.1
+commands: jbgtopbm,jbgtopbm85,pbmtojbg,pbmtojbg85
+
+name: jhead
+version: 1:3.06.0.1-2ubuntu0.22.04.1
+commands: jhead
+
+name: jid
+version: 0.7.6-1ubuntu0.22.04.1
+commands: jid
+
+name: jp
+version: 0.1.3-3ubuntu0.1
+commands: jp
+
+name: jtreg6
+version: 6.1+2-1ubuntu1~22.04
+commands: jtdiff,jtreg
+
+name: jtreg7
+version: 7.5.2+1+ds1-2~22.04.2
+commands: jtdiff,jtreg
+
+name: jtreg8
+version: 8.1+1+ds1-1~22.04
+commands: jtdiff,jtreg
+
+name: jupyter-notebook
+version: 6.4.8-1ubuntu0.1
+commands: jupyter-bundlerextension,jupyter-nbextension,jupyter-notebook,jupyter-serverextension
+
+name: jwt
+version: 4.2.0-1ubuntu0.1
+commands: jwt
+
+name: kcptun
+version: 20210922+ds-1ubuntu0.22.04.1
+commands: kcptun-client,kcptun-server
+
+name: kitty
+version: 0.21.2-1ubuntu0.22.04.1
+commands: kitty,x-terminal-emulator
+
+name: kopano-archiver
+version: 8.7.0-7.1ubuntu10.1
+commands: kopano-archiver
+
+name: kopano-backup
+version: 8.7.0-7.1ubuntu10.1
+commands: kopano-backup
+
+name: kopano-dagent
+version: 8.7.0-7.1ubuntu10.1
+commands: kopano-autorespond,kopano-dagent,kopano-mr-accept,kopano-mr-process
+
+name: kopano-gateway
+version: 8.7.0-7.1ubuntu10.1
+commands: kopano-gateway
+
+name: kopano-ical
+version: 8.7.0-7.1ubuntu10.1
+commands: kopano-ical
+
+name: kopano-monitor
+version: 8.7.0-7.1ubuntu10.1
+commands: kopano-monitor
+
+name: kopano-presence
+version: 8.7.0-7.1ubuntu10.1
+commands: kopano-presence
+
+name: kopano-search
+version: 8.7.0-7.1ubuntu10.1
+commands: kopano-search
+
+name: kopano-server
+version: 8.7.0-7.1ubuntu10.1
+commands: kopano-server
+
+name: kopano-spamd
+version: 8.7.0-7.1ubuntu10.1
+commands: kopano-spamd
+
+name: kopano-spooler
+version: 8.7.0-7.1ubuntu10.1
+commands: kopano-spooler
+
+name: kopano-utils
+version: 8.7.0-7.1ubuntu10.1
+commands: kopano-admin,kopano-archiver-aclset,kopano-archiver-aclsync,kopano-archiver-restore,kopano-cachestat,kopano-cli,kopano-dbadm,kopano-fix-ipm-subtree,kopano-fsck,kopano-ibrule,kopano-localize-folders,kopano-mailbox-permissions,kopano-migration-imap,kopano-migration-pst,kopano-oof,kopano-passwd,kopano-recreate-systemfolders,kopano-rules,kopano-set-oof,kopano-srvadm,kopano-stats,kopano-storeadm
+
+name: krb5-admin-server
+version: 1.19.2-2ubuntu0.7
+commands: kadmin.local,kadmind,kprop,krb5_newrealm
+
+name: krb5-gss-samples
+version: 1.19.2-2ubuntu0.7
+commands: gss-client,gss-server
+
+name: krb5-kdc
+version: 1.19.2-2ubuntu0.7
+commands: kdb5_util,kproplog,krb5kdc
+
+name: krb5-kdc-ldap
+version: 1.19.2-2ubuntu0.7
+commands: kdb5_ldap_util
+
+name: krb5-kpropd
+version: 1.19.2-2ubuntu0.7
+commands: kpropd
+
+name: krb5-user
+version: 1.19.2-2ubuntu0.7
+commands: k5srvutil,kadmin,kdestroy,kinit,klist,kpasswd,ksu,kswitch,ktutil,kvno
+
+name: ksuid
+version: 1.0.4-2ubuntu0.22.04.1
+commands: ksuid
+
+name: kube-openapi
+version: 0.0~git20211014.b3fe75c-2ubuntu0.22.04.3
+commands: openapi-gen,openapi2smd
+
+name: kubecolor
+version: 0.0.20-1ubuntu0.1
+commands: kubecolor
+
+name: kubernetes-split-yaml
+version: 0.3.0-1ubuntu0.1
+commands: kubernetes-split-yaml
+
+name: kwin-wayland
+version: 4:5.24.7-0ubuntu0.2
+commands: kwin_wayland,kwin_wayland_wrapper
+
+name: kwin-x11
+version: 4:5.24.7-0ubuntu0.2
+commands: kwin,kwin_x11,x-window-manager
+
+name: lalrpop
+version: 0.17.2-8ubuntu0.1
+commands: lalrpop
+
+name: ldb-tools
+version: 2:2.4.4-0ubuntu0.22.04.2
+commands: ldbadd,ldbdel,ldbedit,ldbmodify,ldbrename,ldbsearch
+
+name: lego
+version: 4.1.3-3ubuntu1.22.04.1
+commands: lego
+
+name: lemon
+version: 3.37.2-2ubuntu0.5
+commands: lemon
+
+name: libarchive-tools
+version: 3.6.0-1ubuntu1.7
+commands: bsdcat,bsdcpio,bsdtar
+
+name: libbatik-java
+version: 1.14-1ubuntu0.2
+commands: rasterizer,squiggle,svgpp,ttf2svg
+
+name: libc-icap-mod-urlcheck
+version: 1:0.5.5-1ubuntu0.1
+commands: c-icap-mods-sguardDB
+
+name: libcdio-utils
+version: 2.1.0-3ubuntu0.2
+commands: cd-drive,cd-info,cd-read,cdda-player,iso-info,iso-read,mmc-tool
+
+name: libcharon-extra-plugins
+version: 5.9.5-2ubuntu2.7
+commands: pt-tls-client
+
+name: libcpdb-libs-common-dev
+version: 1.2.0-0ubuntu8.1.22.04.1
+commands: print_frontend
+
+name: libde265-examples
+version: 1.0.8-1ubuntu0.3
+commands: libde265-dec265,libde265-sherlock265
+
+name: libflatpak-dev
+version: 1.12.7-1ubuntu0.1
+commands: flatpak-bisect,flatpak-coredumpctl
+
+name: libfribidi-bin
+version: 1.0.8-2ubuntu3.1
+commands: fribidi
+
+name: libgd-tools
+version: 2.3.0-2ubuntu2.3
+commands: annotate,bdftogd,gd2copypal,gd2togif,gd2topng,gdcmpgif,gdparttopng,gdtopng,giftogd2,pngtogd,pngtogd2,webpng
+
+name: libgimp2.0-dev
+version: 2.10.30-1ubuntu0.1
+commands: gimptool-2.0
+
+name: libgraphicsmagick++1-dev
+version: 1.4+really1.3.38-1ubuntu0.1
+commands: GraphicsMagick++-config
+
+name: libgraphicsmagick1-dev
+version: 1.4+really1.3.38-1ubuntu0.1
+commands: GraphicsMagick-config,GraphicsMagickWand-config
+
+name: libgsf-bin
+version: 1.14.47-1ubuntu0.1
+commands: gsf,gsf-office-thumbnailer,gsf-vba-dump
+
+name: libgtk2.0-dev
+version: 2.24.33-2ubuntu2.1
+commands: gtk-builder-convert
+
+name: libharfbuzz-bin
+version: 2.7.4-1ubuntu3.2
+commands: hb-ot-shape-closure,hb-shape,hb-view
+
+name: libinput-tools
+version: 1.20.0-1ubuntu0.1
+commands: libinput
+
+name: libjavascriptcoregtk-4.0-bin
+version: 2.50.4-0ubuntu0.22.04.1
+commands: jsc
+
+name: liblouis-bin
+version: 3.20.0-2ubuntu0.2
+commands: lou_allround,lou_checkhyphens,lou_checktable,lou_checkyaml,lou_debug,lou_tableinfo,lou_trace,lou_translate
+
+name: libmariadb-dev
+version: 1:10.6.22-0ubuntu0.22.04.1
+commands: mariadb-config,mariadb_config
+
+name: libmariadb-dev-compat
+version: 1:10.6.22-0ubuntu0.22.04.1
+commands: mysql_config
+
+name: libndp-tools
+version: 1.8-0ubuntu3.1
+commands: ndptool
+
+name: libnss3-tools
+version: 2:3.98-0ubuntu0.22.04.3
+commands: certutil,chktest,cmsutil,crlutil,derdump,httpserv,modutil,nss-addbuiltin,nss-dbtest,nss-pp,ocspclnt,p7content,p7env,p7sign,p7verify,pk12util,pk1sign,pwdecrypt,rsaperf,selfserv,shlibsign,signtool,signver,ssltap,strsclnt,symkeyutil,tstclnt,vfychain,vfyserv
+
+name: libomp-13-dev
+version: 1:13.0.1-2ubuntu2.2
+commands: llvm-omp-device-info-13
+
+name: libomp-14-dev
+version: 1:14.0.0-1ubuntu1.1
+commands: llvm-omp-device-info-14
+
+name: libopenjp2-tools
+version: 2.4.0-6ubuntu0.5
+commands: opj_compress,opj_decompress,opj_dump
+
+name: libopenjp3d-tools
+version: 2.4.0-6ubuntu0.5
+commands: opj_jp3d_compress,opj_jp3d_decompress
+
+name: libopenjpip-dec-server
+version: 2.4.0-6ubuntu0.5
+commands: opj_dec_server,opj_jpip_addxml,opj_jpip_test,opj_jpip_transcode
+
+name: libopenjpip-server
+version: 2.4.0-6ubuntu0.5
+commands: opj_server
+
+name: libopenjpip-viewer
+version: 2.4.0-6ubuntu0.5
+commands: opj_jpip_viewer
+
+name: libpam-pkcs11
+version: 0.6.11-4ubuntu0.1
+commands: card_eventmgr,pkcs11_eventmgr,pkcs11_inspect,pkcs11_listcerts,pkcs11_make_hash_link,pkcs11_setup,pklogin_finder
+
+name: libpython2.7-dbg
+version: 2.7.18-13ubuntu1.5
+commands: x86_64-linux-gnu-python2.7-dbg-config
+
+name: libpython2.7-dev
+version: 2.7.18-13ubuntu1.5
+commands: x86_64-linux-gnu-python2.7-config
+
+name: libqb-tools
+version: 2.0.4-1ubuntu0.2
+commands: qb-blackbox
+
+name: libraw-bin
+version: 0.20.2-2ubuntu2.22.04.2
+commands: 4channels,dcraw_emu,dcraw_half,half_mt,mem_image,multirender_test,postprocessing_benchmark,raw-identify,rawtextdump,simple_dcraw,unprocessed_raw
+
+name: libreoffice-base
+version: 1:7.3.7-0ubuntu0.22.04.11
+commands: lobase
+
+name: librsvg2-bin
+version: 2.52.5+dfsg-3ubuntu0.2
+commands: rsvg-convert
+
+name: libsnmp-dev
+version: 5.9.1+dfsg-1ubuntu2.9
+commands: mib2c,mib2c-update,net-snmp-config
+
+name: libstrongswan-extra-plugins
+version: 5.9.5-2ubuntu2.7
+commands: tpm_extendpcr
+
+name: libtasn1-bin
+version: 4.18.0-4ubuntu0.2
+commands: asn1Coding,asn1Decoding,asn1Parser
+
+name: libtiff-opengl
+version: 4.3.0-6ubuntu0.13
+commands: tiffgt
+
+name: libtiff-tools
+version: 4.3.0-6ubuntu0.13
+commands: fax2ps,fax2tiff,pal2rgb,ppm2tiff,raw2tiff,tiff2bw,tiff2pdf,tiff2ps,tiff2rgba,tiffcmp,tiffcp,tiffcrop,tiffdither,tiffdump,tiffinfo,tiffmedian,tiffset,tiffsplit
+
+name: libvirt-login-shell
+version: 8.0.0-1ubuntu7.15
+commands: virt-login-shell
+
+name: libvirt-sanlock
+version: 8.0.0-1ubuntu7.15
+commands: virt-sanlock-cleanup
+
+name: libwebsockets-test-server
+version: 4.0.20-2ubuntu1.1
+commands: libwebsockets-test-client,libwebsockets-test-lejp,libwebsockets-test-server,libwebsockets-test-server-extpoll
+
+name: libxerces-c-samples
+version: 3.2.3+debian-3ubuntu0.1
+commands: CreateDOMDocument,DOMCount,DOMPrint,EnumVal,MemParse,PParse,PSVIWriter,Redirect,SAX2Count,SAX2Print,SAXCount,SAXPrint,SCMPrint,SEnumVal,StdInParse,XInclude
+
+name: license-detector
+version: 4.3.0-3ubuntu0.22.04.3
+commands: license-detector
+
+name: lighttpd
+version: 1.4.63-1ubuntu3.1
+commands: lighttpd,lighttpd-angel,lighttpd-disable-mod,lighttpd-enable-mod,lighty-disable-mod,lighty-enable-mod
+
+name: linux-nvidia-5.19-cloud-tools-common
+version: 5.19.0-1014.14
+commands: hv_fcopy_daemon,hv_get_dhcp_info,hv_get_dns_info,hv_kvp_daemon,hv_set_ifconfig,hv_vss_daemon,lsvmbus
+
+name: linux-nvidia-5.19-tools-common
+version: 5.19.0-1014.14
+commands: acpidbg,bpftool,cpupower,perf,turbostat,usbip,usbipd,x86_energy_perf_policy
+
+name: linux-nvidia-5.19-tools-host
+version: 5.19.0-1014.14
+commands: kvm_stat
+
+name: linux-nvidia-tegra-igx-tools-common
+version: 5.15.0-1008.8
+commands: bpftool,cpupower,perf,turbostat,usbip,usbipd,x86_energy_perf_policy
+
+name: linux-nvidia-tegra-tools-common
+version: 5.15.0-1030.30
+commands: bpftool,cpupower,perf,turbostat,usbip,usbipd,x86_energy_perf_policy
+
+name: linux-xilinx-zynqmp-tools-common
+version: 5.15.0-1053.57
+commands: bpftool,cpupower,perf,turbostat,usbip,usbipd,x86_energy_perf_policy
+
+name: lld-13
+version: 1:13.0.1-2ubuntu2.2
+commands: ld.lld-13,ld64.lld-13,ld64.lld.darwinnew-13,ld64.lld.darwinold-13,lld-13,lld-link-13,wasm-ld-13
+
+name: lld-14
+version: 1:14.0.0-1ubuntu1.1
+commands: ld.lld-14,ld64.lld-14,lld-14,lld-link-14,wasm-ld-14
+
+name: lldb-13
+version: 1:13.0.1-2ubuntu2.2
+commands: lldb-13,lldb-argdumper-13,lldb-instr-13,lldb-server-13,lldb-vscode-13
+
+name: lldb-14
+version: 1:14.0.0-1ubuntu1.1
+commands: lldb-14,lldb-argdumper-14,lldb-instr-14,lldb-server-14,lldb-vscode-14
+
+name: llvm-14
+version: 1:14.0.0-1ubuntu1.1
+commands: bugpoint-14,dsymutil-14,llc-14,llvm-PerfectShuffle-14,llvm-addr2line-14,llvm-ar-14,llvm-as-14,llvm-bcanalyzer-14,llvm-bitcode-strip-14,llvm-c-test-14,llvm-cat-14,llvm-cfi-verify-14,llvm-config-14,llvm-cov-14,llvm-cvtres-14,llvm-cxxdump-14,llvm-cxxfilt-14,llvm-cxxmap-14,llvm-debuginfod-find-14,llvm-diff-14,llvm-dis-14,llvm-dlltool-14,llvm-dwarfdump-14,llvm-dwp-14,llvm-exegesis-14,llvm-extract-14,llvm-gsymutil-14,llvm-ifs-14,llvm-install-name-tool-14,llvm-jitlink-14,llvm-jitlink-executor-14,llvm-lib-14,llvm-libtool-darwin-14,llvm-link-14,llvm-lipo-14,llvm-lto-14,llvm-lto2-14,llvm-mc-14,llvm-mca-14,llvm-ml-14,llvm-modextract-14,llvm-mt-14,llvm-nm-14,llvm-objcopy-14,llvm-objdump-14,llvm-opt-report-14,llvm-otool-14,llvm-pdbutil-14,llvm-profdata-14,llvm-profgen-14,llvm-ranlib-14,llvm-rc-14,llvm-readelf-14,llvm-readobj-14,llvm-reduce-14,llvm-rtdyld-14,llvm-sim-14,llvm-size-14,llvm-split-14,llvm-stress-14,llvm-strings-14,llvm-strip-14,llvm-symbolizer-14,llvm-tapi-diff-14,llvm-tblgen-14,llvm-tli-checker-14,llvm-undname-14,llvm-windres-14,llvm-xray-14,obj2yaml-14,opt-14,sanstats-14,verify-uselistorder-14,yaml2obj-14
+
+name: llvm-14-runtime
+version: 1:14.0.0-1ubuntu1.1
+commands: lli-14,lli-child-target-14
+
+name: llvm-14-tools
+version: 1:14.0.0-1ubuntu1.1
+commands: FileCheck-14,count-14,not-14,split-file-14,yaml-bench-14
+
+name: llvm-spirv-15
+version: 15.0.0-1~ubuntu0.22.04.2
+commands: llvm-spirv-15
+
+name: lrzip
+version: 0.651-2ubuntu0.22.04.1
+commands: lrunzip,lrz,lrzcat,lrzip,lrztar,lrzuntar
+
+name: maradns
+version: 2.0.13-1.4+deb11u1build0.22.04.1
+commands: askmara,bind2csv2,fetchzone,getzone,maradns
+
+name: maradns-deadwood
+version: 2.0.13-1.4+deb11u1build0.22.04.1
+commands: deadwood
+
+name: maradns-zoneserver
+version: 2.0.13-1.4+deb11u1build0.22.04.1
+commands: askmara-tcp,zoneserver
+
+name: mariadb-backup
+version: 1:10.6.22-0ubuntu0.22.04.1
+commands: mariabackup,mariadb-backup,mbstream
+
+name: mariadb-client-10.6
+version: 1:10.6.22-0ubuntu0.22.04.1
+commands: innotop,mariadb-access,mariadb-admin,mariadb-analyze,mariadb-conv,mariadb-dump,mariadb-dumpslow,mariadb-find-rows,mariadb-fix-extensions,mariadb-import,mariadb-optimize,mariadb-repair,mariadb-report,mariadb-show,mariadb-slap,mariadb-waitpid,mariadbcheck,mysql_find_rows,mysql_fix_extensions,mysql_waitpid,mysqlaccess,mysqladmin,mysqlanalyze,mysqlcheck,mysqldump,mysqldumpslow,mysqlimport,mysqloptimize,mysqlrepair,mysqlreport,mysqlshow,mysqlslap,mytop
+
+name: mariadb-client-core-10.6
+version: 1:10.6.22-0ubuntu0.22.04.1
+commands: mariadb,mariadb-check,my_print_defaults,mysql
+
+name: mariadb-plugin-rocksdb
+version: 1:10.6.22-0ubuntu0.22.04.1
+commands: mariadb-ldb,myrocks_hotbackup,mysql_ldb
+
+name: mariadb-plugin-s3
+version: 1:10.6.22-0ubuntu0.22.04.1
+commands: aria_s3_copy
+
+name: mariadb-server-10.6
+version: 1:10.6.22-0ubuntu0.22.04.1
+commands: aria_chk,aria_dump_log,aria_ftdump,aria_pack,aria_read_log,galera_new_cluster,galera_recovery,mariadb-binlog,mariadb-convert-table-format,mariadb-hotcopy,mariadb-plugin,mariadb-secure-installation,mariadb-service-convert,mariadb-setpermission,mariadb-tzinfo-to-sql,mariadbd-multi,mariadbd-safe,mariadbd-safe-helper,msql2mysql,myisam_ftdump,myisamchk,myisamlog,myisampack,mysql_convert_table_format,mysql_plugin,mysql_secure_installation,mysql_setpermission,mysql_tzinfo_to_sql,mysqlbinlog,mysqld_multi,mysqld_safe,mysqld_safe_helper,mysqlhotcopy,perror,replace,resolve_stack_dump,wsrep_sst_backup,wsrep_sst_common,wsrep_sst_mariabackup,wsrep_sst_mysqldump,wsrep_sst_rsync,wsrep_sst_rsync_wan
+
+name: mariadb-server-core-10.6
+version: 1:10.6.22-0ubuntu0.22.04.1
+commands: innochecksum,mariadb-install-db,mariadb-upgrade,mariadbd,mysql_install_db,mysql_upgrade,mysqld,resolveip
+
+name: mariadb-test
+version: 1:10.6.22-0ubuntu0.22.04.1
+commands: mariadb-client-test,mariadb-client-test-embedded,mariadb-test,mariadb-test-embedded,mysql_client_test,mysql_client_test_embedded,mysqltest,mysqltest_embedded
+
+name: mencoder
+version: 2:1.4+ds1-3ubuntu0.1
+commands: mencoder
+
+name: mender-artifact
+version: 3.6.0+ds1-2ubuntu0.1
+commands: mender-artifact
+
+name: mender-cli
+version: 1.7.0+ds1-2ubuntu0.3
+commands: mender-cli
+
+name: mender-client
+version: 3.0.0+ds1-2ubuntu0.1
+commands: mender
+
+name: micro
+version: 2.0.9-1ubuntu0.22.04.3
+commands: micro
+
+name: miller
+version: 6.0.0-1ubuntu0.1
+commands: mlr
+
+name: minidlna
+version: 1.3.0+dfsg-2.1ubuntu0.1
+commands: minidlnad
+
+name: minify
+version: 2.9.22-1ubuntu0.1
+commands: minify
+
+name: mirrorbits
+version: 0.5.1+git20210123.eeea0e0+ds1-1ubuntu0.3
+commands: mirrorbits
+
+name: mkcert
+version: 1.4.3-1ubuntu0.3
+commands: mkcert
+
+name: mlir-13-tools
+version: 1:13.0.1-2ubuntu2.2
+commands: mlir-cpu-runner-13,mlir-linalg-ods-gen-13,mlir-linalg-ods-yaml-gen-13,mlir-lsp-server-13,mlir-opt-13,mlir-reduce-13,mlir-tblgen-13,mlir-translate-13
+
+name: mlir-14-tools
+version: 1:14.0.0-1ubuntu1.1
+commands: mlir-cpu-runner-14,mlir-linalg-ods-yaml-gen-14,mlir-lsp-server-14,mlir-opt-14,mlir-pdll-14,mlir-reduce-14,mlir-tblgen-14,mlir-translate-14
+
+name: mockgen
+version: 1.6.0-1ubuntu0.1
+commands: mockgen
+
+name: molly-brown
+version: 0.0~git20210124.92cd40d-2ubuntu0.1
+commands: molly-brown
+
+name: morty
+version: 0.2.0-3ubuntu0.20.04.3
+commands: morty
+
+name: mosquitto
+version: 2.0.11-1ubuntu1.2
+commands: mosquitto,mosquitto_ctrl,mosquitto_passwd
+
+name: mosquitto-clients
+version: 2.0.11-1ubuntu1.2
+commands: mosquitto_pub,mosquitto_rr,mosquitto_sub
+
+name: mpg123
+version: 1.29.3-1ubuntu0.1
+commands: mpg123-alsa,mpg123-id3dump,mpg123-jack,mpg123-nas,mpg123-openal,mpg123-oss,mpg123-portaudio,mpg123-pulse,mpg123-strip,mpg123.bin,out123
+
+name: mplayer
+version: 2:1.4+ds1-3ubuntu0.1
+commands: mplayer
+
+name: mplayer-gui
+version: 2:1.4+ds1-3ubuntu0.1
+commands: gmplayer
+
+name: mstflint
+version: 4.21.0-7
+commands: mstconfig,mstcongestion,mstflint,mstfwreset,mstfwtrace,mstmcra,mstmread,mstmtserver,mstmwrite,mstprivhost,mstregdump,mstresourcedump,mstresourceparse,mstvpd
+
+name: mtail
+version: 3.0.0~rc48-3ubuntu0.1
+commands: mfmt,mtail
+
+name: munge
+version: 0.5.14-6ubuntu0.1
+commands: munge,munged,mungekey,remunge,unmunge
+
+name: mutter
+version: 42.9-0ubuntu7.1
+commands: mutter,x-window-manager
+
+name: mysql-router
+version: 8.0.46-0ubuntu0.22.04.2
+commands: mysqlrouter,mysqlrouter_keyring,mysqlrouter_passwd,mysqlrouter_plugin_info
+
+name: nano-tiny
+version: 6.2-1ubuntu0.2
+commands: editor,nano-tiny
+
+name: ncbi-entrez-direct
+version: 14.6.20210224+dfsg-5ubuntu0.3
+commands: accn-at-a-time,amino-acid-composition,archive-pubmed,between-two-genes,download-ncbi-data,download-pubmed,download-sequence,eaddress,eblast,ecitmatch,econtact,edirect,edirutil,efetch,efetch.ncbi,efilter,einfo,einfo.ncbi,elink,enotify,entrez-phrase-search,epost,eproxy,esample,esearch,espell,esummary,exclude-uid-lists,expand-current,fetch-pubmed,filter-stop-words,ftp-cp,ftp-ls,gbf2xml,index-extras,index-pubmed,intersect-uid-lists,join-into-groups-of,nquire,phrase-search,pm-collect,pm-index,pm-invert,pm-merge,pm-prepare,pm-promote,pm-refresh,pm-stash,protein-neighbors,rchive,reorder-columns,run-ncbi-converter,skip-if-file-exists,sort-uniq-count,sort-uniq-count-rank,stream-pubmed,theme-aliases,transmute,word-at-a-time,xml2tbl,xtract,xy-plot
+
+name: netatalk
+version: 3.1.12~ds-9ubuntu0.22.04.4
+commands: ad,afpd,afpldaptest,afppasswd,afpstats,apple_dump,asip-status.pl,cnid2_create,cnid_dbd,cnid_metad,dbd,macusers,netatalk
+
+name: nghttp2-client
+version: 1.43.0-1ubuntu0.3
+commands: h2load,nghttp
+
+name: nghttp2-proxy
+version: 1.43.0-1ubuntu0.3
+commands: nghttpx
+
+name: nghttp2-server
+version: 1.43.0-1ubuntu0.3
+commands: nghttpd
+
+name: nginx-extras
+version: 1.18.0-6ubuntu14.13
+commands: nginx
+
+name: nginx-light
+version: 1.18.0-6ubuntu14.13
+commands: nginx
+
+name: nncp
+version: 8.5.0-1ubuntu0.1
+commands: nncp-bundle,nncp-call,nncp-caller,nncp-cfgdir,nncp-cfgenc,nncp-cfgmin,nncp-cfgnew,nncp-check,nncp-cronexpr,nncp-daemon,nncp-exec,nncp-file,nncp-freq,nncp-hash,nncp-log,nncp-pkt,nncp-reass,nncp-rm,nncp-stat,nncp-toss,nncp-trns,nncp-xfer
+
+name: nodejs
+version: 12.22.9~dfsg-1ubuntu3.6
+commands: js,node,nodejs
+
+name: notary
+version: 0.7.0+ds1-1ubuntu0.22.04.3
+commands: escrow,notary,notary-server,notary-signer
+
+name: nscd
+version: 2.35-0ubuntu3.13
+commands: nscd
+
+name: nullboot
+version: 0.4.0-0ubuntu0.22.04.4
+commands: nullbootctl
+
+name: oathtool
+version: 2.6.7-3ubuntu0.1
+commands: oathtool
+
+name: obfs4proxy
+version: 0.0.13-1ubuntu0.1
+commands: obfs4proxy
+
+name: obs-cli
+version: 0.4.0-1ubuntu0.22.04.1
+commands: obs-cli
+
+name: octorpki
+version: 1.4.2-1ubuntu0.1
+commands: octorpki
+
+name: odbcinst
+version: 2.3.9-5ubuntu0.1
+commands: odbcinst
+
+name: ofono
+version: 1.31-3ubuntu1.2
+commands: dundee,ofonod
+
+name: opam
+version: 2.1.2-1+deb12u1build0.22.04.1
+commands: opam
+
+name: opam-installer
+version: 2.1.2-1+deb12u1build0.22.04.1
+commands: opam-installer
+
+name: opencc
+version: 1.1.3+ds1-3ubuntu3.1
+commands: opencc,opencc_dict,opencc_phrase_extract
+
+name: opengcs
+version: 0.3.4+dfsg2-0ubuntu8.1
+commands: exportSandbox,gcs,gcstools,netnscfg,remotefs,tar2vhd,udhcpc_config.script,vhd2tar
+
+name: openjdk-17-jdk
+version: 17.0.19+10-1~22.04.2
+commands: jconsole
+
+name: openjdk-17-jdk-headless
+version: 17.0.19+10-1~22.04.2
+commands: jar,jarsigner,javac,javadoc,javap,jcmd,jdb,jdeprscan,jdeps,jfr,jhsdb,jimage,jinfo,jlink,jmap,jmod,jps,jrunscript,jshell,jstack,jstat,jstatd,serialver
+
+name: openjdk-17-jre-headless
+version: 17.0.19+10-1~22.04.2
+commands: java,jexec,jpackage,keytool,rmiregistry
+
+name: openjdk-18-jdk
+version: 18.0.2+9-2~22.04
+commands: jconsole
+
+name: openjdk-18-jdk-headless
+version: 18.0.2+9-2~22.04
+commands: jar,jarsigner,javac,javadoc,javap,jcmd,jdb,jdeprscan,jdeps,jfr,jhsdb,jimage,jinfo,jlink,jmap,jmod,jps,jrunscript,jshell,jstack,jstat,jstatd,jwebserver,serialver
+
+name: openjdk-18-jre-headless
+version: 18.0.2+9-2~22.04
+commands: java,jexec,jpackage,keytool,rmiregistry
+
+name: openjdk-21-jdk
+version: 21.0.11+10-1~22.04.2
+commands: jconsole
+
+name: openjdk-21-jdk-headless
+version: 21.0.11+10-1~22.04.2
+commands: jar,jarsigner,javac,javadoc,javap,jcmd,jdb,jdeprscan,jdeps,jfr,jhsdb,jimage,jinfo,jlink,jmap,jmod,jps,jrunscript,jshell,jstack,jstat,jstatd,jwebserver,serialver
+
+name: openjdk-21-jre-headless
+version: 21.0.11+10-1~22.04.2
+commands: java,jexec,jpackage,keytool,rmiregistry
+
+name: openjdk-25-jdk
+version: 25.0.3+9-2~22.04.2
+commands: jconsole
+
+name: openjdk-25-jdk-headless
+version: 25.0.3+9-2~22.04.2
+commands: jar,jarsigner,javac,javadoc,javap,jcmd,jdb,jdeprscan,jdeps,jfr,jhsdb,jimage,jinfo,jlink,jmap,jmod,jnativescan,jps,jrunscript,jshell,jstack,jstat,jstatd,jwebserver,serialver
+
+name: openjdk-25-jre-headless
+version: 25.0.3+9-2~22.04.2
+commands: java,jexec,jpackage,keytool,rmiregistry
+
+name: openjdk-8-jdk
+version: 8u492-ga~us2-0ubuntu1~22.04.1
+commands: appletviewer,jconsole
+
+name: openjdk-8-jdk-headless
+version: 8u492-ga~us2-0ubuntu1~22.04.1
+commands: clhsdb,extcheck,hsdb,idlj,jar,jarsigner,javac,javadoc,javah,javap,jcmd,jdb,jdeps,jfr,jhat,jinfo,jmap,jps,jrunscript,jsadebugd,jstack,jstat,jstatd,native2ascii,rmic,schemagen,serialver,wsgen,wsimport,xjc
+
+name: openjdk-8-jre
+version: 8u492-ga~us2-0ubuntu1~22.04.1
+commands: policytool
+
+name: openjdk-8-jre-headless
+version: 8u492-ga~us2-0ubuntu1~22.04.1
+commands: java,jjs,keytool,orbd,pack200,rmid,rmiregistry,servertool,tnameserv,unpack200
+
+name: opensaml-tools
+version: 3.2.1-1ubuntu0.1
+commands: samlsign
+
+name: openshift-imagebuilder
+version: 1.2.1+ds1-3ubuntu0.1
+commands: imagebuilder
+
+name: openvswitch-test
+version: 2.17.9-0ubuntu0.22.04.1
+commands: ovs-l3ping,ovs-test
+
+name: openvswitch-testcontroller
+version: 2.17.9-0ubuntu0.22.04.1
+commands: ovs-testcontroller
+
+name: openvswitch-vtep
+version: 2.17.9-0ubuntu0.22.04.1
+commands: vtep-ctl
+
+name: ovn-controller-vtep
+version: 22.03.3-0ubuntu0.22.04.5
+commands: ovn-controller-vtep
+
+name: ovn-docker
+version: 22.03.3-0ubuntu0.22.04.5
+commands: ovn-docker-overlay-driver,ovn-docker-underlay-driver
+
+name: ovn-ic
+version: 22.03.3-0ubuntu0.22.04.5
+commands: ovn-ic
+
+name: ovn-ic-db
+version: 22.03.3-0ubuntu0.22.04.5
+commands: ovn-ic-nbctl,ovn-ic-sbctl
+
+name: packer
+version: 1.6.6+ds1-4ubuntu0.22.04.3
+commands: packer
+
+name: pagure
+version: 5.11.3+dfsg-1ubuntu0.1
+commands: pagure-admin
+
+name: pamu2fcfg
+version: 1.1.0-1.1+deb12u1build0.22.04.1
+commands: pamu2fcfg
+
+name: pat
+version: 0.12.1-1ubuntu0.1
+commands: pat-winlink
+
+name: pcre2-utils
+version: 10.39-3ubuntu0.1
+commands: pcre2grep,pcre2test
+
+name: pcregrep
+version: 2:8.39-13ubuntu0.22.04.1
+commands: pcregrep,zpcregrep
+
+name: peco
+version: 0.5.10-1ubuntu0.22.04.1
+commands: peco
+
+name: php8.1-fpm
+version: 8.1.2-1ubuntu2.24
+commands: php-fpm8.1
+
+name: php8.1-phpdbg
+version: 8.1.2-1ubuntu2.24
+commands: phpdbg,phpdbg8.1
+
+name: plantuml
+version: 1:1.2020.2+ds-1ubuntu0.1
+commands: plantuml
+
+name: plasma-workspace
+version: 4:5.24.7-0ubuntu0.2
+commands: gmenudbusmenuproxy,kcminit,kcminit_startup,kcolorschemeeditor,kde-systemd-start-condition,kfontinst,kfontview,klipper,krunner,ksmserver,ksplashqml,lookandfeeltool,plasma-apply-colorscheme,plasma-apply-cursortheme,plasma-apply-desktoptheme,plasma-apply-lookandfeel,plasma-apply-wallpaperimage,plasma-interactiveconsole,plasma-shutdown,plasma_session,plasma_waitforname,plasmashell,plasmawindowed,startplasma-x11,systemmonitor,x-session-manager,xembedsniproxy
+
+name: plasma-workspace-wayland
+version: 4:5.24.7-0ubuntu0.2
+commands: startplasma-wayland
+
+name: pleaser
+version: 0.5.1-4ubuntu0.22.04.1
+commands: please,pleaseedit
+
+name: podman
+version: 3.4.4+ds1-1ubuntu1.22.04.3
+commands: podman
+
+name: podman-docker
+version: 3.4.4+ds1-1ubuntu1.22.04.3
+commands: docker
+
+name: proftpd-core
+version: 1.3.7c+dfsg-1ubuntu0.1
+commands: auth-otp,ftpasswd,ftpcount,ftpdctl,ftpmail,ftpquota,ftpscrub,ftpshut,ftpstats,ftptop,ftpwho,in.proftpd,proftpd,proftpd-gencert
+
+name: proftpd-dev
+version: 1.3.7c+dfsg-1ubuntu0.1
+commands: prxs
+
+name: prometheus
+version: 2.31.2+ds1-1ubuntu1.22.04.3
+commands: prometheus,promtool
+
+name: prometheus-alertmanager
+version: 0.23.0-4ubuntu0.3
+commands: amtool,prometheus-alertmanager
+
+name: prometheus-apache-exporter
+version: 0.11.0-1ubuntu0.22.04.3
+commands: prometheus-apache-exporter
+
+name: prometheus-bind-exporter
+version: 0.5.0-1ubuntu0.22.04.3
+commands: prometheus-bind-exporter
+
+name: prometheus-bird-exporter
+version: 1.2.6+ds-1ubuntu0.1
+commands: prometheus-bird-exporter
+
+name: prometheus-blackbox-exporter
+version: 0.19.0-1ubuntu0.3
+commands: prometheus-blackbox-exporter
+
+name: prometheus-frr-exporter
+version: 1.1.0-1ubuntu0.3
+commands: prometheus-frr-exporter
+
+name: prometheus-hacluster-exporter
+version: 1.2.3-2ubuntu0.3
+commands: ha_cluster_exporter
+
+name: prometheus-haproxy-exporter
+version: 0.13.0+ds1-1ubuntu0.3
+commands: prometheus-haproxy-exporter
+
+name: prometheus-ipmi-exporter
+version: 1.4.0+ds-3ubuntu0.1
+commands: prometheus-ipmi-exporter
+
+name: prometheus-mysqld-exporter
+version: 0.13.0-1ubuntu0.3
+commands: prometheus-mysqld-exporter
+
+name: prometheus-nextcloud-exporter
+version: 0.4.0-2ubuntu0.1
+commands: prometheus-nextcloud-exporter
+
+name: prometheus-nginx-exporter
+version: 0.10.0-1ubuntu0.1
+commands: prometheus-nginx-exporter
+
+name: prometheus-node-exporter
+version: 1.3.1-1ubuntu0.22.04.3
+commands: prometheus-node-exporter
+
+name: prometheus-postfix-exporter
+version: 0.3.0-1ubuntu0.1
+commands: prometheus-postfix-exporter
+
+name: prometheus-postgres-exporter
+version: 0.10.1-1ubuntu0.22.04.3
+commands: prometheus-postgres-exporter
+
+name: prometheus-process-exporter
+version: 0.7.10-1ubuntu0.3
+commands: prometheus-process-exporter
+
+name: prometheus-pushgateway
+version: 1.4.2+ds1-1ubuntu0.3
+commands: prometheus-pushgateway
+
+name: prometheus-redis-exporter
+version: 1.33.0-1ubuntu0.1
+commands: prometheus-redis-exporter
+
+name: prometheus-smokeping-prober
+version: 0.5.0-1ubuntu0.1
+commands: prometheus-smokeping-prober
+
+name: prometheus-snmp-exporter
+version: 0.20.0-1ubuntu0.2
+commands: prometheus-snmp-exporter,prometheus-snmp-generator
+
+name: prometheus-sql-exporter
+version: 0.4.2-1ubuntu0.1
+commands: prometheus-sql-exporter
+
+name: prometheus-squid-exporter
+version: 1.10.0+ds-1ubuntu0.1
+commands: prometheus-squid-exporter
+
+name: protobuf-compiler
+version: 3.12.4-1ubuntu7.22.04.6
+commands: protoc
+
+name: protoc-gen-go
+version: 1.27.1-1ubuntu0.1
+commands: protoc-gen-go
+
+name: pskctool
+version: 2.6.7-3ubuntu0.1
+commands: pskctool
+
+name: pypy3
+version: 7.3.9+dfsg-1ubuntu0.1
+commands: pypy3,pypy3.8,pypy3clean,pypy3compile
+
+name: python-wheel-common
+version: 0.37.1-2ubuntu0.22.04.1
+commands: wheel
+
+name: python2.7
+version: 2.7.18-13ubuntu1.5
+commands: 2to3-2.7,pdb2.7,pydoc2.7,pygettext2.7
+
+name: python2.7-dbg
+version: 2.7.18-13ubuntu1.5
+commands: python2.7-dbg,python2.7-dbg-config
+
+name: python2.7-dev
+version: 2.7.18-13ubuntu1.5
+commands: python2.7-config
+
+name: python2.7-minimal
+version: 2.7.18-13ubuntu1.5
+commands: python2.7
+visible-pkgname: python2.7
+
+name: python3-ironic
+version: 1:20.1.0-0ubuntu1.2
+commands: ironic,ironic-api,ironic-api-wsgi,ironic-conductor,ironic-dbsync,ironic-rootwrap,ironic-status
+
+name: python3-nopie
+version: 3.10.6-1~22.04
+commands: python3-pie
+visible-pkgname: python3
+
+name: python3-pip
+version: 22.0.2+dfsg-1ubuntu0.7
+commands: pip,pip3,pip3.10
+
+name: python3-py7zr
+version: 0.11.3+dfsg-4ubuntu0.1
+commands: py7zr
+
+name: python3-trove
+version: 2:17.0.0-0ubuntu1.1
+commands: trove-api,trove-conductor,trove-fake-mode,trove-guestagent,trove-manage,trove-mgmt-taskmanager,trove-status,trove-taskmanager
+
+name: python3.10-nopie
+version: 3.10.12-1~22.04.15
+commands: python3.10
+visible-pkgname: python3.10
+
+name: qemu-guest-agent
+version: 1:6.2+dfsg-2ubuntu6.30
+commands: qemu-ga
+
+name: qemu-system-x86-xen
+version: 1:6.2+dfsg-2ubuntu6.30
+commands: qemu-system-i386,qemu-system-x86_64
+
+name: qemu-user
+version: 1:6.2+dfsg-2ubuntu6.30
+commands: qemu-aarch64,qemu-aarch64_be,qemu-alpha,qemu-arm,qemu-armeb,qemu-cris,qemu-hexagon,qemu-hppa,qemu-i386,qemu-m68k,qemu-microblaze,qemu-microblazeel,qemu-mips,qemu-mips64,qemu-mips64el,qemu-mipsel,qemu-mipsn32,qemu-mipsn32el,qemu-nios2,qemu-or1k,qemu-ppc,qemu-ppc64,qemu-ppc64le,qemu-riscv32,qemu-riscv64,qemu-s390x,qemu-sh4,qemu-sh4eb,qemu-sparc,qemu-sparc32plus,qemu-sparc64,qemu-x86_64,qemu-xtensa,qemu-xtensaeb
+
+name: qemu-user-static
+version: 1:6.2+dfsg-2ubuntu6.30
+commands: qemu-aarch64-static,qemu-aarch64_be-static,qemu-alpha-static,qemu-arm-static,qemu-armeb-static,qemu-cris-static,qemu-debootstrap,qemu-hexagon-static,qemu-hppa-static,qemu-i386-static,qemu-m68k-static,qemu-microblaze-static,qemu-microblazeel-static,qemu-mips-static,qemu-mips64-static,qemu-mips64el-static,qemu-mipsel-static,qemu-mipsn32-static,qemu-mipsn32el-static,qemu-nios2-static,qemu-or1k-static,qemu-ppc-static,qemu-ppc64-static,qemu-ppc64le-static,qemu-riscv32-static,qemu-riscv64-static,qemu-s390x-static,qemu-sh4-static,qemu-sh4eb-static,qemu-sparc-static,qemu-sparc32plus-static,qemu-sparc64-static,qemu-x86_64-static,qemu-xtensa-static,qemu-xtensaeb-static
+
+name: ratt
+version: 0.0~git20190123.9e77a6d-1ubuntu0.22.04.1
+commands: ratt
+
+name: rbd-fuse
+version: 17.2.9-0ubuntu0.22.04.2
+commands: rbd-fuse
+
+name: rbd-mirror
+version: 17.2.9-0ubuntu0.22.04.2
+commands: rbd-mirror
+
+name: rbd-nbd
+version: 17.2.9-0ubuntu0.22.04.2
+commands: rbd-nbd
+
+name: rclone
+version: 1.53.3-4ubuntu1.22.04.4
+commands: rclone
+
+name: redis-sentinel
+version: 5:6.0.16-1ubuntu1.1
+commands: redis-sentinel
+
+name: redis-server
+version: 5:6.0.16-1ubuntu1.1
+commands: redis-server
+
+name: redis-tools
+version: 5:6.0.16-1ubuntu1.1
+commands: redis-benchmark,redis-check-aof,redis-check-rdb,redis-cli
+
+name: reflex
+version: 0.3.1-1ubuntu0.22.04.1
+commands: reflex
+
+name: registry-tools
+version: 2:4.15.13+dfsg-0ubuntu1.12
+commands: regdiff,regpatch,regshell,regtree
+
+name: remmina-plugin-kiosk
+version: 1.4.25+dfsg-1ubuntu0.1
+commands: gnome-session-remmina
+
+name: request-tracker4
+version: 4.4.4+dfsg-2ubuntu1.22.04.1
+commands: rt-attributes-viewer-4,rt-clean-sessions-4,rt-crontool-4,rt-dump-metadata-4,rt-email-dashboards-4,rt-email-digest-4,rt-email-group-admin-4,rt-externalize-attachments-4,rt-fulltext-indexer-4,rt-importer-4,rt-ldapimport-4,rt-munge-attachments-4,rt-passwd-4,rt-preferences-viewer-4,rt-search-attributes-4,rt-serializer-4,rt-session-viewer-4,rt-setup-database-4,rt-setup-fulltext-index-4,rt-shredder-4,rt-validate-aliases-4,rt-validator-4
+
+name: restic
+version: 0.12.1-2ubuntu0.3
+commands: restic
+
+name: ripgrep
+version: 13.0.0-2ubuntu0.1
+commands: rg
+
+name: robustirc-bridge
+version: 1.8-1ubuntu0.22.04.1
+commands: robustirc-bridge
+
+name: rootlesskit
+version: 0.14.6-1ubuntu1.1
+commands: rootlessctl,rootlesskit,rootlesskit-docker-proxy
+
+name: rt4-clients
+version: 4.4.4+dfsg-2ubuntu1.22.04.1
+commands: rt,rt-4,rt-mailgate,rt-mailgate-4
+
+name: ruby-bundler
+version: 2.3.5-2ubuntu1.2
+commands: bundle,bundler
+
+name: ruby-rack
+version: 2.1.4-5ubuntu1.2
+commands: rackup
+
+name: ruby-redcloth
+version: 4.3.2-4ubuntu0.22.04.1
+commands: redcloth
+
+name: rust-1.62-clippy
+version: 1.62.1+dfsg1-1ubuntu0.22.04.3
+commands: cargo-clippy-1.62,clippy-1.62-driver
+
+name: rust-1.62-gdb
+version: 1.62.1+dfsg1-1ubuntu0.22.04.3
+commands: rust-1.62-gdb,rust-1.62-gdbgui
+
+name: rust-1.62-lldb
+version: 1.62.1+dfsg1-1ubuntu0.22.04.3
+commands: rust-1.62-lldb
+
+name: rust-1.76-gdb
+version: 1.76.0+dfsg0ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.76-gdb,rust-1.76-gdbgui
+
+name: rust-1.76-lldb
+version: 1.76.0+dfsg0ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.76-lldb
+
+name: rust-1.77-gdb
+version: 1.77.2+dfsg1ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.77-gdb,rust-1.77-gdbgui
+
+name: rust-1.77-lldb
+version: 1.77.2+dfsg1ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.77-lldb
+
+name: rust-1.78-gdb
+version: 1.78.0+dfsg1ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.78-gdb,rust-1.78-gdbgui
+
+name: rust-1.78-lldb
+version: 1.78.0+dfsg1ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.78-lldb
+
+name: rust-1.79-gdb
+version: 1.79.0+dfsg1ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.79-gdb,rust-1.79-gdbgui
+
+name: rust-1.79-lldb
+version: 1.79.0+dfsg1ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.79-lldb
+
+name: rust-1.80-gdb
+version: 1.80.1+dfsg0ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.80-gdb,rust-1.80-gdbgui
+
+name: rust-1.80-lldb
+version: 1.80.1+dfsg0ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.80-lldb
+
+name: rust-1.81-gdb
+version: 1.81.0+dfsg0ubuntu0-0ubuntu0.22.04.1
+commands: rust-1.81-gdb,rust-1.81-gdbgui
+
+name: rust-1.81-lldb
+version: 1.81.0+dfsg0ubuntu0-0ubuntu0.22.04.1
+commands: rust-1.81-lldb
+
+name: rust-1.82-gdb
+version: 1.82.0+dfsg0ubuntu0~jammy-0ubuntu0.22.04.1
+commands: rust-1.82-gdb,rust-1.82-gdbgui
+
+name: rust-1.82-lldb
+version: 1.82.0+dfsg0ubuntu0~jammy-0ubuntu0.22.04.1
+commands: rust-1.82-lldb
+
+name: rust-1.83-gdb
+version: 1.83.0+dfsg0ubuntu2~bpo2-0ubuntu2.22.04.1
+commands: rust-1.83-gdb,rust-1.83-gdbgui
+
+name: rust-1.83-lldb
+version: 1.83.0+dfsg0ubuntu2~bpo2-0ubuntu2.22.04.1
+commands: rust-1.83-lldb
+
+name: rust-1.84-gdb
+version: 1.84.1+dfsg0ubuntu1~bpo10-0ubuntu4.22.04.1
+commands: rust-1.84-gdb,rust-1.84-gdbgui
+
+name: rust-1.84-lldb
+version: 1.84.1+dfsg0ubuntu1~bpo10-0ubuntu4.22.04.1
+commands: rust-1.84-lldb
+
+name: rust-1.85-gdb
+version: 1.85.1+dfsg0ubuntu2~bpo0-0ubuntu1.22.04.1
+commands: rust-1.85-gdb,rust-1.85-gdbgui
+
+name: rust-1.85-lldb
+version: 1.85.1+dfsg0ubuntu2~bpo0-0ubuntu1.22.04.1
+commands: rust-1.85-lldb
+
+name: rust-1.89-gdb
+version: 1.89.0+dfsg~24.04-0ubuntu0.22.04.2
+commands: rust-1.89-gdb,rust-1.89-gdbgui
+
+name: rust-1.89-lldb
+version: 1.89.0+dfsg~24.04-0ubuntu0.22.04.2
+commands: rust-1.89-lldb
+
+name: rust-1.91-gdb
+version: 1.91.1+dfsg~22.04-0ubuntu0.22.04.3
+commands: rust-1.91-gdb,rust-1.91-gdbgui
+
+name: rust-1.91-lldb
+version: 1.91.1+dfsg~22.04-0ubuntu0.22.04.3
+commands: rust-1.91-lldb
+
+name: rust-clippy
+version: 1.75.0+dfsg0ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: cargo-clippy,clippy-driver
+
+name: rust-gdb
+version: 1.75.0+dfsg0ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-gdb,rust-gdbgui
+
+name: rust-lldb
+version: 1.75.0+dfsg0ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-lldb
+
+name: rust-markdown
+version: 0.3.0-1ubuntu0.22.04.1
+commands: rust-markdown
+
+name: rustc-1.62
+version: 1.62.1+dfsg1-1ubuntu0.22.04.3
+commands: rust-1.62-clang,rust-1.62-lld,rust-1.62-llvm-dwp,rustc-1.62,rustdoc-1.62
+
+name: rustc-1.76
+version: 1.76.0+dfsg0ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.76-clang,rust-1.76-lld,rust-1.76-llvm-dwp,rustc-1.76,rustdoc-1.76
+
+name: rustc-1.77
+version: 1.77.2+dfsg1ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.77-clang,rust-1.77-lld,rust-1.77-llvm-dwp,rustc-1.77,rustdoc-1.77
+
+name: rustc-1.78
+version: 1.78.0+dfsg1ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.78-clang,rust-1.78-lld,rust-1.78-llvm-dwp,rustc-1.78,rustdoc-1.78
+
+name: rustc-1.79
+version: 1.79.0+dfsg1ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.79-clang,rust-1.79-lld,rust-1.79-llvm-dwp,rustc-1.79,rustdoc-1.79
+
+name: rustc-1.80
+version: 1.80.1+dfsg0ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: rust-1.80-clang,rust-1.80-lld,rust-1.80-llvm-dwp,rustc-1.80,rustdoc-1.80
+
+name: rustc-1.81
+version: 1.81.0+dfsg0ubuntu0-0ubuntu0.22.04.1
+commands: rust-1.81-clang,rust-1.81-lld,rust-1.81-llvm-dwp,rustc-1.81,rustdoc-1.81
+
+name: rustc-1.82
+version: 1.82.0+dfsg0ubuntu0~jammy-0ubuntu0.22.04.1
+commands: rust-1.82-clang,rust-1.82-lld,rust-1.82-llvm-dwp,rustc-1.82,rustdoc-1.82
+
+name: rustc-1.83
+version: 1.83.0+dfsg0ubuntu2~bpo2-0ubuntu2.22.04.1
+commands: rust-1.83-clang,rust-1.83-lld,rust-1.83-llvm-dwp,rustc-1.83,rustdoc-1.83
+
+name: rustc-1.84
+version: 1.84.1+dfsg0ubuntu1~bpo10-0ubuntu4.22.04.1
+commands: rust-1.84-clang,rust-1.84-lld,rust-1.84-llvm-dwp,rustc-1.84,rustdoc-1.84
+
+name: rustc-1.85
+version: 1.85.1+dfsg0ubuntu2~bpo0-0ubuntu1.22.04.1
+commands: rust-1.85-clang,rust-1.85-lld,rust-1.85-llvm-dwp,rustc-1.85,rustdoc-1.85
+
+name: rustc-1.89
+version: 1.89.0+dfsg~24.04-0ubuntu0.22.04.2
+commands: rust-1.89-clang,rust-1.89-lld,rust-1.89-llvm-dwp,rustc-1.89,rustdoc-1.89
+
+name: rustc-1.91
+version: 1.91.1+dfsg~22.04-0ubuntu0.22.04.3
+commands: rust-1.91-clang,rust-1.91-lld,rust-1.91-llvm-dwp,rustc-1.91,rustdoc-1.91
+
+name: rustfilt
+version: 0.2.1-1ubuntu0.22.04.1
+commands: rustfilt
+
+name: rustfmt
+version: 1.75.0+dfsg0ubuntu1~bpo0-0ubuntu0.22.04.1
+commands: cargo-fmt,rustfmt
+
+name: rustfmt-1.62
+version: 1.62.1+dfsg1-1ubuntu0.22.04.3
+commands: rustfmt-1.62
+
+name: samba-testsuite
+version: 2:4.15.13+dfsg-0ubuntu1.12
+commands: gentest,locktest,masktest,ndrdump,smbtorture
+
+name: sbuild-launchpad-chroot
+version: 0.19ubuntu0.0.1
+commands: sbuild-launchpad-chroot
+
+name: scep
+version: 2.0.0-2ubuntu1.1
+commands: scepclient,scepserver
+
+name: secsipidx
+version: 1.1.1~git20210601.d388d64-2ubuntu0.1
+commands: secsipidx
+
+name: seqkit
+version: 2.1.0+ds-1ubuntu0.1
+commands: seqkit,seqkit-benchmark
+
+name: shoelaces
+version: 1.2.0+ds-1ubuntu0.1
+commands: shoelaces
+
+name: shrinksafe
+version: 1.15.4+dfsg1-1ubuntu0.1
+commands: shrinksafe
+
+name: sia
+version: 1.3.0-1.1ubuntu1.3
+commands: siac,siad
+
+name: siftool
+version: 1.0.9-2.1ubuntu0.1
+commands: siftool
+
+name: skeema
+version: 1.7.0+ds-2ubuntu0.1
+commands: skeema
+
+name: skopeo
+version: 1.4.1+ds1-1ubuntu0.1
+commands: skopeo
+
+name: slinkwatch
+version: 1.1-3ubuntu0.3
+commands: slinkwatch
+
+name: sndfile-programs
+version: 1.0.31-2ubuntu0.2
+commands: sndfile-cmp,sndfile-concat,sndfile-convert,sndfile-deinterleave,sndfile-info,sndfile-interleave,sndfile-metadata-get,sndfile-metadata-set,sndfile-play,sndfile-salvage
+
+name: sniffglue
+version: 0.14.0-2ubuntu0.1
+commands: sniffglue
+
+name: sniproxy
+version: 0.6.0-2ubuntu0.22.04.1
+commands: sniproxy
+
+name: snmptrapd
+version: 5.9.1+dfsg-1ubuntu2.9
+commands: snmptrapd,traptoemail
+
+name: snowflake-client
+version: 1.1.0-2ubuntu0.1
+commands: snowflake-client
+
+name: snowflake-proxy
+version: 1.1.0-2ubuntu0.1
+commands: snowflake-proxy
+
+name: sofia-sip-bin
+version: 1.12.11+20110422.1-2.1+deb10u3ubuntu0.22.04.2
+commands: addrinfo,localinfo,sip-date,sip-dig,sip-options,stunc
+
+name: sox
+version: 14.4.2+git20190427-2+deb11u2ubuntu0.22.04.1
+commands: play,rec,sox,soxi
+
+name: sq
+version: 0.25.0-3ubuntu0.22.04.1
+commands: sq
+
+name: sq-keyring-linter
+version: 0.5.0-1ubuntu0.22.04.1
+commands: sq-keyring-linter
+
+name: sqlformat
+version: 0.4.2-1ubuntu0.22.04.2
+commands: sqlformat
+
+name: sqlite3-tools
+version: 3.37.2-2ubuntu0.5
+commands: showdb,showjournal,showstat4,showwal,sqldiff,sqlite3_analyzer
+
+name: sqop
+version: 0.26.1-2ubuntu0.22.04.1
+commands: sqop
+
+name: squid-openssl
+version: 5.9-0ubuntu0.22.04.5
+commands: squid
+
+name: squid-purge
+version: 5.9-0ubuntu0.22.04.5
+commands: squid-purge
+
+name: squidclient
+version: 5.9-0ubuntu0.22.04.5
+commands: squidclient
+
+name: ssh-askpass-gnome
+version: 1:8.9p1-3ubuntu0.15
+commands: ssh-askpass
+
+name: sshesame
+version: 0.0~git20210926.d7fdb81-1ubuntu0.22.04.1
+commands: sshesame,testproxy
+
+name: sslh
+version: 1.20-1+deb11u1build0.22.04.1
+commands: sslh,sslh-select
+
+name: stayrtr
+version: 0.3.0-1ubuntu0.1
+commands: rtrdump,rtrmon,stayrtr
+
+name: stenographer
+version: 1.0.1-2ubuntu0.22.04.3
+commands: stenographer,stenotype
+
+name: stenographer-client
+version: 1.0.1-2ubuntu0.22.04.3
+commands: stenocurl,stenoread
+
+name: stenographer-common
+version: 1.0.1-2ubuntu0.22.04.3
+commands: stenokeys
+
+name: strongswan-pki
+version: 5.9.5-2ubuntu2.7
+commands: pki
+
+name: strongswan-swanctl
+version: 5.9.5-2ubuntu2.7
+commands: swanctl
+
+name: subversion
+version: 1.14.1-3ubuntu0.22.04.1
+commands: svn,svnadmin,svnauthz,svnauthz-validate,svnbench,svndumpfilter,svnfsfs,svnlook,svnmucc,svnrdump,svnserve,svnsync,svnversion
+
+name: subversion-tools
+version: 1.14.1-3ubuntu0.22.04.1
+commands: fsfs-access-map,fsfs-stats,svn-backup-dumps,svn-bisect,svn-clean,svn-hot-backup,svn-mergeinfo-normalizer,svn-populate-node-origins-index,svn-vendor,svn_apply_autoprops,svn_load_dirs,svnraisetreeconflict,svnwrap
+
+name: sudo-ldap
+version: 1.9.9-1ubuntu2.6
+commands: cvtsudoers,sudo,sudo_logsrvd,sudo_sendlog,sudoedit,sudoreplay,visudo
+
+name: suffixfsm
+version: 0.0~git20150829.56e4718-5ubuntu0.22.04.1
+commands: suffixfsm,switchvsmap
+
+name: surf
+version: 2.1+git20210719-2ubuntu0.22.04.1
+commands: surf,x-www-browser
+
+name: syncthing
+version: 1.18.0~ds1-3ubuntu0.3
+commands: syncthing
+
+name: syncthing-discosrv
+version: 1.18.0~ds1-3ubuntu0.3
+commands: stdiscosrv
+
+name: syncthing-relaysrv
+version: 1.18.0~ds1-3ubuntu0.3
+commands: strelaysrv
+
+name: systemd-coredump
+version: 249.11-0ubuntu3.21
+commands: coredumpctl
+
+name: systemd-standalone-sysusers
+version: 249.11-0ubuntu3.21
+commands: systemd-sysusers
+
+name: systemd-standalone-tmpfiles
+version: 249.11-0ubuntu3.21
+commands: systemd-tmpfiles
+
+name: tang-common
+version: 11-1ubuntu0.1
+commands: tang-show-keys
+
+name: tar-scripts
+version: 1.34+dfsg-1ubuntu0.1.22.04.2
+commands: backup.sh,dump-remind,tar-backup,tar-restore
+
+name: terminews
+version: 1.2.2-1ubuntu0.22.04.3
+commands: terminews
+
+name: termshark
+version: 2.2.0-2ubuntu0.22.04.3
+commands: termshark
+
+name: texlive-binaries
+version: 2021.20210626.59705-1ubuntu0.3
+commands: afm2pl,afm2tfm,aleph,autosp,axohelp,bibtex,bibtex.original,bibtex8,bibtexu,chkdvifont,ctangle,ctie,ctwill,ctwill-refsort,ctwill-twinx,cweave,detex,devnag,disdvi,dt2dv,dv2dt,dvi2tty,dvibook,dviconcat,dvicopy,dvihp,dvilj,dvilj2p,dvilj4,dvilj4l,dvilj6,dvipdfm,dvipdfmx,dvipdft,dvipos,dvips,dviselect,dvispc,dvitodvi,dvitomp,dvitype,ebb,eptex,etex,euptex,extractbb,gftodvi,gftopk,gftype,gregorio,gsftopk,inimf,initex,kpseaccess,kpsereadlink,kpsestat,kpsewhich,luahbtex,luajithbtex,luajittex,luatex,mag,makeindex,makejvf,mendex,mf,mf-nowin,mflua,mflua-nowin,mfluajit,mfluajit-nowin,mfplain,mft,mkindex,mkocp,mkofm,mpost,msxlint,odvicopy,odvitype,ofm2opl,omfonts,opl2ofm,otangle,otp2ocp,outocp,ovf2ovp,ovp2ovf,patgen,pbibtex,pdfclose,pdfetex,pdfopen,pdftex,pdftosrc,pdvitomp,pdvitype,pfb2pfa,pk2bm,pktogf,pktype,pltotf,pmpost,pmxab,pooltype,ppltotf,prepmx,ps2pk,ptex,ptftopl,r-mpost,r-pmpost,r-upmpost,scor2prt,synctex,t4ht,tangle,tex,tex2aspc,tex4ht,texlua,texluac,texluajit,texluajitc,tftopl,tie,tpic2pdftex,ttf2afm,ttf2pk,ttf2tfm,ttfdump,upbibtex,updvitomp,updvitype,upmendex,upmpost,uppltotf,uptex,uptftopl,vftovp,vlna,vptovf,weave,wofm2opl,wopl2ofm,wovf2ovp,wovp2ovf,xdvi,xdvi-xaw,xdvi.bin,xdvipdfmx,xetex,xml2pmx
+
+name: tidy
+version: 2:5.6.0-11ubuntu0.22.04.1
+commands: tidy
+
+name: tigervnc-common
+version: 1.12.0+dfsg-4ubuntu0.22.04.1
+commands: tigervncconfig
+
+name: tigervnc-scraping-server
+version: 1.12.0+dfsg-4ubuntu0.22.04.1
+commands: X0tigervnc,x0tigervncserver
+
+name: tigervnc-standalone-server
+version: 1.12.0+dfsg-4ubuntu0.22.04.1
+commands: Xtigervnc,tigervncserver,tigervncsession
+
+name: tigervnc-tools
+version: 1.12.0+dfsg-4ubuntu0.22.04.1
+commands: tigervncpasswd
+
+name: tigervnc-viewer
+version: 1.12.0+dfsg-4ubuntu0.22.04.1
+commands: xtigervncviewer
+
+name: tkmib
+version: 5.9.1+dfsg-1ubuntu2.9
+commands: tkmib
+
+name: tml
+version: 0.4.0-2ubuntu0.1
+commands: tml
+
+name: tomcat9-user
+version: 9.0.58-1ubuntu0.2
+commands: tomcat9-instance-create
+
+name: trafficserver
+version: 9.1.1+ds-2ubuntu0.1
+commands: traffic_cache_tool,traffic_crashlog,traffic_ctl,traffic_layout,traffic_logcat,traffic_logstats,traffic_manager,traffic_server,traffic_top,traffic_via,tspush
+
+name: trafficserver-dev
+version: 9.1.1+ds-2ubuntu0.1
+commands: tsxs
+
+name: transmission-cli
+version: 3.00-2ubuntu2.2
+commands: transmission-cli,transmission-create,transmission-edit,transmission-remote,transmission-show
+
+name: transmission-daemon
+version: 3.00-2ubuntu2.2
+commands: transmission-daemon
+
+name: transmission-qt
+version: 3.00-2ubuntu2.2
+commands: transmission-qt
+
+name: tty-share
+version: 2.2.1+ds-1ubuntu0.1
+commands: tty-share
+
+name: ucd-generate
+version: 0.2.3-1ubuntu0.22.04.1
+commands: ucd-generate
+
+name: udhcpc
+version: 1:1.30.1-7ubuntu3.1
+commands: udhcpc
+
+name: udhcpd
+version: 1:1.30.1-7ubuntu3.1
+commands: dumpleases,udhcpd
+
+name: uidmap
+version: 1:4.8.1-2ubuntu2.2
+commands: newgidmap,newuidmap
+
+name: umoci
+version: 0.4.7+ds-2ubuntu0.1
+commands: umoci
+
+name: unbound
+version: 1.13.1-1ubuntu5.15
+commands: unbound,unbound-checkconf,unbound-control,unbound-control-setup
+
+name: unbound-anchor
+version: 1.13.1-1ubuntu5.15
+commands: unbound-anchor
+
+name: unbound-host
+version: 1.13.1-1ubuntu5.15
+commands: unbound-host
+
+name: unifdef
+version: 2.10-1.1build0.2
+commands: unifdef,unifdefall
+
+name: unikmer
+version: 0.18.8-1ubuntu0.1
+commands: unikmer
+
+name: unixodbc
+version: 2.3.9-5ubuntu0.1
+commands: isql,iusql
+
+name: v4l2loopback-utils
+version: 0.12.7-2ubuntu2~22.04.1
+commands: v4l2loopback-ctl
+
+name: varnish
+version: 6.6.1-1ubuntu0.2
+commands: varnishadm,varnishd,varnishhist,varnishlog,varnishncsa,varnishstat,varnishstat_help_gen,varnishtest,varnishtop
+
+name: vcfanno
+version: 0.3.3+ds-1ubuntu0.1
+commands: vcfanno
+
+name: victoria-metrics
+version: 1.71.0+ds1-1ubuntu0.3
+commands: victoria-metrics,vmagent,vmalert,vmauth,vmbackup,vmctl,vmrestore
+
+name: vim-athena
+version: 2:8.2.3995-1ubuntu2.30
+commands: editor,eview,evim,ex,gview,gvim,gvimdiff,rgview,rgvim,rview,rvim,vi,view,vim,vim.athena,vimdiff
+
+name: vim-gtk3
+version: 2:8.2.3995-1ubuntu2.30
+commands: editor,eview,evim,ex,gview,gvim,gvimdiff,rgview,rgvim,rview,rvim,vi,view,vim,vim.gtk3,vimdiff
+
+name: vim-gui-common
+version: 2:8.2.3995-1ubuntu2.30
+commands: gvimtutor
+
+name: vim-nox
+version: 2:8.2.3995-1ubuntu2.30
+commands: editor,eview,evim,ex,gview,gvim,gvimdiff,rgview,rgvim,rview,rvim,vi,view,vim,vim.nox,vimdiff
+
+name: vip-manager
+version: 1.0.1-5ubuntu0.3
+commands: vip-manager
+
+name: vpx-tools
+version: 1.11.0-2ubuntu2.5
+commands: vpxdec,vpxenc
+
+name: vuls
+version: 0.6.1-3ubuntu0.22.04.3
+commands: vuls
+
+name: webhook
+version: 2.8.0-3ubuntu0.1
+commands: webhook
+
+name: webkit2gtk-driver
+version: 2.50.4-0ubuntu0.22.04.1
+commands: WebKitWebDriver
+
+name: webp
+version: 1.2.2-2ubuntu0.22.04.2
+commands: cwebp,dwebp,gif2webp,img2webp,vwebp,webpinfo,webpmux
+
+name: winrmcp
+version: 0.0~git20180921.c76d91c-1ubuntu0.22.04.3
+commands: winrmcp
+
+name: wireguard-go
+version: 0.0.20220117-2ubuntu0.1
+commands: wireguard
+
+name: wpagui
+version: 2:2.10-6ubuntu2.2
+commands: wpa_gui
+
+name: xfce4-settings
+version: 4.16.2-1ubuntu2.22.04.1
+commands: xfce4-accessibility-settings,xfce4-appearance-settings,xfce4-color-settings,xfce4-display-settings,xfce4-find-cursor,xfce4-keyboard-settings,xfce4-mime-helper,xfce4-mime-settings,xfce4-mouse-settings,xfce4-settings-editor,xfce4-settings-manager,xfsettingsd
+
+name: xfpt
+version: 0.11-1ubuntu0.1
+commands: xfpt
+
+name: xnest
+version: 2:21.1.4-2ubuntu1.7~22.04.16
+commands: Xnest
+
+name: xpmutils
+version: 1:3.5.12-1ubuntu0.22.04.2
+commands: cxpm,sxpm
+
+name: xvfb
+version: 2:21.1.4-2ubuntu1.7~22.04.16
+commands: Xvfb,xvfb-run
+
+name: xzdec
+version: 5.2.5-2ubuntu1.1
+commands: lzmadec,xzdec
+
+name: yajl-tools
+version: 2.1.0-3ubuntu0.22.04.1
+commands: json_reformat,json_verify
+
+name: yard
+version: 0.9.26-1ubuntu0.1
+commands: yard,yardoc,yri
+
+name: yggdrasil
+version: 0.4.3-2ubuntu0.22.04.3
+commands: yggdrasil,yggdrasil-genkeys,yggdrasilctl
+
+name: yubikey-agent
+version: 0.1.4-2ubuntu0.22.04.1
+commands: yubikey-agent
+
+name: zfs-test
+version: 2.1.5-1ubuntu6~22.04.4
+commands: raidz_test,zinject,ztest
+
+name: znc
+version: 1.8.2-2ubuntu0.1
+commands: znc
+
+name: znc-dev
+version: 1.8.2-2ubuntu0.1
+commands: znc-buildmod
+
+name: zookeeper
+version: 3.4.13-6ubuntu4.1
+commands: zooinspector
+
+name: zookeeper-bin
+version: 3.4.13-6ubuntu4.1
+commands: zktreeutil
+

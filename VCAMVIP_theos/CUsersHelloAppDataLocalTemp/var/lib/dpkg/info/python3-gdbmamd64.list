@@ -1,0 +1,15 @@
+/.
+/usr
+/usr/lib
+/usr/lib/python3.10
+/usr/lib/python3.10/lib-dynload
+/usr/lib/python3.10/lib-dynload/_gdbm.cpython-310-x86_64-linux-gnu.so
+/usr/lib/python3.11
+/usr/lib/python3.11/lib-dynload
+/usr/lib/python3.11/lib-dynload/_gdbm.cpython-311-x86_64-linux-gnu.so
+/usr/share
+/usr/share/doc
+/usr/share/doc/python3-gdbm
+/usr/share/doc/python3-gdbm/README.Debian
+/usr/share/doc/python3-gdbm/changelog.Debian.gz
+/usr/share/doc/python3-gdbm/copyright

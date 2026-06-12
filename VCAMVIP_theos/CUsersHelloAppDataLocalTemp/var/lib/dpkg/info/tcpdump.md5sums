@@ -1,0 +1,11 @@
+588243d9315080426c0ce2d20b18abf9  usr/bin/tcpdump
+e97113781816ca448748be8623b1b6a0  usr/share/doc/tcpdump/NEWS.Debian.gz
+4cb3482753693a38d84271dcf8b74a25  usr/share/doc/tcpdump/README.Debian
+ef1b423eec33960aaceeb537c32d85e4  usr/share/doc/tcpdump/README.md.gz
+ca83c952ee9d46575357df99ac7b36db  usr/share/doc/tcpdump/changelog.Debian.gz
+0baa30c7e8a9d00c3102ddceb3643554  usr/share/doc/tcpdump/copyright
+f62c99424d4bde287c842a1dc9d33cec  usr/share/doc/tcpdump/examples/atime.awk
+2d2f4c9ef37a9ff6addd6f0b55acf1d2  usr/share/doc/tcpdump/examples/packetdat.awk
+04eb6463bab3266110142040ae9fa63c  usr/share/doc/tcpdump/examples/send-ack.awk
+a7753832551077724d0c8386ce106993  usr/share/doc/tcpdump/examples/stime.awk
+dda4cbd6ab02dbddbebc39c35ae148f8  usr/share/man/man8/tcpdump.8.gz

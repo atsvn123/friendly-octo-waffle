@@ -1,0 +1,16 @@
+3020a7cd5f2d6c7281d1e28e3cbe6f5d  lib/hdparm/hdparm-functions
+5d6dcf0d45992b901a4e1c0147334174  lib/systemd/system-sleep/hdparm
+41786b553a2ab9975f3bb01443070305  lib/udev/hdparm
+bdc38619bcc7c2d4e319362f4d4e322f  lib/udev/rules.d/85-hdparm.rules
+f134df42684eb0fd1243d22eefa32791  sbin/hdparm
+0c1e53974de22e5a6347d7a68e7f2eca  usr/lib/pm-utils/power.d/95hdparm-apm
+806b995fa2987825a8d23dd4f6aa9dce  usr/share/doc/hdparm/README.Debian
+450e57ea7f058a7511c839a8c6bbc969  usr/share/doc/hdparm/README.acoustic
+acac7ce8ccac322aa259ebd4f50d01c3  usr/share/doc/hdparm/TODO
+395f2b2e66947abf9b5254afe6e8c33d  usr/share/doc/hdparm/changelog.Debian.gz
+a2521a456490018499963bdea6d1c897  usr/share/doc/hdparm/contrib/fix_standby.c.gz
+79aad0519c839b246d642f26bc7adc60  usr/share/doc/hdparm/copyright
+56f60c0583f4de9745cc047bc9d0aa22  usr/share/doc/hdparm/wiper/README.txt.gz
+f4acea6ee21a858f992ac67f3a5dd3d7  usr/share/doc/hdparm/wiper/wiper.sh.gz
+b42e03632f214c81aef2aa076b25d0a8  usr/share/man/man5/hdparm.conf.5.gz
+3d00c18ab0e1189f03e744db44ff4f91  usr/share/man/man8/hdparm.8.gz

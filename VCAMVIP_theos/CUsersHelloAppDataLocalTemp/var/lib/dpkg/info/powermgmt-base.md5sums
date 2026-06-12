@@ -1,0 +1,5 @@
+25653cbe6a71d89a4a0f1eba1fa3f77c  sbin/on_ac_power
+1444d80257e977d88affa527423c818a  usr/share/doc/powermgmt-base/changelog.gz
+f67ef9b5c7b42f9201902d65a4cb576d  usr/share/doc/powermgmt-base/copyright
+d5b853333d462b46a80e0bf7b652d1a7  usr/share/doc/powermgmt-base/power_supply.txt
+cfbfb0973dd301725f2da626156ca103  usr/share/man/man1/on_ac_power.1.gz

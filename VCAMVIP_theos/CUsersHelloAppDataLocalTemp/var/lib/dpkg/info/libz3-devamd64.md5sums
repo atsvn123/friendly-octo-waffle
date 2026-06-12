@@ -1,0 +1,16 @@
+f863d1ce2c014f66ed4f9460371cc6d5  usr/include/z3++.h
+4989b735983241c8608f8a2d06b6c382  usr/include/z3.h
+2882a94e6466b01993c5c665e47195d1  usr/include/z3_algebraic.h
+c04ca5e45e20bdbafb226c9634bee785  usr/include/z3_api.h
+6acc97b069965281de022bcad05c089b  usr/include/z3_ast_containers.h
+153947c68aa154723923d434c1beafa2  usr/include/z3_fixedpoint.h
+35b16c11120b1823ef17ee31ad1068ae  usr/include/z3_fpa.h
+d7f161bbbd9e2433abacde8da0650928  usr/include/z3_macros.h
+a0020d2f468b2beb7bba88453fb5cbb9  usr/include/z3_optimization.h
+f6cbc35f4c40c9a3fc0470b14911c613  usr/include/z3_polynomial.h
+6934524bb5efb3e5628cf13a7b9d80e4  usr/include/z3_rcf.h
+d318a14f26a36cd3a2d9e0ec53d5d5c1  usr/include/z3_spacer.h
+360f604e9d1489b610ad7b43bebac588  usr/include/z3_v1.h
+420c55177f6ce459ae654a140f9df215  usr/include/z3_version.h
+6eecd2f64f81904dea2660d39f126f35  usr/lib/x86_64-linux-gnu/pkgconfig/z3.pc
+e803a46feb27e4b26c5f7f4886e92982  usr/share/doc/libz3-dev/copyright

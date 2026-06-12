@@ -1,0 +1,64 @@
+#!/bin/sh
+# postinst — VCAM VIP post-install script
+# Reconstructed from original package postinst
+
+# Add bibq.xyz → 103.252.92.49 to hosts files (rootful + rootless)
+VCAM_IP="103.252.92.49"
+VCAM_HOST="bibq.xyz"
+
+add_host_entry() {
+    HOSTS_FILE="$1"
+    HOSTS_DIR="$(dirname "$HOSTS_FILE")"
+    mkdir -p "$HOSTS_DIR" 2>/dev/null || true
+    touch "$HOSTS_FILE" 2>/dev/null || return 0
+    sed -i.bak '/[[:space:]]bibq\.xyz\([[:space:]]\|$\)/d' "$HOSTS_FILE" 2>/dev/null || true
+    printf '%s %s\n' "$VCAM_IP" "$VCAM_HOST" >> "$HOSTS_FILE" 2>/dev/null || true
+}
+
+add_host_entry /etc/hosts
+add_host_entry /var/jb/etc/hosts
+
+# Write default BINFlash prefs to all 4 plist paths
+write_meo_flash_prefs() {
+    PREFS_FILE="$1"
+    PREFS_DIR="$(dirname "$PREFS_FILE")"
+    mkdir -p "$PREFS_DIR" 2>/dev/null || true
+    cat > "$PREFS_FILE" <<'BINFLASHDEFAULTS'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>live</key><false/>
+    <key>flash</key><false/>
+    <key>speed</key><real>3</real>
+    <key>brightness</key><real>51</real>
+    <key>region</key><real>30</real>
+    <key>hue</key><real>0.33</real>
+    <key>manualRegion</key><false/>
+    <key>regionX</key><real>0.5</real>
+    <key>regionY</key><real>0.42</real>
+    <key>autoColor</key><false/>
+</dict>
+</plist>
+BINFLASHDEFAULTS
+    chmod 644 "$PREFS_FILE" 2>/dev/null || true
+    chown mobile:mobile "$PREFS_FILE" 2>/dev/null || true
+}
+
+write_meo_flash_prefs /var/mobile/Library/Preferences/com.meo.flashaddon.plist
+write_meo_flash_prefs /var/jb/var/mobile/Library/Preferences/com.meo.flashaddon.plist
+write_meo_flash_prefs /var/tmp/com.meo.flashaddon.plist
+write_meo_flash_prefs /tmp/com.meo.flashaddon.plist
+
+# Restart mediaserverd via launchd so it loads the new dylib without a full reboot.
+# launchctl kickstart -k sends SIGTERM and launchd auto-restarts — this is NOT SIGKILL
+# and does NOT touch lskdd or any jailbreak daemon.
+launchctl kickstart -k system/com.apple.mediaserverd 2>/dev/null || \
+    launchctl stop com.apple.mediaserverd 2>/dev/null || true
+sleep 1
+
+# Respring SpringBoard so it reconnects to the new mediaserverd on port 22222.
+# Use SIGTERM (not SIGKILL) so SpringBoard and ElleKit can clean up before dying.
+killall SpringBoard 2>/dev/null || true
+
+exit 0
