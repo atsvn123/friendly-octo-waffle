@@ -377,7 +377,7 @@ static UIColor *BorderColor(void) {
 
     // Version label (visible through transparent handleView above it)
     _versionLabel = [[UILabel alloc] initWithFrame:CGRectMake(pad, y, cw, 15)];
-    _versionLabel.text = @"v2.111-VCAM";
+    _versionLabel.text = @"v2.112-VCAM";
     _versionLabel.font = [UIFont systemFontOfSize:11.0];
     _versionLabel.textColor = [UIColor lightGrayColor];
     _versionLabel.textAlignment = NSTextAlignmentCenter;

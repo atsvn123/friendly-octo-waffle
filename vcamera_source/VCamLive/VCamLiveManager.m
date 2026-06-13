@@ -517,8 +517,9 @@ static void vcamDedupInsert(uint64_t key, double now) {
 
 - (void)setLive:(BOOL)live {
     if (!live && self.bLive) {
-        // Trace: log call stack snippet so we can identify who turns off live unexpectedly.
-        vcamSendDiag(@"LIVE->NO");
+        // Catch-all for call sites not tagged in VCamBridge parse: (code 1001/1005 are tagged).
+        // If "[?]" appears without a preceding "[1001]" or "[1005]", it's an unknown caller.
+        vcamSendDiag(@"LIVE->NO[?]");
     }
     self.bLive = live;
 }

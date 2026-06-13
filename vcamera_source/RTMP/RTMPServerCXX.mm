@@ -129,15 +129,17 @@ static NSString *s_lastBindErr = nil;
                     frame = session->GetRTMPMessage();
                     errCount = 0;  // success — reset retry counter
                 } catch (...) {
-                    // Transient error (EINTR from process suspension, brief socket hiccup):
-                    // retry up to 3 times before treating as genuine disconnect.
-                    if (++errCount <= 3 && server.userWantsRunning) {
-                        usleep(10000);  // 10ms
+                    // Transient error: Camera.app taking a photo or starting a recording
+                    // can cause AVFoundation to briefly reconfigure, which may disrupt the
+                    // TCP recv() for 100-500ms on some devices (A11, dual-camera configs).
+                    // Budget: 6 × 30ms = 180ms — enough to survive AVFoundation reconfig.
+                    if (++errCount <= 6 && server.userWantsRunning) {
+                        usleep(30000);  // 30ms
                         // Refresh decoder ref in case stopDecoding was called during sleep.
                         decoder = (H264Decoder *)server.h264Decoder;
                         continue;
                     }
-                    throw;  // 3+ consecutive failures or userWantsRunning=NO → genuine disconnect
+                    throw;  // 6+ consecutive failures or userWantsRunning=NO → genuine disconnect
                 }
 
                 // Refresh decoder ref every message — stopDecoding may have changed it.

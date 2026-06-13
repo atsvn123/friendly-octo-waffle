@@ -77,6 +77,11 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
     size_t height      = CVPixelBufferGetHeight(pixbuf);
     OSType pixelFormat = CVPixelBufferGetPixelFormatType(pixbuf);
 
+    // Skip frames larger than 4MP. Photo captures (12MP on iPhone 7/8) would
+    // run the pixel loop over 12M pixels = 50-200ms stall on the camera thread.
+    // 1080p video (2MP) runs normally. 4K (8MP) and photos (12MP+) are skipped.
+    if (width * height > 4000000UL) return;
+
     // Face position from GPUImageThinFaceFilter landmarks (updated by BINFlashCamera swizzle).
     // Sticky: last known position held when GPUImage temporarily loses tracking.
     double cx, cy, rx, ry;

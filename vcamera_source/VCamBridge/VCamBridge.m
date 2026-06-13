@@ -492,6 +492,7 @@ void vcamSendDiag(NSString *msg) {
             [buffer replaceBytesInRange:NSMakeRange(0, 4) withBytes:NULL length:0];
             // Pause delivery but keep server + thread alive.
             if ([self server]) [[self server] stopDecoding];
+            vcamSendDiag(@"LIVE->NO[1001]");
             [[VCamLiveManager sharedInstance] setLive:NO];
         }
         else if (code == 1002) {
@@ -528,6 +529,7 @@ void vcamSendDiag(NSString *msg) {
             [buffer replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
             [[VCamLiveManager sharedInstance] setSwitchFace:(val == 1)];
             if (val == 1) {
+                vcamSendDiag(@"LIVE->NO[1005]");
                 [[VCamLiveManager sharedInstance] setLive:NO];
                 [self stop];
             }
