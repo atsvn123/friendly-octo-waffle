@@ -129,17 +129,17 @@ static NSString *s_lastBindErr = nil;
                     frame = session->GetRTMPMessage();
                     errCount = 0;  // success — reset retry counter
                 } catch (...) {
-                    // Transient error: Camera.app taking a photo or starting a recording
-                    // can cause AVFoundation to briefly reconfigure, which may disrupt the
-                    // TCP recv() for 100-500ms on some devices (A11, dual-camera configs).
-                    // Budget: 6 × 30ms = 180ms — enough to survive AVFoundation reconfig.
-                    if (++errCount <= 6 && server.userWantsRunning) {
-                        usleep(30000);  // 30ms
+                    // Transient error: Camera.app photo capture or recording start causes
+                    // AVFoundation reconfiguration, which can disrupt recv() for up to ~1s
+                    // on dual-camera devices (iPhone 7 Plus) or A11 (iPhone 8).
+                    // Budget: 10 × 100ms = 1000ms — survives the worst-case reconfig window.
+                    if (++errCount <= 10 && server.userWantsRunning) {
+                        usleep(100000);  // 100ms
                         // Refresh decoder ref in case stopDecoding was called during sleep.
                         decoder = (H264Decoder *)server.h264Decoder;
                         continue;
                     }
-                    throw;  // 6+ consecutive failures or userWantsRunning=NO → genuine disconnect
+                    throw;  // 10+ consecutive failures or userWantsRunning=NO → genuine disconnect
                 }
 
                 // Refresh decoder ref every message — stopDecoding may have changed it.

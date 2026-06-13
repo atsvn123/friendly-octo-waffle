@@ -62,8 +62,6 @@ static void hook_emitSampleBuffer(id self, SEL _cmd, CMSampleBufferRef sbuf) {
 
         if (isLive) {
             // Resolution reporting: only update for landscape frames (IDA original behaviour).
-            // Portrait frames (video recording pipeline, face-detect sub-outputs) still get
-            // injection — modifyImageBuffer: handles 90° rotation lazily.
             if (width >= height) {
                 // IDA: two separate [NSDate date] calls — one for elapsed check, one for store
                 NSDate *checkDate = [NSDate date];
@@ -78,7 +76,14 @@ static void hook_emitSampleBuffer(id self, SEL _cmd, CMSampleBufferRef sbuf) {
                 }
             }
 
-            [state modifyImageBuffer:sbuf];
+            // Skip injection for frames larger than 4MP (photo captures on iPhone 7/8 are
+            // 12MP). VTPixelTransferSessionTransferImage on a 12MP buffer saturates the VT
+            // hardware and competes with Camera.app's recording VTCompressionSession on A11,
+            // causing VTDecompressionSession invalidation and RTMP dropout on those devices.
+            // Preview and video frames are ≤2MP (1080p) or ≤8MP (4K) — handled normally.
+            if (width * height <= 4000000UL) {
+                [state modifyImageBuffer:sbuf];
+            }
         }
     }
     ((void (*)(id, SEL, CMSampleBufferRef))orig_emitSampleBuffer)(self, _cmd, sbuf);
