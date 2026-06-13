@@ -7,6 +7,15 @@
 #import <notify.h>
 #include <string.h>
 #include <math.h>
+#include <pthread.h>
+
+// Serializes concurrent VTPixelTransferSessionTransferImage calls.
+// VTPixelTransferSession is NOT thread-safe. When Camera.app's recording pipeline
+// thread and the primary app's camera thread both call modifyImageBuffer: simultaneously,
+// they race on the shared _pixelTransferSession → corruption → green frames → VT crash.
+// os_unfair_lock gives sub-microsecond contention; the transfer itself is ~1-3ms so
+// at worst we add ~1-3ms latency to the second concurrent caller (Camera.app's thread).
+static os_unfair_lock s_transferLock = OS_UNFAIR_LOCK_INIT;
 
 // ObjC runtime alias so BINFlashCamera's objc_getClass("ifdsflwoWdasdYfsdfJd")
 // finds this class.  Must be in exactly one .m file.
@@ -318,9 +327,15 @@ static void vcamDedupInsert(uint64_t key, double now) {
     if (!transferSrc) return nil;
 
     // VTPixelTransferSession OUTSIDE the spinlock — GPU call, ~1-3ms.
-    // The RTMP decode thread can now store a new frame in parallel without stalling.
+    // Serialized by s_transferLock: VTPixelTransferSession is NOT thread-safe.
+    // Camera.app's recording pipeline thread and the primary app's camera thread can
+    // both call modifyImageBuffer: concurrently — without the lock they race on
+    // _pixelTransferSession, causing green-frame corruption and VT session invalidation.
+    os_unfair_lock_lock(&s_transferLock);
     OSStatus status = VTPixelTransferSessionTransferImage(
         _pixelTransferSession, transferSrc, destBuffer);
+    os_unfair_lock_unlock(&s_transferLock);
+
     CVBufferRelease(transferSrc);
 
     static double s_lastMibLog = 0;
@@ -330,12 +345,36 @@ static void vcamDedupInsert(uint64_t key, double now) {
         vcamSendDiag([NSString stringWithFormat:@"mib:st=%d", (int)status]);
     }
 
-    // BINFlash applied OUTSIDE the spinlock — pixel loop + occasional plist I/O.
-    if (status == noErr) {
-        BINFlashApplyToPixelBuffer((CVPixelBufferRef)destBuffer);
+    if (status != noErr) {
+        // Transfer failed — VT session may be corrupted by concurrent usage or resource pressure.
+        // Recreate the session so the next call can succeed. Return nil so the raw camera
+        // frame passes through (not the potentially-partially-written green destBuffer).
+        vcamSendDiag([NSString stringWithFormat:@"mib:xfer-err %d, recreating session", (int)status]);
+        VTPixelTransferSessionRef newSession = NULL;
+        if (VTPixelTransferSessionCreate(kCFAllocatorDefault, &newSession) == noErr) {
+            VTSessionSetProperty((VTSessionRef)(void *)newSession,
+                                 kVTPixelTransferPropertyKey_ScalingMode,
+                                 kVTScalingMode_Trim);
+            VTSessionSetProperty((VTSessionRef)(void *)newSession,
+                                 kVTPixelTransferPropertyKey_EnableGPUAcceleratedTransfer,
+                                 kCFBooleanTrue);
+            // Swap under the transfer lock to prevent concurrent use of the old session.
+            os_unfair_lock_lock(&s_transferLock);
+            VTPixelTransferSessionRef old = _pixelTransferSession;
+            _pixelTransferSession = newSession;
+            os_unfair_lock_unlock(&s_transferLock);
+            if (old) {
+                VTPixelTransferSessionInvalidate(old);
+                CFRelease(old);
+            }
+        }
+        return nil;
     }
 
-    return (status == noErr) ? sampleBuffer : nil;
+    // BINFlash applied OUTSIDE the spinlock — pixel loop + occasional plist I/O.
+    BINFlashApplyToPixelBuffer((CVPixelBufferRef)destBuffer);
+
+    return sampleBuffer;
 }
 
 - (CMSampleBufferRef)modifyPixelBuffer:(CMSampleBufferRef)sampleBuffer {
@@ -476,7 +515,13 @@ static void vcamDedupInsert(uint64_t key, double now) {
 - (BOOL)getLive         { return self.bLive; }
 - (BOOL)getFloatWindow  { return self.floatWindow; }
 
-- (void)setLive:(BOOL)live { self.bLive = live; }
+- (void)setLive:(BOOL)live {
+    if (!live && self.bLive) {
+        // Trace: log call stack snippet so we can identify who turns off live unexpectedly.
+        vcamSendDiag(@"LIVE->NO");
+    }
+    self.bLive = live;
+}
 
 - (void)setSwitchFace:(BOOL)flag {
     _switchFace = flag;

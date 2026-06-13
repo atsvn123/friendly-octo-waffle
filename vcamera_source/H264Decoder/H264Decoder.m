@@ -318,7 +318,7 @@ static void VTDecodeCallback(void *outputRefCon,
     if (!_session) {
         static double s_lastReinit = 0;
         double now = [[NSDate date] timeIntervalSince1970];
-        if (now - s_lastReinit >= 1.0 && _savedSPS && _savedPPS) {
+        if (now - s_lastReinit >= 0.2 && _savedSPS && _savedPPS) {
             s_lastReinit = now;
             if ([self initDecoder:(const uint8_t *)[_savedSPS bytes] spsSize:[_savedSPS length]
                              pps:(const uint8_t *)[_savedPPS bytes] ppsSize:[_savedPPS length]]) {
@@ -370,6 +370,13 @@ static void VTDecodeCallback(void *outputRefCon,
     if (vtErr == kVTInvalidSessionErr) {
         _sessionNeedsReset = YES;
     }
+}
+
+// ─── reinitFromSaved ─────────────────────────────────────────────────────────
+- (BOOL)reinitFromSaved {
+    if (!_savedSPS || !_savedPPS) return NO;
+    return [self initDecoder:(const uint8_t *)[_savedSPS bytes] spsSize:[_savedSPS length]
+                        pps:(const uint8_t *)[_savedPPS bytes] ppsSize:[_savedPPS length]];
 }
 
 // ─── endDecode ───────────────────────────────────────────────────────────────

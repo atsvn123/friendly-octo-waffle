@@ -1,10 +1,6 @@
 // RTMPServerCXX.mm
 // Objective-C++ bridge implementing the C++ RTMP accept loop.
 // Compiled as ObjC++ (.mm) so it can use librtmp and libvcam C++ classes.
-//
-// IDA-confirmed architecture (0xA2998 / 0xA2BB8 / 0xA2B08):
-//   qword_130390 (= g_tcpServer): global TCPServer*, created in startServerLoop,
-//   destroyed + deleted + nulled in stopServer. handleRTMP calls accept on it.
 
 #import "RTMPServer.h"
 #import "../H264Decoder/H264Decoder.h"
@@ -26,11 +22,8 @@ using librtmp::RTMPEndpoint;
 using librtmp::RTMPServerSession;
 using librtmp::H264Frame;
 
-// vcamSendDiag is defined in VCamBridge.m — C linkage prevents C++ name mangling.
 extern "C" void vcamSendDiag(NSString *msg);
 
-// Send a formatted diagnostic string from the RTMP thread to SpringBoard's menu.
-// Uses an @autoreleasepool so NSString formatting works on a thread without a pool.
 static void rtmpLog(const char *format, ...) {
     char buf[128];
     va_list args;
@@ -43,7 +36,6 @@ static void rtmpLog(const char *format, ...) {
     }
 }
 
-// Mirrors original binary's qword_130390.
 static TCPServer *g_tcpServer = nullptr;
 static NSString *s_lastBindErr = nil;
 
@@ -51,8 +43,6 @@ static NSString *s_lastBindErr = nil;
 
 + (NSString *)lastBindError { return s_lastBindErr; }
 
-// +createActiveTCPServer — called from startServerLoop, BEFORE setIsRunning:YES.
-// IDA 0xA2A14: if (!qword_130390) { new TCPServer(0x78F); qword_130390 = v6; }
 + (BOOL)createActiveTCPServer {
     [s_lastBindErr release]; s_lastBindErr = nil;
     if (g_tcpServer) return YES;
@@ -68,27 +58,48 @@ static NSString *s_lastBindErr = nil;
     }
 }
 
-// +destroyActiveTCPServer — called from stopServer.
-// IDA 0xA2B5C: destroy + ~TCPServer + delete + qword_130390=0
 + (void)destroyActiveTCPServer {
     if (g_tcpServer) {
-        g_tcpServer->destroy();  // close listen socket, unblocks accept()
-        delete g_tcpServer;      // calls ~TCPServer + frees memory
+        g_tcpServer->destroy();
+        delete g_tcpServer;
         g_tcpServer = nullptr;
     }
 }
 
-// +runRTMPAcceptLoop: — called from handleRTMP. Uses the already-bound g_tcpServer.
-// IDA 0xA2BB8: do { accept on qword_130390; RTMPEndpoint; RTMPServerSession; GetRTMPMessage loop } while (isRunning)
+// +runRTMPAcceptLoop: — blocking accept + session loop on g_tcpServer.
+//
+// v2.110 changes:
+//   1. Outer accept loop: uses userWantsRunning (not isRunning) so external isRunning=NO
+//      does NOT exit the loop. Only explicit stopServer() (userWantsRunning=NO) stops it.
+//   2. Accept failure counter: if accept() fails 5+ consecutive times, g_tcpServer may be
+//      dead (socket closed externally without our knowledge). Destroy it and break so
+//      handleRTMP outer loop rebuilds via createActiveTCPServer. Prevents busy-loop.
+//   3. Session message loop: uses userWantsRunning instead of isRunning for same reason.
+//   4. Transient error retry: GetRTMPMessage() can throw EINTR when iOS briefly suspends
+//      mediaserverd during AVCaptureSession reconfiguration (e.g. Camera.app opens).
+//      Up to 3 retries with 10ms gap before treating as genuine disconnect.
+//      This prevents OBS losing connection on transient kernel interrupts.
+
 + (void)runRTMPAcceptLoop:(RTMPServer *)server {
-    while (server.isRunning) {
+    int acceptFailCount = 0;
+
+    while (server.userWantsRunning) {  // userWantsRunning: immune to external isRunning=NO
         if (!g_tcpServer) break;
 
         int clientFd = -1;
         try {
             clientFd = g_tcpServer->accept();
+            acceptFailCount = 0;  // reset on success
         } catch (...) {
-            if (!server.isRunning) break;
+            if (!server.userWantsRunning) break;
+            if (++acceptFailCount > 5) {
+                // accept() failing repeatedly — socket may be dead (not just EINTR).
+                // Destroy and let handleRTMP outer loop rebuild via createActiveTCPServer.
+                rtmpLog("r:accept-dead, rebuilding");
+                [RTMPServer destroyActiveTCPServer];
+                break;
+            }
+            usleep(100000);  // 100ms between retries
             continue;
         }
 
@@ -104,18 +115,39 @@ static NSString *s_lastBindErr = nil;
             endpoint->doHandshake();
             rtmpLog("r1:handshake");
 
-            session  = new RTMPServerSession(endpoint);
+            session = new RTMPServerSession(endpoint);
             rtmpLog("r2:session");
 
             H264Decoder *decoder = (H264Decoder *)server.h264Decoder;
             int msgCount = 0;
+            int errCount = 0;  // consecutive GetRTMPMessage failures for retry logic
 
-            while (server.isRunning) {
-                H264Frame frame = session->GetRTMPMessage();
+            // Session message loop: userWantsRunning so external isRunning=NO is ignored.
+            while (server.userWantsRunning) {
+                H264Frame frame;
+                try {
+                    frame = session->GetRTMPMessage();
+                    errCount = 0;  // success — reset retry counter
+                } catch (...) {
+                    // Transient error (EINTR from process suspension, brief socket hiccup):
+                    // retry up to 3 times before treating as genuine disconnect.
+                    if (++errCount <= 3 && server.userWantsRunning) {
+                        usleep(10000);  // 10ms
+                        // Refresh decoder ref in case stopDecoding was called during sleep.
+                        decoder = (H264Decoder *)server.h264Decoder;
+                        continue;
+                    }
+                    throw;  // 3+ consecutive failures or userWantsRunning=NO → genuine disconnect
+                }
+
+                // Refresh decoder ref every message — stopDecoding may have changed it.
+                decoder = (H264Decoder *)server.h264Decoder;
+
                 msgCount++;
                 if (msgCount <= 5) {
                     rtmpLog("r3:msg%d", msgCount);
                 }
+
                 if (frame.isSequenceHeader) {
                     if (!frame.sps.empty() && !frame.pps.empty()) {
                         rtmpLog("r4:sps-pps");
@@ -126,9 +158,6 @@ static NSString *s_lastBindErr = nil;
                         rtmpLog("r5:decoder-init");
                     }
                 } else if (!frame.nalu.empty()) {
-                    // Compute display PTS = DTS + CTS for the software reorder buffer.
-                    // compositionTime is a 24-bit signed value stored in uint32 (top 8 bits = 0).
-                    // Sign-extend: shift left 8 to move sign bit to bit 31, then arithmetic right.
                     int32_t signedCTS = (int32_t)(frame.compositionTime << 8) >> 8;
                     int32_t pts       = (int32_t)frame.timestamp + signedCTS;
                     @try {
@@ -139,11 +168,11 @@ static NSString *s_lastBindErr = nil;
                     }
                 }
             }
-            rtmpLog("r:loop-exit isRunning=%d", (int)server.isRunning);
+            rtmpLog("r:loop-exit uWR=%d", (int)server.userWantsRunning);
         } catch (const std::exception &e) {
             rtmpLog("r:ERR %s", e.what());
         } catch (...) {
-            rtmpLog("r:disc");  // normal client disconnect (read EOF/ECONNRESET)
+            rtmpLog("r:disc");
         }
 
         delete session;

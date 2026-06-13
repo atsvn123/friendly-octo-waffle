@@ -37,4 +37,8 @@
 // Tear down the VTDecompressionSession.
 - (void)endDecode;
 
+// Try to reinitialize using saved SPS/PPS from last successful initDecoder:.
+// Use after stopDecoding/endDecode to resume without waiting for a new sequence header.
+- (BOOL)reinitFromSaved;
+
 @end

@@ -13,15 +13,21 @@
 @interface RTMPServer : NSObject
 
 @property (nonatomic, assign) id<RTMPServerDelegate> delegate;
-@property (nonatomic, strong) id h264Decoder;       // H264Decoder instance
+@property (nonatomic, strong) id h264Decoder;        // H264Decoder instance
 @property (nonatomic, assign) BOOL isRunning;
 @property (nonatomic, strong) NSThread *RTMPThread;
-@property (nonatomic, assign) BOOL userWantsRunning;  // set YES on code 1000, NO on code 1001
+@property (nonatomic, assign) BOOL userWantsRunning;  // YES while server should live; only NO on full shutdown
+@property (nonatomic, assign) BOOL deliversFrames;    // YES when LIVE is on; NO when LIVE is off but server stays up
 
-// Start RTMP server on port 1935 (creates TCPServer + H264Decoder + background thread)
+// Start RTMP server — idempotent: only spawns thread/TCPServer if not already alive.
+// On subsequent calls (LIVE toggle on) just enables frame delivery + reinits decoder.
 - (void)startServerLoop;
 
-// Stop RTMP server (sets isRunning=NO, waits 1s, cancels thread)
+// Pause frame delivery without touching TCPServer or thread.
+// OBS connection stays live. Call on code 1001 (user presses Stop).
+- (void)stopDecoding;
+
+// Full shutdown — kills thread, destroys TCPServer. Only for process cleanup or unrecoverable errors.
 - (void)stopServer;
 
 // Main accept + decode loop — runs on RTMPThread, calls +runRTMPLoop:

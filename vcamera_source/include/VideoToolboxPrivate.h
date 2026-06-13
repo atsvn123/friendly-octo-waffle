@@ -18,6 +18,8 @@ extern int32_t VTPixelTransferSessionCreate(
     CFAllocatorRef allocator,
     VTPixelTransferSessionRef *pixelTransferSessionOut);
 
+extern void VTPixelTransferSessionInvalidate(VTPixelTransferSessionRef session);
+
 extern int32_t VTPixelTransferSessionTransferImage(
     VTPixelTransferSessionRef session,
     CVImageBufferRef sourceBuffer,

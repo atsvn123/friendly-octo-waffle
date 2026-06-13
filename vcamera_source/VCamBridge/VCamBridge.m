@@ -438,16 +438,14 @@ void vcamSendDiag(NSString *msg) {
 }
 
 // ─── -stop (0x8B3C0) ──────────────────────────────────────────────────────────
-// Confirmed order: _beginTimeYUV=0.0 FIRST, then check server, stopServer,
-// setServerThread:nil, setServer:nil
+// v2.110: calls stopDecoding (pause delivery) instead of stopServer (destroy everything).
+// TCPServer and handleRTMP thread remain alive — OBS stays connected across LIVE toggle.
 - (void)stop {
-    vcamSendDiag(@"vcam:stop");   // probe: confirms stop() is being called
+    vcamSendDiag(@"vcam:stop");
     self->_beginTimeYUV = 0.0;
     if ([self server]) {
-        RTMPServer *s = [self server];
-        [s stopServer];
-        [self setServerThread:nil];
-        [self setServer:nil];
+        [[self server] stopDecoding];
+        // Keep server object and thread — do NOT nil server or cancel thread.
     }
 }
 
@@ -459,18 +457,23 @@ void vcamSendDiag(NSString *msg) {
         int32_t code = *(const int32_t *)bytes;
 
         if (code == 1000) {
+            // Pause delivery (stop() → stopDecoding) but keep server/thread alive.
             [self stop];
             [[VCamLiveManager sharedInstance] setLive:YES];
             [[VCamLiveManager sharedInstance] setSwitchFace:NO];
 
-            RTMPServer *srv = [[RTMPServer alloc] init];
-            [self setServer:srv];
-            [srv release];
-            [self setServerThread:nil];
-            RTMPServer *srvRef = [self server];
-            [srvRef setDelegate:self];
+            // Reuse existing server if alive — only create on first call.
+            if (![self server]) {
+                RTMPServer *srv = [[RTMPServer alloc] init];
+                [self setServer:srv];
+                [srv release];
+                [[self server] setDelegate:self];
+            }
+            [self setServerThread:nil];  // informational only; thread managed inside RTMPServer
 
-            BOOL bindOK = [RTMPServer createActiveTCPServer];
+            RTMPServer *srvRef = [self server];
+
+            BOOL bindOK = [RTMPServer createActiveTCPServer];  // no-op if already bound
 
             if (!bindOK) {
                 NSString *err = [RTMPServer lastBindError] ?: @"?";
@@ -479,7 +482,7 @@ void vcamSendDiag(NSString *msg) {
             } else {
                 [_serverSocket sendAll:makeErrorPacket(2001, @"1935:ok")];
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                    [srvRef startServerLoop];
+                    [srvRef startServerLoop];  // idempotent: no-op on thread/TCPServer if alive
                 });
             }
 
@@ -487,7 +490,8 @@ void vcamSendDiag(NSString *msg) {
         }
         else if (code == 1001) {
             [buffer replaceBytesInRange:NSMakeRange(0, 4) withBytes:NULL length:0];
-            [self stop];
+            // Pause delivery but keep server + thread alive.
+            if ([self server]) [[self server] stopDecoding];
             [[VCamLiveManager sharedInstance] setLive:NO];
         }
         else if (code == 1002) {

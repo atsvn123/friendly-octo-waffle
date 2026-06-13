@@ -1,18 +1,16 @@
 // RTMPServer.m
 // Reconstructed from -[RTMPServer *] methods (0xA28E0 / 0xA2998 / 0xA2B08 / 0xA2BB8).
-// IDA-confirmed architecture:
-//   startServerLoop (0xA2998): create H264Decoder → createActiveTCPServer → setIsRunning:YES → start handleRTMP thread
-//   stopServer (0xA2B08):      setIsRunning:NO → sleep(1) → cancel RTMPThread → destroyActiveTCPServer → endDecode
-//   handleRTMP (0xA2BB8):      if isRunning → accept loop using g_tcpServer → [NSThread exit]
 //
-// v2.108 — "unable to kill" hardening:
-//   handleRTMP loops on userWantsRunning (not isRunning). External code setting isRunning=NO
-//   causes runRTMPAcceptLoop to exit its inner while, but handleRTMP immediately restores
-//   isRunning=YES and retries — no shutdown, no sleep. Zero gap.
-//   pthread cancellation is disabled inside the thread — external pthread_cancel is ignored.
-//   Watchdog GCD timer revives the thread if it is externally killed by process-level signal.
-//   stopServer: sets userWantsRunning=NO + isRunning=NO + destroys TCPServer (unblocks accept),
-//   then sleeps 1s for clean thread exit before final cleanup.
+// v2.110 persistent-server architecture:
+//   TCPServer (port 1935) and handleRTMP thread live for the lifetime of the mediaserverd
+//   process. Only stopServer() (called on process exit / unrecoverable error) destroys them.
+//
+//   startServerLoop:  idempotent — reinits H264Decoder, enables deliversFrames, spawns
+//                     thread+TCPServer only on first call (or after crash recovery).
+//   stopDecoding:     disables frame delivery + endDecodes, but NEVER touches TCPServer or thread.
+//                     OBS stays connected across LIVE toggle off/on.
+//   stopServer:       full teardown for process cleanup. Sets userWantsRunning=NO so
+//                     handleRTMP and runRTMPAcceptLoop both exit cleanly.
 
 #import "RTMPServer.h"
 #import "../H264Decoder/H264Decoder.h"
@@ -66,16 +64,34 @@
     }
 }
 
-// --- -startServerLoop (0xA2998) ---
+// ── -startServerLoop — idempotent (0xA2998) ──────────────────────────────────
 - (void)startServerLoop {
+    // H264Decoder: create if nil, otherwise reinit from saved SPS/PPS for
+    // immediate decode after LIVE toggle on (OBS already connected, won't resend SPS/PPS).
     if (!self.h264Decoder) {
         H264Decoder *decoder = [[H264Decoder alloc] init];
         decoder.delegate = (id<H264DecoderDelegate>)self;
         self.h264Decoder = decoder;
         [decoder release];
+    } else {
+        H264Decoder *dec = (H264Decoder *)self.h264Decoder;
+        [dec reinitFromSaved];  // fast resume — no need to wait for OBS to resend SPS/PPS
     }
 
+    // Enable frame delivery BEFORE anything else so no race on deliversFrames.
+    self.deliversFrames = YES;
+
+    // TCPServer: createActiveTCPServer is a no-op if g_tcpServer is still alive.
     if (![RTMPServer createActiveTCPServer]) {
+        return;
+    }
+
+    // Thread: only spawn if not already running.
+    NSThread *existing = self.RTMPThread;
+    if (existing && !existing.isFinished && !existing.isCancelled) {
+        // Thread is alive — just ensure flags are set.
+        self.isRunning       = YES;
+        self.userWantsRunning = YES;
         return;
     }
 
@@ -86,16 +102,22 @@
     [self _startWatchdog];
 }
 
-// --- -stopServer (0xA2B08) — only called when user explicitly presses Stop ---
-- (void)stopServer {
-    if (self.isRunning) {
-        vcamSendDiag(@"!stopSrv:active");
-        NSLog(@"[VCAM] stopServer called while isRunning=YES");
-    }
+// ── -stopDecoding — pause delivery, keep server/thread alive ─────────────────
+- (void)stopDecoding {
+    self.deliversFrames = NO;
+    // endDecode releases the VT hardware decoder session, freeing it for other apps.
+    // The H264Decoder object itself is NOT nilled — startServerLoop will reinitFromSaved.
+    H264Decoder *dec = (H264Decoder *)self.h264Decoder;
+    if (dec) [dec endDecode];
+    // TCPServer, handleRTMP thread, userWantsRunning — all untouched.
+    // OBS stays connected.
+}
 
-    // Signal intent BEFORE anything else so handleRTMP loop exits naturally.
+// ── -stopServer (0xA2B08) — full teardown, only for process cleanup ───────────
+- (void)stopServer {
     self.userWantsRunning = NO;
     self.isRunning        = NO;
+    self.deliversFrames   = NO;
 
     [self _stopWatchdog];
 
@@ -112,24 +134,20 @@
     self.h264Decoder = nil;
 }
 
-// --- -handleRTMP — loops on userWantsRunning, immune to external isRunning=NO ---
+// ── -handleRTMP — loops on userWantsRunning ───────────────────────────────────
 - (void)handleRTMP {
     // Prevent external pthread_cancel from killing this thread.
-    // Only userWantsRunning=NO (set by stopServer) terminates the loop.
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 
     while (self.userWantsRunning) {
-        // Restore isRunning in case it was flipped externally.
         self.isRunning = YES;
 
         // createActiveTCPServer: no-op if g_tcpServer is still alive.
-        // If it was destroyed, SO_REUSEADDR+SO_REUSEPORT allow instant rebind.
         if (![RTMPServer createActiveTCPServer]) {
             usleep(50000);  // 50ms — port briefly busy, retry
             continue;
         }
 
-        // Blocking accept + session loop. Exits when isRunning=NO or g_tcpServer=null.
         @try {
             [RTMPServer runRTMPAcceptLoop:self];
         } @catch (NSException *ex) {
@@ -137,23 +155,20 @@
         }
 
         if (!self.userWantsRunning) break;
-
-        // runRTMPAcceptLoop exited while user still wants RTMP.
-        // Do NOT destroy the server — if g_tcpServer is still valid, the next
-        // createActiveTCPServer call (top of loop) is a no-op and we retry instantly.
-        // If g_tcpServer was already destroyed, createActiveTCPServer will rebuild it.
-        // Either way: no sleep, no manual destroy — fastest possible recovery.
+        // runRTMPAcceptLoop exited (accept failure or g_tcpServer destroyed).
+        // Do NOT destroy the server — createActiveTCPServer at top of loop rebuilds if needed.
     }
 
     self.isRunning = NO;
     [NSThread exit];
 }
 
-// --- -outputFrame:presentationTimeStamp:presentationDuration: (0xA28E0) ---
+// ── -outputFrame: (0xA28E0) — only forward when LIVE is on ───────────────────
 - (void)outputFrame:(void *)frameData
  presentationTimeStamp:(int64_t)pts
   presentationDuration:(int64_t)duration
 {
+    if (!self.deliversFrames) return;  // LIVE toggle is off — OBS stays connected but no injection
     id<RTMPServerDelegate> del = self.delegate;
     if (del) {
         [del outputFrame:frameData
