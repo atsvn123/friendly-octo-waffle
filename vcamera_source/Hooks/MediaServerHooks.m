@@ -76,14 +76,10 @@ static void hook_emitSampleBuffer(id self, SEL _cmd, CMSampleBufferRef sbuf) {
                 }
             }
 
-            // Skip injection for frames larger than 4MP (photo captures on iPhone 7/8 are
-            // 12MP). VTPixelTransferSessionTransferImage on a 12MP buffer saturates the VT
-            // hardware and competes with Camera.app's recording VTCompressionSession on A11,
-            // causing VTDecompressionSession invalidation and RTMP dropout on those devices.
-            // Preview and video frames are ≤2MP (1080p) or ≤8MP (4K) — handled normally.
-            if (width * height <= 4000000UL) {
-                [state modifyImageBuffer:sbuf];
-            }
+            // IDA-confirmed: no size guard. All landscape frames get injection.
+            // The real fix for RTMP disconnect is serializing ALL VT operations through
+            // a single NSRecursiveLock in VCamLiveManager (v2.114), not skipping frames.
+            [state modifyImageBuffer:sbuf];
         }
     }
     ((void (*)(id, SEL, CMSampleBufferRef))orig_emitSampleBuffer)(self, _cmd, sbuf);

@@ -769,28 +769,70 @@ void vcamSendDiag(NSString *msg) {
     [_serverSocket sendAll:[NSData dataWithBytes:buf length:12]];
 }
 
-// ─── RTMPServerDelegate (0x89010) — decoded H.264 frames from RTMP ────────────
-// Pass the VT-decoded IOSurface buffer directly — no intermediate pixel copy.
-// VTDecodeCallback already retained the buffer before calling here;
-// setYUVPixelBuffer: adds its own retain, so releasing in the callback is safe.
-// modifyImageBuffer: does the single VTPixelTransferSessionTransferImage into
-// the camera buffer — one copy total instead of the previous three.
+// imageBufferToSampleBuffer:timeStamp: (IDA 0x88F1C)
+// Wraps a CVPixelBuffer into a CMSampleBuffer with PTS derived from _beginTimeYUV.
+// timescale=600: each tick is 1/600s; beginTimeYUV*600 gives unique, monotonically
+// increasing PTS values used for dedup in modifyImageBuffer:.
+- (CMSampleBufferRef)imageBufferToSampleBuffer:(CVImageBufferRef)imageBuffer
+                                     timeStamp:(double)ts
+{
+    if (!imageBuffer) return NULL;
+
+    CVPixelBufferLockBaseAddress((CVPixelBufferRef)imageBuffer, 0);
+
+    CMVideoFormatDescriptionRef fmt = NULL;
+    OSStatus fmtErr = CMVideoFormatDescriptionCreateForImageBuffer(
+        kCFAllocatorDefault, imageBuffer, &fmt);
+    if (fmtErr != noErr) {
+        CVPixelBufferUnlockBaseAddress((CVPixelBufferRef)imageBuffer, 0);
+        return NULL;
+    }
+
+    CMSampleTimingInfo timing;
+    memset(&timing, 0, sizeof(timing));
+    timing.presentationTimeStamp.timescale = 600;
+    timing.presentationTimeStamp.flags     = kCMTimeFlags_Valid;
+    timing.presentationTimeStamp.value     = (int64_t)(ts * 600.0);
+
+    CMSampleBufferRef sbuf = NULL;
+    OSStatus sbufErr = CMSampleBufferCreateForImageBuffer(
+        kCFAllocatorDefault,
+        imageBuffer,
+        YES, NULL, NULL,
+        fmt, &timing, &sbuf);
+
+    CVPixelBufferUnlockBaseAddress((CVPixelBufferRef)imageBuffer, 0);
+
+    if (fmt) CFRelease(fmt);
+
+    if (sbufErr != noErr) {
+        if (sbuf) CFRelease(sbuf);
+        return NULL;
+    }
+    return sbuf;
+}
+
+// ─── RTMPServerDelegate (IDA 0x89010) — decoded H.264 frames from RTMP ───────
+// IDA-confirmed: wraps CVPixelBuffer → CMSampleBuffer → setYUVSampleBuffer:.
+// This ensures modifyImageBuffer: reads _liveYUVSampleBuffer (IDA-confirmed path)
+// rather than _pixelYUVBuffer (the divergent fast-path used in v2.110–v2.113).
+// Both the CMSampleBufferCreateCopy in setYUVSampleBuffer: AND the
+// VTImageRotationSessionTransferImage for _pixelYUVBuffer90 happen under _lock,
+// preventing concurrent VT hardware use with the camera thread.
 - (void)outputFrame:(void *)frameData
  presentationTimeStamp:(int64_t)pts
   presentationDuration:(int64_t)duration
 {
     if (!frameData) return;
-    CVPixelBufferRef src = (CVPixelBufferRef)frameData;
-    [[VCamLiveManager sharedInstance] setYUVPixelBuffer:src];
-    self.beginTimeYUV += 20.0;
-}
+    CVImageBufferRef src = (CVImageBufferRef)frameData;
 
-// imageBufferToSampleBuffer:timeStamp: — STUB (no longer called)
-- (CMSampleBufferRef)imageBufferToSampleBuffer:(CVImageBufferRef)imageBuffer
-                                     timeStamp:(double)ts
-{
-    (void)imageBuffer; (void)ts;
-    return NULL;
+    CMSampleBufferRef sbuf = [self imageBufferToSampleBuffer:src
+                                                   timeStamp:self.beginTimeYUV];
+    if (sbuf) {
+        [[VCamLiveManager sharedInstance] setYUVSampleBuffer:sbuf];
+        CFRelease(sbuf);
+    }
+    self.beginTimeYUV += 20.0;
 }
 
 // ─── Output stubs ─────────────────────────────────────────────────────────────

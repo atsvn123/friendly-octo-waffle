@@ -1,21 +1,18 @@
 // VCamLiveManager.m
 // Reconstructed from ifdsflwoWdasdYfsdfJd (0x12ADB0)
+// v2.114: restored single NSRecursiveLock design to match IDA exactly.
+//   IDA-confirmed: _lock (NSRecursiveLock) is held across the ENTIRE
+//   modifyImageBuffer: operation including VTPixelTransferSessionTransferImage.
+//   setYUVSampleBuffer: and setYUVPixelBuffer: ALSO hold _lock during all VT work.
+//   All VT operations (createImageBuffer:, create90ImageBuffer:,
+//   VTPixelTransferSessionTransferImage) are serialized through the same lock,
+//   preventing concurrent VT hardware use that caused RTMP disconnect on A11/dual-camera.
 
 #import "VCamLiveManager.h"
 #import "../BINFlash/BINFlashPixelEffect.h"
-#import <os/lock.h>
 #import <notify.h>
 #include <string.h>
 #include <math.h>
-#include <pthread.h>
-
-// Serializes concurrent VTPixelTransferSessionTransferImage calls.
-// VTPixelTransferSession is NOT thread-safe. When Camera.app's recording pipeline
-// thread and the primary app's camera thread both call modifyImageBuffer: simultaneously,
-// they race on the shared _pixelTransferSession → corruption → green frames → VT crash.
-// os_unfair_lock gives sub-microsecond contention; the transfer itself is ~1-3ms so
-// at worst we add ~1-3ms latency to the second concurrent caller (Camera.app's thread).
-static os_unfair_lock s_transferLock = OS_UNFAIR_LOCK_INIT;
 
 // ObjC runtime alias so BINFlashCamera's objc_getClass("ifdsflwoWdasdYfsdfJd")
 // finds this class.  Must be in exactly one .m file.
@@ -24,48 +21,25 @@ static os_unfair_lock s_transferLock = OS_UNFAIR_LOCK_INIT;
 // Cross-process diagnostic — defined in VCamBridge.m
 extern void vcamSendDiag(NSString *msg);
 
-// ── Dedup ring buffer ─────────────────────────────────────────────────────────
-// Replaces NSMutableDictionary — 16 uint64 compares vs ObjC hash + alloc per frame.
-#define VCAM_DEDUP_SIZE 16
-typedef struct { uint64_t key; double ts; } VCamDedupEntry;
-static VCamDedupEntry s_dedup[VCAM_DEDUP_SIZE];
-static int            s_dedupHead = 0;
-
-static BOOL vcamDedupCheck(uint64_t key, double now) {
-    for (int i = 0; i < VCAM_DEDUP_SIZE; i++) {
-        if (s_dedup[i].key == key && (now - s_dedup[i].ts) < 0.2) return YES;
-    }
-    return NO;
-}
-static void vcamDedupInsert(uint64_t key, double now) {
-    s_dedup[s_dedupHead].key = key;
-    s_dedup[s_dedupHead].ts  = now;
-    s_dedupHead = (s_dedupHead + 1) % VCAM_DEDUP_SIZE;
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 @implementation VCamLiveManager {
-    // Replaces NSRecursiveLock — guards only pointer swaps (nanoseconds held).
-    os_unfair_lock _spinlock;
+    // IDA-confirmed: single NSRecursiveLock that serializes ALL frame operations.
+    // - setYUVSampleBuffer: (RTMP decode thread) holds it during CMSampleBufferCreateCopy
+    //   + create90ImageBuffer: (VTImageRotationSessionTransferImage)
+    // - setYUVPixelBuffer: (face-swap / other paths) holds it during createImageBuffer:
+    //   (VTPixelTransferSessionTransferImage) + create90ImageBuffer:
+    // - modifyImageBuffer: (camera pipeline thread) holds it through the entire
+    //   VTPixelTransferSessionTransferImage call
+    // This prevents concurrent VT hardware use from different threads, which caused
+    // VT session invalidation and RTMP disconnect on A11 and dual-camera devices.
+    NSRecursiveLock    *_lock;
 
-    // Cross-tick RTMP buffer snapshot.
-    // BWNodeOutput::emitSampleBuffer: fires N times per camera tick (preview, data output, …)
-    // across multiple pipeline nodes. Each node may create its own CMSampleBuffer with a
-    // different PTS, so PTS-based grouping is unreliable. Instead we use a dirty flag:
-    //   _pixelDirty is set YES by setYUVPixelBuffer: (RTMP decode thread).
-    //   modifyImageBuffer: snapshots _pixelYUVBuffer → _cycleBuffer on the FIRST firing
-    //   after each new RTMP frame arrives, then clears the flag.
-    //   All subsequent firings before the next RTMP frame reuse _cycleBuffer unchanged.
-    // This guarantees every pipeline node in one batch sees the same RTMP frame.
-    CVPixelBufferRef _cycleBuffer;    // RTMP frame locked for current batch
-    CVPixelBufferRef _cycleBuffer90;  // 90°-rotated variant (from setYUVSampleBuffer: path)
-    BOOL             _pixelDirty;     // YES = new RTMP frame arrived, snapshot needed
-
-    // Lazy rotation cache for setYUVPixelBuffer: fast path (RTMP decode thread never
-    // pre-computes rotation; we do it here on the camera thread to avoid GPU contention).
-    // Camera pipeline is serial — these are accessed only from modifyImageBuffer:.
-    CVPixelBufferRef _cachedRotBuf;    // last rotation result
-    uintptr_t        _cachedRotSrcPtr; // _cycleBuffer pointer it was computed for
+    // IDA-confirmed dedup dictionary (maps key → timestamp NSNumber).
+    // Key = (uintptr_t)destBuffer + pts.value as NSNumber/uint64.
+    // When multiple BWNodeOutput nodes share the same underlying CVPixelBuffer
+    // for the same camera tick, the first call does the injection; subsequent
+    // calls with the same key are filtered. Entries expire after 200ms.
+    NSMutableDictionary *_dictionary;
 }
 
 // ── +sharedInstance (0x900EC) ──────────────────────────────────────────────
@@ -86,7 +60,9 @@ static void vcamDedupInsert(uint64_t key, double now) {
         self.hasFace    = NO;
         self.floatWindow    = YES;
         self.cameraSelected = YES;
-        _spinlock = OS_UNFAIR_LOCK_INIT;
+
+        _lock       = [[NSRecursiveLock alloc] init];
+        _dictionary = [[NSMutableDictionary alloc] init];
 
         VTPixelTransferSessionCreate(kCFAllocatorDefault, &_pixelTransferSession);
         VTSessionSetProperty((VTSessionRef)(void *)_pixelTransferSession,
@@ -121,6 +97,62 @@ static void vcamDedupInsert(uint64_t key, double now) {
 // PRIVATE HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
 
+// createImageBuffer: (IDA 0x90898) — creates an IOSurface-backed copy of src.
+// Called by setYUVPixelBuffer: under _lock.
+- (CVPixelBufferRef)createImageBuffer:(CVPixelBufferRef)src {
+    if (!src) return NULL;
+    OSType fmt = CVPixelBufferGetPixelFormatType(src);
+    int w = (int)CVPixelBufferGetWidth(src);
+    int h = (int)CVPixelBufferGetHeight(src);
+
+    NSDictionary *ioSurfaceProps = @{
+        @"IOSurfacePreallocPages":    @0,
+        @"IOSurfacePurgeWhenNotInUse": @1,
+    };
+    NSDictionary *attrs = @{
+        (NSString *)kCVPixelBufferIOSurfacePropertiesKey: ioSurfaceProps,
+    };
+    CVPixelBufferRef dst = NULL;
+    if (CVPixelBufferCreate(kCFAllocatorDefault, (size_t)w, (size_t)h, fmt,
+                            (__bridge CFDictionaryRef)attrs, &dst) != kCVReturnSuccess) {
+        return NULL;
+    }
+    if (VTPixelTransferSessionTransferImage(_pixelTransferSession, src, dst) != noErr) {
+        CVPixelBufferRelease(dst);
+        return NULL;
+    }
+    return dst;
+}
+
+// create90ImageBuffer: (IDA 0x90708) — creates 90°-rotated copy (dimensions swapped).
+// Called by setYUVSampleBuffer: and setYUVPixelBuffer: under _lock.
+- (CVPixelBufferRef)create90ImageBuffer:(CVPixelBufferRef)src {
+    if (!src || !_imageRotationSession) return NULL;
+    OSType fmt = CVPixelBufferGetPixelFormatType(src);
+    int srcW = (int)CVPixelBufferGetWidth(src);
+    int srcH = (int)CVPixelBufferGetHeight(src);
+
+    NSDictionary *ioSurfaceProps = @{
+        @"IOSurfacePreallocPages":    @0,
+        @"IOSurfacePurgeWhenNotInUse": @1,
+    };
+    NSDictionary *attrs = @{
+        (NSString *)kCVPixelBufferIOSurfacePropertiesKey: ioSurfaceProps,
+    };
+    CVPixelBufferRef dst = NULL;
+    // Destination has swapped dimensions (90° rotation)
+    if (CVPixelBufferCreate(kCFAllocatorDefault, (size_t)srcH, (size_t)srcW, fmt,
+                            (__bridge CFDictionaryRef)attrs, &dst) != kCVReturnSuccess) {
+        return NULL;
+    }
+    if (VTImageRotationSessionTransferImage(_imageRotationSession, src, dst) != noErr) {
+        CVPixelBufferRelease(dst);
+        return NULL;
+    }
+    return dst;
+}
+
+// vcam_createPixelBuffer — used only by createSampleBuffer: / getSampleBuffer: (face swap).
 - (CVPixelBufferRef)vcam_createPixelBuffer:(OSType)fmt
                                      width:(int)w
                                     height:(int)h
@@ -141,72 +173,46 @@ static void vcamDedupInsert(uint64_t key, double now) {
     return dst;
 }
 
-- (CVPixelBufferRef)create90ImageBuffer:(CVPixelBufferRef)src {
-    if (!src || !_imageRotationSession) return NULL;
-    int srcW = (int)CVPixelBufferGetWidth(src);
-    int srcH = (int)CVPixelBufferGetHeight(src);
-    OSType fmt = CVPixelBufferGetPixelFormatType(src);
-
-    NSDictionary *attrs = @{
-        (NSString *)kCVPixelBufferPixelFormatTypeKey: @(fmt),
-        (NSString *)kCVPixelBufferIOSurfacePropertiesKey: @{},
-    };
-    CVPixelBufferRef dst = NULL;
-    CVPixelBufferCreate(kCFAllocatorDefault, (size_t)srcH, (size_t)srcW, fmt,
-                        (__bridge CFDictionaryRef)attrs, &dst);
-    if (!dst) return NULL;
-
-    OSStatus st = VTImageRotationSessionTransferImage(_imageRotationSession, src, dst);
-    if (st != noErr) { CVPixelBufferRelease(dst); return NULL; }
-    return dst;
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // FRAME INPUT — called by VCamBridge after RTMP decode
 // ─────────────────────────────────────────────────────────────────────────────
 
+// setYUVSampleBuffer: (IDA 0x90A98) — primary RTMP frame delivery path.
+// Holds _lock during BOTH CMSampleBufferCreateCopy AND create90ImageBuffer:
+// (VTImageRotationSessionTransferImage), serializing with modifyImageBuffer:.
 - (void)setYUVSampleBuffer:(CMSampleBufferRef)sbuf {
     if (!sbuf) return;
 
-    // Pre-rotate and copy OUTSIDE the spinlock — both involve memory/GPU work.
-    CVPixelBufferRef src = (CVPixelBufferRef)CMSampleBufferGetImageBuffer(sbuf);
-    CVPixelBufferRef new90 = [self create90ImageBuffer:src];
-    CMSampleBufferRef copy = NULL;
-    CMSampleBufferCreateCopy(kCFAllocatorDefault, sbuf, &copy);
+    [_lock lock];
 
-    os_unfair_lock_lock(&_spinlock);
-    CMSampleBufferRef oldSbuf = _liveYUVSampleBuffer;
-    _liveYUVSampleBuffer = copy;
+    CMSampleBufferRef old = _liveYUVSampleBuffer;
+    if (old) { CFRelease(old); _liveYUVSampleBuffer = NULL; }
+    CMSampleBufferCreateCopy(kCFAllocatorDefault, sbuf, &_liveYUVSampleBuffer);
+
     CVPixelBufferRef old90 = _pixelYUVBuffer90;
-    _pixelYUVBuffer90 = new90;
-    os_unfair_lock_unlock(&_spinlock);
+    if (old90) { CFRelease(old90); _pixelYUVBuffer90 = NULL; }
+    _pixelYUVBuffer90 = [self create90ImageBuffer:
+                         (CVPixelBufferRef)CMSampleBufferGetImageBuffer(sbuf)];
 
-    if (oldSbuf) CFRelease(oldSbuf);
-    if (old90)   CVPixelBufferRelease(old90);
+    [_lock unlock];
 }
 
+// setYUVPixelBuffer: (IDA 0x90A2C) — face-swap / alternate path.
+// Holds _lock during BOTH createImageBuffer: AND create90ImageBuffer:.
 - (void)setYUVPixelBuffer:(CVPixelBufferRef)pixbuf {
     if (!pixbuf) return;
 
-    // Skip create90ImageBuffer: here — on iOS 16 (A12+) at 60fps camera + 30fps RTMP,
-    // calling VTImageRotationSessionTransferImage + CVPixelBufferCreate (IOSurface alloc)
-    // on the RTMP decode thread 30/sec creates GPU pressure that stalls the decode loop,
-    // causing TCP buffer fill → "periodic pause / auto-recover" symptom.
-    // Rotation is now computed lazily in modifyImageBuffer: (camera thread) with a
-    // pointer-keyed cache — computed once per new RTMP frame, reused for all camera ticks.
-    CVPixelBufferRef retainedNew = (CVPixelBufferRef)CVBufferRetain(pixbuf);
+    [_lock lock];
 
-    os_unfair_lock_lock(&_spinlock);
-    CVPixelBufferRef oldBuf = _pixelYUVBuffer;
-    CVPixelBufferRef old90  = _pixelYUVBuffer90;
-    _pixelYUVBuffer   = retainedNew;
-    _pixelYUVBuffer90 = NULL;  // rotation deferred; modifyImageBuffer: uses _cachedRotBuf
-    _pixelDirty       = YES;
-    if (!_bLive) _bLive = YES;
-    os_unfair_lock_unlock(&_spinlock);
+    CVPixelBufferRef old = _pixelYUVBuffer;
+    if (old) { CFRelease(old); _pixelYUVBuffer = NULL; }
+    _pixelYUVBuffer = [self createImageBuffer:pixbuf];
 
-    if (oldBuf) CVPixelBufferRelease(oldBuf);
-    if (old90)  CVPixelBufferRelease(old90);
+    CVPixelBufferRef old90 = _pixelYUVBuffer90;
+    if (old90) { CFRelease(old90); _pixelYUVBuffer90 = NULL; }
+    _pixelYUVBuffer90 = [self create90ImageBuffer:pixbuf];
+
+    [_lock unlock];
 }
 
 - (void)setBGRASampleBuffer:(CMSampleBufferRef)sbuf {
@@ -217,164 +223,128 @@ static void vcamDedupInsert(uint64_t key, double now) {
     CMSampleBufferRef copy = NULL;
     CMSampleBufferCreateCopy(kCFAllocatorDefault, sbuf, &copy);
 
-    os_unfair_lock_lock(&_spinlock);
+    [_lock lock];
     CMSampleBufferRef oldSbuf = _liveBGRASampleBuffer;
     _liveBGRASampleBuffer = copy;
-    CVPixelBufferRef old90 = _pixelBGRABuffer90;
+    CVPixelBufferRef oldBGRA90 = _pixelBGRABuffer90;
     _pixelBGRABuffer90 = new90;
-    os_unfair_lock_unlock(&_spinlock);
+    [_lock unlock];
 
     if (oldSbuf) CFRelease(oldSbuf);
-    if (old90)   CVPixelBufferRelease(old90);
+    if (oldBGRA90) CVPixelBufferRelease(oldBGRA90);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // FRAME INJECTION — called from BWNodeOutput hook
 // ─────────────────────────────────────────────────────────────────────────────
 
+// modifyImageBuffer: (IDA 0x92080) — replaces camera pixels with RTMP content.
+//
+// IDA-confirmed design:
+//   1. Guard: _bLive && _liveYUVSampleBuffer (outside lock — fast bail)
+//   2. [_lock lock] — serializes with setYUVSampleBuffer: / setYUVPixelBuffer:
+//   3. Dedup: (destBuffer + pts) key in _dictionary → stale cleanup → return NO
+//   4. On new key: insert timestamp; determine orientation; VTPixelTransfer
+//   5. [_lock unlock]
+//   6. BINFlash OUTSIDE lock (pixel loop + I/O must not hold the lock)
+//
+// The single NSRecursiveLock ensures no two VT operations overlap across threads.
+// This fixes RTMP disconnect on iPhone 7 Plus (dual-camera) and iPhone 8 (A11)
+// where concurrent VT operations during camera pipeline reconfiguration caused
+// VT session invalidation.
 - (CMSampleBufferRef)modifyImageBuffer:(CMSampleBufferRef)sampleBuffer {
-    // Once-per-second probe.
+    // Once-per-second probe (outside lock — fast path).
     static double s_mibInLog = 0;
-    double now = CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970;
-    if (now - s_mibInLog >= 1.0) {
-        s_mibInLog = now;
-        vcamSendDiag([NSString stringWithFormat:@"mib:in bL=%d yb=%d",
-            (int)_bLive, (_pixelYUVBuffer ? 1 : 0)]);
+    double probeNow = [[NSDate date] timeIntervalSince1970];
+    if (probeNow - s_mibInLog >= 1.0) {
+        s_mibInLog = probeNow;
+        vcamSendDiag([NSString stringWithFormat:@"mib:in bL=%d sbuf=%d",
+            (int)_bLive, (_liveYUVSampleBuffer ? 1 : 0)]);
     }
 
-    if (!_bLive || !_pixelYUVBuffer) return nil;
+    // IDA-confirmed guard (outside lock).
+    if (!_bLive || !_liveYUVSampleBuffer) return nil;
 
     CVImageBufferRef destBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     if (!destBuffer) return nil;
 
-    // Read dest dimensions outside the lock — destBuffer is caller-owned, no lock needed.
+    CMTime pts = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+    // IDA: key = (char*)destBuffer + pts.value — uint64 wrapping addition.
+    NSNumber *key = [NSNumber numberWithUnsignedLongLong:
+                     (uint64_t)(uintptr_t)destBuffer + (uint64_t)pts.value];
+
+    [_lock lock];
+
+    // Dedup: already processed this (destBuffer, pts) pair this camera tick.
+    id existing = [_dictionary objectForKey:key];
+    if (existing) {
+        // Purge stale entries (> 200ms) while we have the lock.
+        NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+        NSMutableArray *staleKeys = [NSMutableArray arrayWithCapacity:4];
+        for (NSNumber *k in _dictionary) {
+            if (now - [[_dictionary objectForKey:k] doubleValue] >= 0.2) {
+                [staleKeys addObject:k];
+            }
+        }
+        for (id k in staleKeys) {
+            [_dictionary removeObjectForKey:k];
+        }
+        [_lock unlock];
+        return nil;
+    }
+
+    // Mark this (destBuffer, pts) pair as processed.
+    [_dictionary setObject:[NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]]
+                    forKey:key];
+
+    // Read source buffer from _liveYUVSampleBuffer (IDA-confirmed).
+    CVImageBufferRef srcBuffer = CMSampleBufferGetImageBuffer(_liveYUVSampleBuffer);
+    if (!srcBuffer) {
+        [_lock unlock];
+        return nil;
+    }
+
+    int srcW = (int)CVPixelBufferGetWidth((CVPixelBufferRef)srcBuffer);
+    int srcH = (int)CVPixelBufferGetHeight((CVPixelBufferRef)srcBuffer);
     int dstW = (int)CVPixelBufferGetWidth((CVPixelBufferRef)destBuffer);
     int dstH = (int)CVPixelBufferGetHeight((CVPixelBufferRef)destBuffer);
 
-    CMTime   pts    = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
-    uint64_t keyVal = (uint64_t)(uintptr_t)destBuffer + (uint64_t)pts.value;
-    now = CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970;
-
-    os_unfair_lock_lock(&_spinlock);
-
-    if (!_pixelYUVBuffer) {
-        os_unfair_lock_unlock(&_spinlock);
-        return nil;
-    }
-    if (vcamDedupCheck(keyVal, now)) {
-        os_unfair_lock_unlock(&_spinlock);
-        return nil;
-    }
-    vcamDedupInsert(keyVal, now);
-
-    // Dirty-flag cycle buffer: snapshot _pixelYUVBuffer only on the FIRST modifyImageBuffer:
-    // call after each setYUVPixelBuffer: call. All subsequent calls before the next RTMP
-    // frame arrive reuse _cycleBuffer unchanged. This is correct regardless of whether the
-    // multiple hook firings have the same PTS (which they often don't — each pipeline node
-    // creates its own CMSampleBuffer). Without this, the RTMP decode thread can update
-    // _pixelYUVBuffer between hook firings → different nodes see different RTMP frames
-    // → the display alternates frames: "up a frame, back a frame."
-    CVPixelBufferRef oldCycle   = NULL;
-    CVPixelBufferRef oldCycle90 = NULL;
-    if (_pixelDirty) {
-        _pixelDirty  = NO;
-        oldCycle     = _cycleBuffer;
-        oldCycle90   = _cycleBuffer90;
-        _cycleBuffer   = (CVPixelBufferRef)CVBufferRetain(_pixelYUVBuffer);
-        _cycleBuffer90 = _pixelYUVBuffer90
-                         ? (CVPixelBufferRef)CVBufferRetain(_pixelYUVBuffer90)
-                         : NULL;
-    }
-
-    if (!_cycleBuffer) {
-        os_unfair_lock_unlock(&_spinlock);
-        return nil;
-    }
-
-    int srcW = (int)CVPixelBufferGetWidth(_cycleBuffer);
-    int srcH = (int)CVPixelBufferGetHeight(_cycleBuffer);
-    BOOL needRotation = ((srcW > srcH) != (dstW > dstH));
-
+    // IDA-confirmed orientation logic:
+    //   same orientation (both landscape or both portrait) → use srcBuffer
+    //   different orientation                               → use _pixelYUVBuffer90
     CVImageBufferRef transferSrc;
-    if (!needRotation) {
-        transferSrc = (CVImageBufferRef)CVBufferRetain(_cycleBuffer);
-    } else if (_cycleBuffer90) {
-        transferSrc = (CVImageBufferRef)CVBufferRetain(_cycleBuffer90);
+    if ((srcW > srcH) == (dstW > dstH)) {
+        transferSrc = srcBuffer;
     } else {
-        transferSrc = NULL;
+        transferSrc = (CVImageBufferRef)_pixelYUVBuffer90;
     }
 
-    os_unfair_lock_unlock(&_spinlock);
+    BOOL success = NO;
+    if (transferSrc) {
+        OSStatus status = VTPixelTransferSessionTransferImage(
+            _pixelTransferSession, transferSrc, destBuffer);
 
-    // Release old cycle buffers outside the lock (avoids dealloc under spinlock).
-    if (oldCycle)   CVPixelBufferRelease(oldCycle);
-    if (oldCycle90) CVPixelBufferRelease(oldCycle90);
-
-    // Lazy rotation: setYUVPixelBuffer: (RTMP fast path) does not pre-compute the 90°
-    // buffer. Compute it here on the camera thread, cached by source pointer.
-    // _cachedRotBuf/_cachedRotSrcPtr are accessed only from modifyImageBuffer: (camera
-    // pipeline is serial), so no lock is needed.
-    if (!transferSrc && needRotation && _cycleBuffer) {
-        uintptr_t srcPtr = (uintptr_t)_cycleBuffer;
-        if (_cachedRotSrcPtr != srcPtr || !_cachedRotBuf) {
-            CVPixelBufferRelease(_cachedRotBuf);
-            _cachedRotBuf    = [self create90ImageBuffer:_cycleBuffer];
-            _cachedRotSrcPtr = _cachedRotBuf ? srcPtr : 0;
+        static double s_lastMibLog = 0;
+        double mibNow = [[NSDate date] timeIntervalSince1970];
+        if (mibNow - s_lastMibLog >= 1.0) {
+            s_lastMibLog = mibNow;
+            vcamSendDiag([NSString stringWithFormat:@"mib:st=%d", (int)status]);
         }
-        transferSrc = _cachedRotBuf ? (CVImageBufferRef)CVBufferRetain(_cachedRotBuf) : NULL;
-    }
 
-    if (!transferSrc) return nil;
-
-    // VTPixelTransferSession OUTSIDE the spinlock — GPU call, ~1-3ms.
-    // Serialized by s_transferLock: VTPixelTransferSession is NOT thread-safe.
-    // Camera.app's recording pipeline thread and the primary app's camera thread can
-    // both call modifyImageBuffer: concurrently — without the lock they race on
-    // _pixelTransferSession, causing green-frame corruption and VT session invalidation.
-    os_unfair_lock_lock(&s_transferLock);
-    OSStatus status = VTPixelTransferSessionTransferImage(
-        _pixelTransferSession, transferSrc, destBuffer);
-    os_unfair_lock_unlock(&s_transferLock);
-
-    CVBufferRelease(transferSrc);
-
-    static double s_lastMibLog = 0;
-    double mibNow = CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970;
-    if (mibNow - s_lastMibLog >= 1.0) {
-        s_lastMibLog = mibNow;
-        vcamSendDiag([NSString stringWithFormat:@"mib:st=%d", (int)status]);
-    }
-
-    if (status != noErr) {
-        // Transfer failed — VT session may be corrupted by concurrent usage or resource pressure.
-        // Recreate the session so the next call can succeed. Return nil so the raw camera
-        // frame passes through (not the potentially-partially-written green destBuffer).
-        vcamSendDiag([NSString stringWithFormat:@"mib:xfer-err %d, recreating session", (int)status]);
-        VTPixelTransferSessionRef newSession = NULL;
-        if (VTPixelTransferSessionCreate(kCFAllocatorDefault, &newSession) == noErr) {
-            VTSessionSetProperty((VTSessionRef)(void *)newSession,
-                                 kVTPixelTransferPropertyKey_ScalingMode,
-                                 kVTScalingMode_Trim);
-            VTSessionSetProperty((VTSessionRef)(void *)newSession,
-                                 kVTPixelTransferPropertyKey_EnableGPUAcceleratedTransfer,
-                                 kCFBooleanTrue);
-            // Swap under the transfer lock to prevent concurrent use of the old session.
-            os_unfair_lock_lock(&s_transferLock);
-            VTPixelTransferSessionRef old = _pixelTransferSession;
-            _pixelTransferSession = newSession;
-            os_unfair_lock_unlock(&s_transferLock);
-            if (old) {
-                VTPixelTransferSessionInvalidate(old);
-                CFRelease(old);
-            }
+        if (status != noErr) {
+            vcamSendDiag([NSString stringWithFormat:@"mib:xfer-err %d", (int)status]);
         }
-        return nil;
+        success = (status == noErr);
     }
 
-    // BINFlash applied OUTSIDE the spinlock — pixel loop + occasional plist I/O.
-    BINFlashApplyToPixelBuffer((CVPixelBufferRef)destBuffer);
+    [_lock unlock];
 
-    return sampleBuffer;
+    // BINFlash pixel effect runs OUTSIDE the lock — pixel loop + plist I/O.
+    if (success) {
+        BINFlashApplyToPixelBuffer((CVPixelBufferRef)destBuffer);
+    }
+
+    return success ? sampleBuffer : nil;
 }
 
 - (CMSampleBufferRef)modifyPixelBuffer:(CMSampleBufferRef)sampleBuffer {
@@ -383,11 +353,11 @@ static void vcamDedupInsert(uint64_t key, double now) {
     CVImageBufferRef destIB = CMSampleBufferGetImageBuffer(sampleBuffer);
     if (!destIB) return nil;
 
-    os_unfair_lock_lock(&_spinlock);
+    [_lock lock];
     CVPixelBufferRef resultBuf = _pixelResultBuffer
         ? (CVPixelBufferRef)CVBufferRetain(_pixelResultBuffer)
         : NULL;
-    os_unfair_lock_unlock(&_spinlock);
+    [_lock unlock];
 
     if (!resultBuf) return nil;
 
@@ -517,8 +487,6 @@ static void vcamDedupInsert(uint64_t key, double now) {
 
 - (void)setLive:(BOOL)live {
     if (!live && self.bLive) {
-        // Catch-all for call sites not tagged in VCamBridge parse: (code 1001/1005 are tagged).
-        // If "[?]" appears without a preceding "[1001]" or "[1005]", it's an unknown caller.
         vcamSendDiag(@"LIVE->NO[?]");
     }
     self.bLive = live;
@@ -565,14 +533,12 @@ static void vcamDedupInsert(uint64_t key, double now) {
 }
 
 // ── RTMP color sampling ───────────────────────────────────────────────────────
-// Reads the current RTMP pixel buffer under the spinlock (safe: only swaps
-// pointer, does not hold lock during pixel read).
 - (double)sampleHueAtNormalizedX:(double)nx y:(double)ny {
-    os_unfair_lock_lock(&_spinlock);
+    [_lock lock];
     CVPixelBufferRef buf = _pixelYUVBuffer
                            ? (CVPixelBufferRef)CVBufferRetain(_pixelYUVBuffer)
                            : NULL;
-    os_unfair_lock_unlock(&_spinlock);
+    [_lock unlock];
     if (!buf) return -1.0;
 
     OSType fmt = CVPixelBufferGetPixelFormatType(buf);
@@ -585,8 +551,6 @@ static void vcamDedupInsert(uint64_t key, double now) {
     double nxc = nx < 0.0 ? 0.0 : (nx > 1.0 ? 1.0 : nx);
     double nyc = ny < 0.0 ? 0.0 : (ny > 1.0 ? 1.0 : ny);
 
-    // RTMP buffer is landscape (bW > bH); displayed portrait via 90° rotation.
-    // Screen Y → buffer X;  screen X → buffer Y (inverted).
     size_t bufX, bufY;
     if (bW > bH) {
         bufX = (size_t)(nyc * (double)(bW - 1));
@@ -607,13 +571,12 @@ static void vcamDedupInsert(uint64_t key, double now) {
 
     double Y  = (double)yPlane[bufY * yStride + bufX] / 255.0;
     uint8_t *uvp = uvPlane + (bufY / 2) * uvStride + (bufX / 2) * 2;
-    double Pb = ((double)uvp[0] - 128.0) / 255.0;  // Cb
-    double Pr = ((double)uvp[1] - 128.0) / 255.0;  // Cr
+    double Pb = ((double)uvp[0] - 128.0) / 255.0;
+    double Pr = ((double)uvp[1] - 128.0) / 255.0;
 
     CVPixelBufferUnlockBaseAddress(buf, kCVPixelBufferLock_ReadOnly);
     CVPixelBufferRelease(buf);
 
-    // BT.601 YCbCr → linear RGB
     double r = Y + 1.402   * Pr;
     double g = Y - 0.344136 * Pb - 0.714136 * Pr;
     double b = Y + 1.772   * Pb;
@@ -621,7 +584,6 @@ static void vcamDedupInsert(uint64_t key, double now) {
     g = g < 0.0 ? 0.0 : (g > 1.0 ? 1.0 : g);
     b = b < 0.0 ? 0.0 : (b > 1.0 ? 1.0 : b);
 
-    // RGB → hue
     double maxC  = r > g ? (r > b ? r : b) : (g > b ? g : b);
     double minC  = r < g ? (r < b ? r : b) : (g < b ? g : b);
     double delta = maxC - minC;
@@ -640,8 +602,6 @@ static void vcamDedupInsert(uint64_t key, double now) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // RTMP COLOR SAMPLER (runs in mediaserverd only)
-// Eliminates the UIKit screen-capture path which cannot see GPU-rendered camera
-// preview layers (AVCaptureVideoPreviewLayer returns black in renderInContext:).
 // ─────────────────────────────────────────────────────────────────────────────
 void vcamInstallRTMPColorSampler(void) {
     static int s_reqToken  = NOTIFY_TOKEN_INVALID;
