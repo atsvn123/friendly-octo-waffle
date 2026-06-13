@@ -60,17 +60,22 @@ static void hook_emitSampleBuffer(id self, SEL _cmd, CMSampleBufferRef sbuf) {
                 (int)width, (int)height, (int)isLive]);
         }
 
-        if (isLive && width >= height) {
-            // IDA: two separate [NSDate date] calls — one for elapsed check, one for store
-            NSDate *checkDate = [NSDate date];
-            double nowTS = [checkDate timeIntervalSince1970];
-            double elapsed = nowTS - g_lastResolutionUpdate;
-            // IDA threshold: 0.100000001 (float 0.1f widened to double)
-            if (g_lastResolutionUpdate <= 0.100000001 || elapsed > 3.0) {
-                NSDate *storeDate = [NSDate date];
-                g_lastResolutionUpdate = [storeDate timeIntervalSince1970];
-                VCamBridge *bridge = [VCamBridge sharedInstance];
-                [bridge setResolution:(unsigned int)width height:(unsigned int)height];
+        if (isLive) {
+            // Resolution reporting: only update for landscape frames (IDA original behaviour).
+            // Portrait frames (video recording pipeline, face-detect sub-outputs) still get
+            // injection — modifyImageBuffer: handles 90° rotation lazily.
+            if (width >= height) {
+                // IDA: two separate [NSDate date] calls — one for elapsed check, one for store
+                NSDate *checkDate = [NSDate date];
+                double nowTS = [checkDate timeIntervalSince1970];
+                double elapsed = nowTS - g_lastResolutionUpdate;
+                // IDA threshold: 0.100000001 (float 0.1f widened to double)
+                if (g_lastResolutionUpdate <= 0.100000001 || elapsed > 3.0) {
+                    NSDate *storeDate = [NSDate date];
+                    g_lastResolutionUpdate = [storeDate timeIntervalSince1970];
+                    VCamBridge *bridge = [VCamBridge sharedInstance];
+                    [bridge setResolution:(unsigned int)width height:(unsigned int)height];
+                }
             }
 
             [state modifyImageBuffer:sbuf];
