@@ -13,6 +13,7 @@
 #import "Hooks/MediaServerHooks.h"
 #import "Hooks/SpringBoardHooks.h"
 #import "UI/VCamFloatButton.h"
+#import "UI/VCamColorPickerWindow.h"
 #import "UI/VCamColorSampleListener.h"
 #import "BINFlash/BINFlashCameraHooks.h"
 
@@ -104,6 +105,7 @@ static void vcamInstallHooks(void) {
         }
     } else if ([pn rangeOfString:@"springboard"].location != NSNotFound) {
         installSpringBoardHooks();
+        vcamInstallPickerNotifyHandler();  // com.vcam.sampleresponse → float button ring
     } else {
         // Foreground UIKit app (TikTok, camera apps, etc.):
         // Installs a Darwin notify listener that captures a pixel region via

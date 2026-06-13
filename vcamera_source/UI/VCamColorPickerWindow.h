@@ -1,13 +1,18 @@
 // VCamColorPickerWindow.h
-// Floating draggable color-picker circle. Samples screen color under its
-// center every ~0.3s; skips near-black / near-white / near-gray samples.
-// Lives in a dedicated UIWindow at a high windowLevel.
+// Pass-through UIWindow that hosts the float button.
+// Also owns the Darwin notify infrastructure for cross-process color sampling.
 
 #import <UIKit/UIKit.h>
 
 @interface VCamColorPickerWindow : UIWindow
 + (instancetype)sharedWindow;
-- (void)showPicker;    // visible + draggable + sampling timer on
-- (void)hidePicker;    // hidden + timer off (call when auto color toggled OFF)
-- (void)setDraggable:(BOOL)draggable;  // toggle drag without affecting visibility or timer
 @end
+
+// Call once in SpringBoard's constructor. Registers com.vcam.sampleresponse handler
+// which updates the float button ring and saves the hue to prefs.
+void vcamInstallPickerNotifyHandler(void);
+
+// Send a sample request for the given normalized position [0,1].
+// Tries IOSurface direct read first; falls back to Darwin notify → UIKit sampler.
+// Updates ring and prefs directly if IOSurface succeeds.
+void vcamSendPickerSampleRequest(float nx, float ny);

@@ -117,7 +117,12 @@ void vcamInstallColorSampleListener(void) {
             for (int i = 0; i < HUE_BINS; i++) {
                 if (binCnt[i] > bestCount) { bestCount = binCnt[i]; bestBin = i; }
             }
-            if (bestBin < 0) return;  // all 4 pixels were achromatic
+            if (bestBin < 0) {
+                // All pixels achromatic — tell SpringBoard to hide the ring.
+                notify_set_state(s_respToken, 0xFFFFFFFFFFFFFFFFULL);
+                notify_post("com.vcam.sampleresponse");
+                return;
+            }
 
             // Circular mean within the dominant bin.
             double meanAngle = atan2(binSin[bestBin] / bestCount,

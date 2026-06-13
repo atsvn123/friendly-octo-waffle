@@ -187,11 +187,8 @@ static UIColor *BorderColor(void) {
                                                      userInfo:nil
                                                       repeats:YES] retain];
 
-    // Re-enable drag on picker / show manual pad based on current prefs.
+    // Auto color is now driven by vcamUpdateFloatButton() — no picker window to show.
     NSDictionary *fp0 = BINFlashLoadPrefs();
-    if (BINFlashBoolForKey(fp0, kBINFlashKeyAutoColor, kBINFlashDefaultAutoColor)) {
-        [[VCamColorPickerWindow sharedWindow] showPicker];
-    }
     if (BINFlashBoolForKey(fp0, kBINFlashKeyManualRegion, kBINFlashDefaultManualRegion)) {
         [[VCamManualPadWindow sharedWindow] showPad];
     }
@@ -251,7 +248,7 @@ static UIColor *BorderColor(void) {
     [_refreshTimer invalidate];
     [_refreshTimer release];
     _refreshTimer = nil;
-    [[VCamColorPickerWindow sharedWindow] setDraggable:NO];
+    // (picker is float button — no draggable flag needed)
     CGFloat sh = [UIScreen mainScreen].bounds.size.height;
     CGFloat sw = [UIScreen mainScreen].bounds.size.width;
     [UIView animateWithDuration:0.28 delay:0 options:UIViewAnimationOptionCurveEaseIn
@@ -380,7 +377,7 @@ static UIColor *BorderColor(void) {
 
     // Version label (visible through transparent handleView above it)
     _versionLabel = [[UILabel alloc] initWithFrame:CGRectMake(pad, y, cw, 15)];
-    _versionLabel.text = @"v2.104-VCAM";
+    _versionLabel.text = @"v2.105-VCAM";
     _versionLabel.font = [UIFont systemFontOfSize:11.0];
     _versionLabel.textColor = [UIColor lightGrayColor];
     _versionLabel.textAlignment = NSTextAlignmentCenter;
@@ -768,8 +765,7 @@ static UIColor *BorderColor(void) {
 
 - (void)autoColorToggled:(UISwitch *)sw {
     BINFlashSavePrefs(@{ kBINFlashKeyAutoColor: @(sw.on) });
-    if (sw.on) [[VCamColorPickerWindow sharedWindow] showPicker];
-    else        [[VCamColorPickerWindow sharedWindow] hidePicker];
+    // Ring visibility is driven by vcamUpdateFloatButton() on the next 200ms tick.
 }
 
 - (void)staticFlashToggled:(UISwitch *)sw {
