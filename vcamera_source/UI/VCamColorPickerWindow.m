@@ -190,7 +190,7 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
         }
         s_window.backgroundColor = [UIColor clearColor];
         s_window.opaque          = NO;
-        s_window.windowLevel     = UIWindowLevelStatusBar + 10000.0;
+        s_window.windowLevel     = UIWindowLevelAlert + 10000.0;
 
         UIViewController *rvc = [[UIViewController alloc] init];
         rvc.view.backgroundColor       = [UIColor clearColor];

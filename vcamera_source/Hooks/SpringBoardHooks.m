@@ -95,15 +95,17 @@ static BOOL hook_isShowingHomescreen(id self, SEL cmd) {
 }
 
 // ── SBLockScreenManager hooks (6 hooks, IDA sub_86760–sub_86868) ─────────────
-// WillDismiss: call original, then clear g_lockScreenVisible
+// WillDismiss / WillPresent: pure passthrough + menu dismiss on present.
+// g_lockScreenVisible is NOT set here — on iOS 15 these selectors also fire when
+// the notification center shade is pulled (shares the same VC infrastructure),
+// which would incorrectly hide the float button. Darwin notifications
+// (com.apple.springboard.lockcomplete / lockstate) are the authoritative
+// lock-state source and only fire for actual device lock/unlock.
 static void hook_lockScreenWillDismiss(id self, SEL cmd) {
     ((void (*)(id, SEL))orig_lockScreenWillDismiss)(self, cmd);
-    g_lockScreenVisible = 0;
 }
-// WillPresent: set g_lockScreenVisible=1, dismiss menu, call original
 static void hook_lockScreenWillPresent(id self, SEL cmd) {
-    g_lockScreenVisible = 1;
-    [[VCamBridge sharedInstance] dismiss];
+    [[VCamBridge sharedInstance] dismiss];   // dismiss menu when any lock-screen-like view appears
     ((void (*)(id, SEL))orig_lockScreenWillPresent)(self, cmd);
 }
 // DidPresent / _isPasscodeVisible / isLockScreenActive / setPasscodeVisible: — pure passthrough

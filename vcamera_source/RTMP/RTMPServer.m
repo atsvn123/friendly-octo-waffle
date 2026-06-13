@@ -122,22 +122,27 @@
         // Restore isRunning in case it was flipped externally.
         self.isRunning = YES;
 
-        // createActiveTCPServer is a no-op if g_tcpServer is already alive.
-        // If it was externally destroyed, SO_REUSEADDR+SO_REUSEPORT allow instant rebind.
+        // createActiveTCPServer: no-op if g_tcpServer is still alive.
+        // If it was destroyed, SO_REUSEADDR+SO_REUSEPORT allow instant rebind.
         if (![RTMPServer createActiveTCPServer]) {
-            // Port temporarily busy — tiny pause before retry (no sleep: just yield).
-            usleep(50000);  // 50ms
+            usleep(50000);  // 50ms — port briefly busy, retry
             continue;
         }
 
         // Blocking accept + session loop. Exits when isRunning=NO or g_tcpServer=null.
-        [RTMPServer runRTMPAcceptLoop:self];
+        @try {
+            [RTMPServer runRTMPAcceptLoop:self];
+        } @catch (NSException *ex) {
+            NSLog(@"[VCAM] handleRTMP ObjC ex: %@", ex);
+        }
 
         if (!self.userWantsRunning) break;
 
-        // Loop exited while user still wants RTMP — rebuild socket and retry instantly.
-        // SO_REUSEADDR + SO_REUSEPORT: rebind succeeds without waiting for TIME_WAIT.
-        [RTMPServer destroyActiveTCPServer];
+        // runRTMPAcceptLoop exited while user still wants RTMP.
+        // Do NOT destroy the server — if g_tcpServer is still valid, the next
+        // createActiveTCPServer call (top of loop) is a no-op and we retry instantly.
+        // If g_tcpServer was already destroyed, createActiveTCPServer will rebuild it.
+        // Either way: no sleep, no manual destroy — fastest possible recovery.
     }
 
     self.isRunning = NO;
