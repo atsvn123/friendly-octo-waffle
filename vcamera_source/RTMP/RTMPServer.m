@@ -5,19 +5,21 @@
 //   stopServer (0xA2B08):      setIsRunning:NO → sleep(1) → cancel RTMPThread → destroyActiveTCPServer → endDecode
 //   handleRTMP (0xA2BB8):      if isRunning → accept loop using g_tcpServer → [NSThread exit]
 //
-// v2.107 additions:
-//   handleRTMP now loops: after runRTMPAcceptLoop exits (client disconnect / error), if isRunning
-//   is still YES (= user hasn't pressed Stop), destroys and recreates TCPServer and retries.
-//   A GCD watchdog timer fires every 5s: if isRunning=YES but RTMPThread.isFinished (external
-//   kill), it spawns a fresh handleRTMP thread.
+// v2.108 — "unable to kill" hardening:
+//   handleRTMP loops on userWantsRunning (not isRunning). External code setting isRunning=NO
+//   causes runRTMPAcceptLoop to exit its inner while, but handleRTMP immediately restores
+//   isRunning=YES and retries — no shutdown, no sleep. Zero gap.
+//   pthread cancellation is disabled inside the thread — external pthread_cancel is ignored.
+//   Watchdog GCD timer revives the thread if it is externally killed by process-level signal.
+//   stopServer: sets userWantsRunning=NO + isRunning=NO + destroys TCPServer (unblocks accept),
+//   then sleeps 1s for clean thread exit before final cleanup.
 
 #import "RTMPServer.h"
 #import "../H264Decoder/H264Decoder.h"
 #import "../VCamLive/VCamLiveManager.h"
 #import "../VCamBridge/VCamBridge.h"
 #import <dispatch/dispatch.h>
-
-// ─── RTMPServer implementation ────────────────────────────────────────────────
+#import <pthread.h>
 
 @implementation RTMPServer {
     dispatch_source_t _watchdog;
@@ -42,16 +44,15 @@
                               dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC),
                               5 * NSEC_PER_SEC,
                               NSEC_PER_SEC);
-    RTMPServer *srv = self;  // block retains; broken when source is cancelled
+    RTMPServer *srv = self;
     dispatch_source_set_event_handler(_watchdog, ^{
-        if (!srv.isRunning) return;
+        if (!srv.userWantsRunning) return;
         NSThread *th = srv.RTMPThread;
         if (!th || th.isFinished || th.isCancelled) {
-            // Thread died while user still wants RTMP — revive it
-            if (![RTMPServer createActiveTCPServer]) {
-                return;  // port busy or other error; try again next tick
+            // Thread was externally killed — revive it.
+            if ([RTMPServer createActiveTCPServer]) {
+                [srv _spawnHandleRTMPThread];
             }
-            [srv _spawnHandleRTMPThread];
         }
     });
     dispatch_resume(_watchdog);
@@ -66,9 +67,7 @@
 }
 
 // --- -startServerLoop (0xA2998) ---
-// IDA order: H264Decoder → TCPServer (qword_130390) → setIsRunning:YES → start handleRTMP thread
 - (void)startServerLoop {
-    // Lazy-create H264Decoder (IDA 0xA2998: only alloc if not already present)
     if (!self.h264Decoder) {
         H264Decoder *decoder = [[H264Decoder alloc] init];
         decoder.delegate = (id<H264DecoderDelegate>)self;
@@ -76,76 +75,76 @@
         [decoder release];
     }
 
-    // g_tcpServer already bound by parse: code 1000 before this GCD block was dispatched;
-    // createActiveTCPServer returns YES immediately (no-op bind).
     if (![RTMPServer createActiveTCPServer]) {
         return;
     }
 
-    // IDA 0xA2A38: setIsRunning:YES called after TCPServer is bound
-    self.isRunning = YES;
+    self.isRunning       = YES;
     self.userWantsRunning = YES;
 
     [self _spawnHandleRTMPThread];
     [self _startWatchdog];
 }
 
-// --- -stopServer (0xA2B08) ---
-// IDA-confirmed order: setIsRunning:NO → sleep(1) → cancel RTMPThread → nil RTMPThread
-//   → destroyActiveTCPServer (destroy + delete + null qword_130390) → endDecode
+// --- -stopServer (0xA2B08) — only called when user explicitly presses Stop ---
 - (void)stopServer {
-    self.userWantsRunning = NO;
-
     if (self.isRunning) {
         vcamSendDiag(@"!stopSrv:active");
         NSLog(@"[VCAM] stopServer called while isRunning=YES");
     }
 
+    // Signal intent BEFORE anything else so handleRTMP loop exits naturally.
+    self.userWantsRunning = NO;
+    self.isRunning        = NO;
+
     [self _stopWatchdog];
 
-    self.isRunning = NO;
+    // Destroy server socket — unblocks accept() in runRTMPAcceptLoop.
+    [RTMPServer destroyActiveTCPServer];
+
+    // Give handleRTMP one second to exit cleanly before we pull the thread.
     sleep(1);
     [self.RTMPThread cancel];
     self.RTMPThread = nil;
-    // destroy + delete + null g_tcpServer — unblocks accept() in handleRTMP
-    [RTMPServer destroyActiveTCPServer];
+
     H264Decoder *dec = (H264Decoder *)self.h264Decoder;
     if (dec) [dec endDecode];
     self.h264Decoder = nil;
 }
 
-// --- -handleRTMP (0xA2BB8) ---
-// Extended: loops while isRunning so a client disconnect or socket error immediately
-// reopens the accept socket rather than killing the RTMP server permanently.
+// --- -handleRTMP — loops on userWantsRunning, immune to external isRunning=NO ---
 - (void)handleRTMP {
-    if (!self.isRunning) {
-        [NSThread exit];
-        return;
-    }
+    // Prevent external pthread_cancel from killing this thread.
+    // Only userWantsRunning=NO (set by stopServer) terminates the loop.
+    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 
-    while (self.isRunning) {
+    while (self.userWantsRunning) {
+        // Restore isRunning in case it was flipped externally.
+        self.isRunning = YES;
+
+        // createActiveTCPServer is a no-op if g_tcpServer is already alive.
+        // If it was externally destroyed, SO_REUSEADDR+SO_REUSEPORT allow instant rebind.
+        if (![RTMPServer createActiveTCPServer]) {
+            // Port temporarily busy — tiny pause before retry (no sleep: just yield).
+            usleep(50000);  // 50ms
+            continue;
+        }
+
+        // Blocking accept + session loop. Exits when isRunning=NO or g_tcpServer=null.
         [RTMPServer runRTMPAcceptLoop:self];
 
-        if (!self.isRunning) break;
+        if (!self.userWantsRunning) break;
 
-        // Accept loop returned unexpectedly (client dropped, socket error, etc.)
-        // Rebuild the TCP server and try again.
+        // Loop exited while user still wants RTMP — rebuild socket and retry instantly.
+        // SO_REUSEADDR + SO_REUSEPORT: rebind succeeds without waiting for TIME_WAIT.
         [RTMPServer destroyActiveTCPServer];
-        sleep(1);
-
-        if (!self.isRunning) break;
-
-        if (![RTMPServer createActiveTCPServer]) {
-            // Port rebind failed; wait a bit longer before next attempt
-            sleep(2);
-        }
     }
 
+    self.isRunning = NO;
     [NSThread exit];
 }
 
 // --- -outputFrame:presentationTimeStamp:presentationDuration: (0xA28E0) ---
-// Called by H264Decoder when a frame is decoded. Forwards to delegate (VCamBridge).
 - (void)outputFrame:(void *)frameData
  presentationTimeStamp:(int64_t)pts
   presentationDuration:(int64_t)duration
