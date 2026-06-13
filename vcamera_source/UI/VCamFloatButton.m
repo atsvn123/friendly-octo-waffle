@@ -134,23 +134,6 @@ VCamFloatButton *g_floatButton = nil;
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesEnded:touches withEvent:event];
-
-    CGFloat screenW    = [UIScreen mainScreen].bounds.size.width;
-    CGFloat screenH    = [UIScreen mainScreen].bounds.size.height;
-    CGFloat cx         = self.center.x;
-    CGFloat currentY   = self.center.y;
-    CGFloat bottomEdge = self.frame.origin.y + 40.0 + self.frame.size.height;
-    CGFloat snapX      = (cx <= screenW * 0.5) ? 30.0 : (screenW - 30.0);
-    BOOL    atBottom   = (bottomEdge > screenH);
-
-    [UIView animateWithDuration:0.0
-                          delay:0.5
-                        options:0
-                     animations:^{
-        self.center = atBottom
-            ? CGPointMake(snapX, screenH - 30.0)
-            : CGPointMake(snapX, currentY);
-    } completion:nil];
 }
 
 @end
