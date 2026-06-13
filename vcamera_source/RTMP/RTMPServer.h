@@ -16,6 +16,7 @@
 @property (nonatomic, strong) id h264Decoder;       // H264Decoder instance
 @property (nonatomic, assign) BOOL isRunning;
 @property (nonatomic, strong) NSThread *RTMPThread;
+@property (nonatomic, assign) BOOL userWantsRunning;  // set YES on code 1000, NO on code 1001
 
 // Start RTMP server on port 1935 (creates TCPServer + H264Decoder + background thread)
 - (void)startServerLoop;
