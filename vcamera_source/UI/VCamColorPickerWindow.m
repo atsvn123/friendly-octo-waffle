@@ -46,63 +46,57 @@ static void vcamPickerDiag(NSString *msg) {
 // edge (32pt = 64px at 2x). Averages their RGB and returns the hue, or -1 if
 // the area is achromatic (white/black/gray).
 // ─────────────────────────────────────────────────────────────────────────────
-static double vcamSampleButtonBackground(CGImageRef img, float nx, float ny) {
+// Sample a 20×20 px cluster at the donut center from a full-screen CGImage.
+// The donut hole is transparent, so (nx,ny) IS the background pixel we want.
+// Uses a Y-flipped CG context so UIKit screen coordinates map correctly.
+// Returns hue [0,1) or -1.0 if achromatic.
+static double vcamSampleCenterCluster(CGImageRef img, float nx, float ny) {
     size_t imgW = CGImageGetWidth(img);
     size_t imgH = CGImageGetHeight(img);
     if (!imgW || !imgH) return -1.0;
 
-    // Crop 300×300 px centered on button position.
-    const size_t cropSz = 300;
-    CGFloat cropX = (CGFloat)nx * imgW - cropSz * 0.5;
-    CGFloat cropY = (CGFloat)ny * imgH - cropSz * 0.5;
-    if (cropX < 0) cropX = 0;
-    if (cropY < 0) cropY = 0;
-    if (cropX + cropSz > imgW) cropX = (CGFloat)imgW - cropSz;
-    if (cropY + cropSz > imgH) cropY = (CGFloat)imgH - cropSz;
+    // Center pixel in image coordinates.
+    int px = (int)(nx * imgW + 0.5);
+    int py = (int)(ny * imgH + 0.5);
 
-    CGImageRef crop = CGImageCreateWithImageInRect(img,
-        CGRectMake(cropX, cropY, (CGFloat)cropSz, (CGFloat)cropSz));
-    if (!crop) return -1.0;
+    // 20×20 px sampling cluster around center.
+    const int SZ = 20;
+    int x0 = px - SZ/2; if (x0 < 0) x0 = 0;
+    int y0 = py - SZ/2; if (y0 < 0) y0 = 0;
+    int x1 = x0 + SZ;   if (x1 > (int)imgW) { x1 = (int)imgW; x0 = x1 - SZ; if (x0 < 0) x0 = 0; }
+    int y1 = y0 + SZ;   if (y1 > (int)imgH) { y1 = (int)imgH; y0 = y1 - SZ; if (y0 < 0) y0 = 0; }
+    int w = x1 - x0, h = y1 - y0;
+    if (w <= 0 || h <= 0) return -1.0;
 
-    // Render to full-res BGRA bitmap (300×300 × 4 = 360 KB).
-    uint8_t *buf = (uint8_t *)malloc(cropSz * cropSz * 4);
-    if (!buf) { CGImageRelease(crop); return -1.0; }
+    uint8_t buf[20*20*4];
+    memset(buf, 0, sizeof(buf));
 
     CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
-    CGContextRef ctx = CGBitmapContextCreate(buf, cropSz, cropSz, 8, cropSz * 4, cs,
+    CGContextRef ctx = CGBitmapContextCreate(buf, (size_t)w, (size_t)h, 8, (size_t)w * 4, cs,
         kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
     CGColorSpaceRelease(cs);
-    if (!ctx) { free(buf); CGImageRelease(crop); return -1.0; }
+    if (!ctx) return -1.0;
+
+    // Flip Y so the context matches UIKit screen coordinates (Y=0 at top).
+    // After flip: drawing at (0,0) in the adjusted context = top-left of our cluster.
+    CGContextTranslateCTM(ctx, 0, (CGFloat)h);
+    CGContextScaleCTM(ctx, 1.0, -1.0);
+
+    // Draw the full image offset so the cluster region lands at (0,0).
     CGContextSetInterpolationQuality(ctx, kCGInterpolationNone);
-    CGContextDrawImage(ctx, CGRectMake(0, 0, (CGFloat)cropSz, (CGFloat)cropSz), crop);
+    CGContextDrawImage(ctx, CGRectMake(-(CGFloat)x0, -(CGFloat)y0,
+                                       (CGFloat)imgW, (CGFloat)imgH), img);
     CGContextRelease(ctx);
-    CGImageRelease(crop);
 
-    // Sample 8 pixels evenly around the button at radius 70px from center.
-    // Ring outer edge: arc 30pt + half lineWidth 2pt = 32pt = 64px at 2x.
-    // 70px puts samples 3pt outside the ring with a clean margin.
-    // Use actual button position within the (possibly clamped) crop — NOT crop center.
-    double cx = (double)nx * imgW - (double)cropX;
-    double cy = (double)ny * imgH - (double)cropY;
-    const double sampleR = 70.0;
-
+    // Average all pixels in the cluster. BGRA layout.
     double totalR = 0.0, totalG = 0.0, totalB = 0.0;
-    int count = 0;
-    for (int a = 0; a < 8; a++) {
-        double angle = a * M_PI * 0.25;
-        int sx = (int)(cx + sampleR * cos(angle) + 0.5);
-        int sy = (int)(cy + sampleR * sin(angle) + 0.5);
-        if (sx < 0 || sx >= (int)cropSz || sy < 0 || sy >= (int)cropSz) continue;
-        size_t idx = (size_t)sy * cropSz + (size_t)sx;
-        // kCGBitmapByteOrder32Little | AlphaPremultipliedFirst → [B,G,R,A]
-        totalR += buf[idx*4+2] / 255.0;
-        totalG += buf[idx*4+1] / 255.0;
-        totalB += buf[idx*4+0] / 255.0;
-        count++;
+    int count = w * h;
+    for (int i = 0; i < count; i++) {
+        totalR += buf[i*4+2] / 255.0;
+        totalG += buf[i*4+1] / 255.0;
+        totalB += buf[i*4+0] / 255.0;
     }
-    free(buf);
 
-    if (count == 0) return -1.0;
     double r = totalR / count;
     double g = totalG / count;
     double b = totalB / count;
@@ -112,13 +106,13 @@ static double vcamSampleButtonBackground(CGImageRef img, float nx, float ny) {
     double delta = maxC - minC;
     if (delta < 0.05 || maxC < 0.04 || minC > 0.97) return -1.0;
 
-    double h;
-    if      (maxC == r) h = fmod((g - b) / delta, 6.0);
-    else if (maxC == g) h = (b - r) / delta + 2.0;
-    else                h = (r - g) / delta + 4.0;
-    h /= 6.0;
-    if (h < 0.0) h += 1.0;
-    return (h >= 0.0 && h <= 1.0) ? h : -1.0;
+    double hue;
+    if      (maxC == r) hue = fmod((g - b) / delta, 6.0);
+    else if (maxC == g) hue = (b - r) / delta + 2.0;
+    else                hue = (r - g) / delta + 4.0;
+    hue /= 6.0;
+    if (hue < 0.0) hue += 1.0;
+    return (hue >= 0.0 && hue <= 1.0) ? hue : -1.0;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -305,19 +299,20 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
     if (getScreenImage) {
         if (!s_fp2Running) {
             s_fp2Running = YES;
-            // Capture position on main thread — used in background to crop the image.
+            // Capture screen on main thread (UIKit API requirement).
+            // We're already on the main thread here (called from NSTimer).
+            // Only the hue computation runs on the background queue.
+            CGImageRef screenImg = getScreenImage();
+            if (!screenImg) {
+                s_fp2Running = NO;
+                return;
+            }
             float capturedNx = nx;
             float capturedNy = ny;
             dispatch_async(s_q, ^{
-                CGImageRef screenImg = getScreenImage();
-                double hue = -1.0;
-                if (screenImg) {
-                    hue = vcamSampleButtonBackground(screenImg, capturedNx, capturedNy);
-                    CGImageRelease(screenImg);
-                }
+                double hue = vcamSampleCenterCluster(screenImg, capturedNx, capturedNy);
+                CGImageRelease(screenImg);
                 s_fp2Running = NO;
-                // Always dispatch — hue=-1 hides ring and sets noColor bit in prefs
-                // so BINFlashPixelEffect returns early → flash off on black/white.
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [g_floatButton setRingHue:hue];
                     BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });

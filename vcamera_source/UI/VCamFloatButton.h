@@ -1,12 +1,10 @@
 // VCamFloatButton.h
-// Reconstructed from iHsfaTkdhwkzopQfsnwBd (0x12AD60)
+// Donut-shaped (ring) float button.
+// The center hole is fully transparent — background shows through for color preview.
+// Only the ring zone registers touches; center hole passes touches to the app.
 //
-// UIButton subclass. Lives inside VCamColorPickerWindow (pass-through UIWindow
-// at UIWindowLevelStatusBar + 10000). Never re-parented; window is always shown.
-//
-// Touch handling: custom touchesBegan/Moved/Ended for drag + edge-snap.
-// Tap action: buttonClicked opens/closes menu if !isMoving.
-// Ring: CAShapeLayer halo showing the current sampled hue (auto color mode).
+// Ring color reflects the detected background hue (auto color mode).
+// Tap ring → opens menu. Drag → moves button.
 
 #import <UIKit/UIKit.h>
 
@@ -14,21 +12,16 @@
 
 @property (nonatomic, assign) BOOL    isMoving;
 @property (nonatomic, assign) CGPoint beginPosition;
-@property (nonatomic, assign) float   offsetX;
-@property (nonatomic, assign) float   offsetY;
 
-// Show hue ring with given hue [0,1). Pass -1.0 to hide the ring.
-// Called from VCamColorPickerWindow's notify handler when a sample arrives.
+// Update ring fill color to match sampled hue [0,1). -1.0 → white (no color).
 - (void)setRingHue:(double)hue;
 
 - (void)buttonClicked;
-- (void)buttonDoubleClicked;
-- (void)buttonDrag;
 
 @end
 
-// Global button — also accessible from VCamColorPickerWindow.m for ring updates.
+// Global button — accessible from VCamColorPickerWindow.m.
 extern VCamFloatButton *g_floatButton;
 
-// Must be called on the main queue every ~200ms by the connect thread.
+// Called on the main queue every ~200ms by the connect thread.
 void vcamUpdateFloatButton(void);
