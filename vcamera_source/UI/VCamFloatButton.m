@@ -13,8 +13,8 @@
 VCamFloatButton *g_floatButton = nil;
 
 // Outer and inner radii for the donut ring (in points).
-static const CGFloat kOuterR = 35.0;
-static const CGFloat kInnerR = 22.0;
+static const CGFloat kOuterR = 22.0;
+static const CGFloat kInnerR = 15.0;
 
 @implementation VCamFloatButton {
     CAShapeLayer *_donutLayer;
@@ -69,13 +69,13 @@ static const CGFloat kInnerR = 22.0;
     [_donutLayer release];
 }
 
-// Only the ring zone registers as a hit. Center hole passes touches to the app.
+// Full circle hit zone: ring + center all register touches (tap/drag works everywhere).
+// The center is visually transparent but functionally interactive.
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
     CGFloat cx = self.bounds.size.width  * 0.5;
     CGFloat cy = self.bounds.size.height * 0.5;
     CGFloat d  = sqrt((point.x - cx)*(point.x - cx) + (point.y - cy)*(point.y - cy));
-    // Hit zone: [innerR - 4, outerR + 4] — 4pt tolerance on each edge.
-    return (d >= kInnerR - 4.0 && d <= kOuterR + 4.0);
+    return d <= kOuterR + 4.0;
 }
 
 // ── Ring color ────────────────────────────────────────────────────────────────
@@ -149,10 +149,10 @@ void vcamUpdateFloatButton(void) {
     VCamColorPickerWindow *pickerWin = [VCamColorPickerWindow sharedWindow];
 
     if (!g_floatButton) {
-        g_floatButton = [[VCamFloatButton alloc] initWithFrame:CGRectMake(0, 0, 74, 74)];
+        g_floatButton = [[VCamFloatButton alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
 
         CGFloat screenW = [UIScreen mainScreen].bounds.size.width;
-        [g_floatButton setCenter:CGPointMake(screenW - 40.0, 160.0)];
+        [g_floatButton setCenter:CGPointMake(screenW - 30.0, 150.0)];
 
         [pickerWin.rootViewController.view addSubview:g_floatButton];
     }
