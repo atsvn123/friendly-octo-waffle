@@ -181,10 +181,7 @@ void vcamUpdateFloatButton(void) {
     BOOL autoColor = BINFlashBoolForKey(fp, kBINFlashKeyAutoColor, kBINFlashDefaultAutoColor);
     BOOL menuPresent = [[VCamBridge sharedInstance] isPresent];
 
-    if (!flashOn || !autoColor) {
-        [g_floatButton setRingHue:-1.0];
-        return;
-    }
+    if (!flashOn || !autoColor) return;
 
     if (menuPresent) return;
 

@@ -242,7 +242,6 @@ void vcamInstallPickerNotifyHandler(void) {
             uint64_t state = 0;
             notify_get_state(token, &state);
             if (state == 0xFFFFFFFFFFFFFFFFULL) {
-                [g_floatButton setRingHue:-1.0];
                 BINFlashSavePrefs(@{ kBINFlashKeyHue: @(-1.0) });
                 return;
             }
@@ -251,7 +250,6 @@ void vcamInstallPickerNotifyHandler(void) {
             memcpy(&hf, &hueBits, 4);
             double h = (double)hf;
             if (h < 0.0 || h > 1.0) return;
-            [g_floatButton setRingHue:h];
             BINFlashSavePrefs(@{ kBINFlashKeyHue: @(h) });
         });
 }
@@ -275,7 +273,6 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
         // >= -1.5 means IOSurface is operational (-1.0 achromatic, [0,1) has color)
         if (shouldLog)
             vcamPickerDiag([NSString stringWithFormat:@"[FP1] IOSurf h=%.2f", hue]);
-        [g_floatButton setRingHue:hue];
         BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });
         return;
     }
@@ -352,7 +349,6 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
                 CFRelease(rawData);
                 s_fp2Running = NO;
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [g_floatButton setRingHue:hue];
                     BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });
                     if (log)
                         vcamPickerDiag([NSString stringWithFormat:@"[FP2] h=%.2f %@",
