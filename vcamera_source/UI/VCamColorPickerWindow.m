@@ -269,30 +269,20 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
     // -2.0 → no entitlement; falls through on A10/iOS 15
 
     // ── Fast path 2: UICreateScreenImage (iOS 15+ rename of UIGetScreenImage) ──
-    // UICreateScreenImage is a GPU compositor readback — expensive (~30-50ms).
-    // Run on a background serial queue so it never blocks SpringBoard's main thread.
-    // Result is cached; main thread reads the cache every tick.
-    static dispatch_queue_t  s_q          = NULL;
-    static volatile double   s_cachedHue  = -1.0;
-    static volatile BOOL     s_fp2Running = NO;
-    static CFAbsoluteTime    s_lastCapture = 0.0;
-    static dispatch_once_t   s_qOnce      = 0;
+    // GPU compositor readback (~30-50ms). Runs on a background serial queue so it
+    // never blocks SpringBoard's main thread. No caching — ring only updates when a
+    // fresh valid hue arrives. One capture at a time (s_fp2Running gate).
+    static dispatch_queue_t s_q          = NULL;
+    static volatile BOOL    s_fp2Running = NO;
+    static dispatch_once_t  s_qOnce      = 0;
     dispatch_once(&s_qOnce, ^{
         s_q = dispatch_queue_create("com.vcam.screencap", DISPATCH_QUEUE_SERIAL);
     });
 
     vcamUIGetScreenImage_t getScreenImage = vcamGetScreenImageFn();
     if (getScreenImage) {
-        // Apply cached hue immediately if available
-        if (s_cachedHue >= 0.0) {
-            [g_floatButton setRingHue:s_cachedHue];
-            BINFlashSavePrefs(@{ kBINFlashKeyHue: @(s_cachedHue) });
-        }
-        // Kick off a new capture every 500ms, non-blocking
-        CFAbsoluteTime now = CFAbsoluteTimeGetCurrent();
-        if (!s_fp2Running && (now - s_lastCapture >= 0.2)) {
+        if (!s_fp2Running) {
             s_fp2Running = YES;
-            s_lastCapture = now;
             dispatch_async(s_q, ^{
                 CGImageRef screenImg = getScreenImage();
                 double hue = -1.0;
@@ -302,7 +292,6 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
                 }
                 s_fp2Running = NO;
                 if (hue < 0.0) return;
-                s_cachedHue = hue;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [g_floatButton setRingHue:hue];
                     BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });
@@ -311,7 +300,7 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
                 });
             });
         }
-        if (s_cachedHue >= 0.0) return; // hue applied above, don't fall through to notify
+        return; // fp2 available — don't fall through to Darwin notify
     }
 
     // ── Fallback: cross-process Darwin notify ─────────────────────────────────
