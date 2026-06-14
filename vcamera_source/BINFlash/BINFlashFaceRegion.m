@@ -156,11 +156,6 @@ static void   *s_visionCopyBuf  = NULL;
 static size_t  s_visionCopySize = 0;
 static volatile int s_visionBusy = 0;
 
-// Noop: s_visionCopyBuf is owned by this file, not by the CVPixelBuffer.
-static void vcamVisionBufNoop(void *ctx, const void *addr) {
-    (void)ctx; (void)addr;
-}
-
 void BINFlashScheduleVisionDetection(const void *yBytes,
                                       size_t yWidth, size_t yHeight,
                                       size_t yStride) {
@@ -188,15 +183,29 @@ void BINFlashScheduleVisionDetection(const void *yBytes,
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
         @autoreleasepool {
-            // CPU-only CVPixelBuffer wrapping our persistent buffer.
-            // Noop release: we manage bufPtr lifetime, not CVPixelBuffer.
-            CVPixelBufferRef visionBuf = NULL;
-            CVPixelBufferCreateWithBytes(kCFAllocatorDefault, w, h,
-                kCVPixelFormatType_OneComponent8,
-                bufPtr, stride,
-                vcamVisionBufNoop, NULL, NULL, &visionBuf);
+            // Log once to confirm the dispatch block IS executing.
+            // If this appears but vis:ok/miss do not, Vision itself is broken here.
+            static BOOL s_visionInitLogged = NO;
+            if (!s_visionInitLogged) {
+                s_visionInitLogged = YES;
+                vcamSendDiag([NSString stringWithFormat:@"vis:init %zux%zu", w, h]);
+            }
 
-            if (!visionBuf) {
+            // Build a grayscale CGImage from the Y-plane CPU copy.
+            // CGImage works in mediaserverd; CVPixelBufferCreateWithBytes with
+            // kCVPixelFormatType_OneComponent8 silently returns NULL there.
+            CGColorSpaceRef cs = CGColorSpaceCreateDeviceGray();
+            CGDataProviderRef dp = CGDataProviderCreateWithData(
+                NULL, bufPtr, stride * h, NULL /* bufPtr is persistent, no free */);
+            CGImageRef cgImg = CGImageCreate(
+                w, h, 8 /* bitsPerComponent */, 8 /* bitsPerPixel */, stride,
+                cs, (CGBitmapInfo)(kCGBitmapByteOrderDefault | kCGImageAlphaNone),
+                dp, NULL, true, kCGRenderingIntentDefault);
+            CGColorSpaceRelease(cs);
+            CGDataProviderRelease(dp);
+
+            if (!cgImg) {
+                vcamSendDiag(@"vis:no-cgimg");
                 __sync_lock_release(&s_visionBusy);
                 return;
             }
@@ -205,17 +214,16 @@ void BINFlashScheduleVisionDetection(const void *yBytes,
                 [[VNDetectFaceRectanglesRequest alloc] init];
             VNImageRequestHandler *hdlr =
                 [[VNImageRequestHandler alloc]
-                    initWithCVPixelBuffer:visionBuf
-                              orientation:kCGImagePropertyOrientationUp
-                                  options:@{}];
-
-            // Release visionBuf AFTER performRequests: — VNImageRequestHandler
-            // may hold only a weak reference, so we must keep it alive ourselves.
+                    initWithCGImage:cgImg
+                         orientation:kCGImagePropertyOrientationUp
+                             options:@{}];
+            // Release cgImg AFTER performRequests: — Vision may defer pixel
+            // access to performRequests time.
             [hdlr performRequests:@[req] error:nil];
-            CVPixelBufferRelease(visionBuf);
+            CGImageRelease(cgImg);
 
             NSArray *results = req.results;
-            // Throttle diagnostics: log once every ~10 Vision calls (~30s at 3Hz).
+            // Throttle: log first detection immediately, then every ~10 calls (~30s).
             static int s_diagCount = 0;
             BOOL shouldLog = (++s_diagCount >= 10);
             if (shouldLog) s_diagCount = 0;
@@ -249,8 +257,7 @@ void BINFlashScheduleVisionDetection(const void *yBytes,
             [req release];
             [hdlr release];
         }
-        // Release busy flag after autorelease pool drains — ensures all Vision
-        // objects (and their CVPixelBuffer refs) are gone before next call.
+        // Release busy flag after autorelease pool drains.
         __sync_lock_release(&s_visionBusy);
     });
 }
