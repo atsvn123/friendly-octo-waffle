@@ -11,8 +11,10 @@
 #import <stdlib.h>
 #import <string.h>
 
+extern void vcamSendDiag(NSString *msg);
+
 double g_faceCX           = 0.5;
-double g_faceCY           = 0.42;
+double g_faceCY           = 0.50;   // true frame centre (RTMP face is centred in stream)
 double g_faceRX           = 0.30;
 double g_faceRY           = 0.35;
 double g_faceTimestamp    = 0.0;
@@ -43,33 +45,31 @@ void BINFlashComputeFaceRegion(NSDictionary *prefs,
         usingFaceData = YES;
     } else {
         faceCX = 0.5;
-        faceCY = 0.42;
+        faceCY = 0.50;   // true frame centre for RTMP content
     }
 
     double r      = clamp(region / 100.0, 0.1, 1.0);
     double minDim = (double)fmax(fmin((double)imgWidth, (double)imgHeight), 1.0);
 
-    // Base radii.
-    // Globals (g_faceRX/RY) are stored in raw BUFFER space (landscape for iPhone portrait).
-    // For a landscape buffer, rx spans the wide axis (buffer-horizontal = portrait-vertical).
-    // → rx needs the LARGER base; ry needs the SMALLER base.
-    // For a portrait buffer (or no-rotation), the standard orientation applies.
+    // Base radii for fallback (no face detection yet).
+    // RTMP face is always upright in the buffer regardless of landscape/portrait:
+    // rx = horizontal radius (face width, smaller), ry = vertical radius (face height, larger).
     double smallerBase = minDim * (r * 0.25 + 0.15);
     double largerBase  = minDim * (r * 0.36 + 0.24);
-    BOOL landscape = (imgWidth > imgHeight);
-    double baseForRX = landscape ? largerBase  : smallerBase;
-    double baseForRY = landscape ? smallerBase : largerBase;
+    double baseForRX = smallerBase;
+    double baseForRY = largerBase;
 
     double rx_computed = baseForRX;
     double ry_computed = baseForRY;
 
     if (usingFaceData) {
         double scaleFactor = r * 0.2 + 0.84;
+        // Vision bounding box is in normalized buffer space — no coordinate swap needed.
+        // faceScaleX = half face width in pixels, faceScaleY = half face height in pixels.
         double faceScaleX  = g_faceRX * (double)imgWidth  * 0.5;
         double faceScaleY  = g_faceRY * (double)imgHeight * 0.5;
-        // In landscape buffer: rx (horizontal) corresponds to the large portrait dimension.
-        rx_computed = fmax(baseForRX, scaleFactor * (landscape ? fmax(faceScaleX, faceScaleY) : fmin(faceScaleX, faceScaleY)));
-        ry_computed = fmax(baseForRY, scaleFactor * (landscape ? fmin(faceScaleX, faceScaleY) : fmax(faceScaleX, faceScaleY)));
+        rx_computed = fmax(baseForRX, scaleFactor * faceScaleX);
+        ry_computed = fmax(baseForRY, scaleFactor * faceScaleY);
     }
 
     double cx  = clamp(faceCX, 0.08, 0.92) * imgWidth;
@@ -215,6 +215,11 @@ void BINFlashScheduleVisionDetection(const void *yBytes,
             CVPixelBufferRelease(visionBuf);
 
             NSArray *results = req.results;
+            // Throttle diagnostics: log once every ~10 Vision calls (~30s at 3Hz).
+            static int s_diagCount = 0;
+            BOOL shouldLog = (++s_diagCount >= 10);
+            if (shouldLog) s_diagCount = 0;
+
             if (results.count > 0) {
                 VNFaceObservation *face = results[0];
                 CGRect bb = face.boundingBox;
@@ -228,7 +233,18 @@ void BINFlashScheduleVisionDetection(const void *yBytes,
                 g_faceRX           = clamp(rx, 0.20, 0.85);
                 g_faceRY           = clamp(ry, 0.25, 0.95);
                 g_faceTimestamp    = CFAbsoluteTimeGetCurrent();
+                BOOL firstDetect   = !g_faceEverDetected;
                 g_faceEverDetected = YES;
+                if (firstDetect || shouldLog) {
+                    vcamSendDiag([NSString stringWithFormat:
+                        @"vis:ok %zux%zu cx=%.2f cy=%.2f rx=%.2f ry=%.2f",
+                        w, h, g_faceCX, g_faceCY, g_faceRX, g_faceRY]);
+                }
+            } else {
+                if (shouldLog) {
+                    vcamSendDiag([NSString stringWithFormat:
+                        @"vis:miss %zux%zu evr=%d", w, h, (int)g_faceEverDetected]);
+                }
             }
             [req release];
             [hdlr release];
