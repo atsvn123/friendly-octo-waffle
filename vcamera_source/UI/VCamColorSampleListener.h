@@ -7,3 +7,7 @@
 
 #pragma once
 void vcamInstallColorSampleListener(void);
+// Listens for "com.vcam.debugcapture" (volume-down double-tap from SpringBoard)
+// and saves a 300×300 PNG of the colour-picker sample area to
+// /var/mobile/Documents/vcam_color_YYYYMMDD_HHmmss.png.
+void vcamInstallDebugCaptureListener(void);

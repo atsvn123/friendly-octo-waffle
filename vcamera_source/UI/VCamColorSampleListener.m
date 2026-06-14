@@ -143,3 +143,63 @@ void vcamInstallColorSampleListener(void) {
         }
     );
 }
+
+// ── Debug capture: volume-down double-tap → save PNG of what the color picker sees ──
+// Saves a 300×300 pt capture (at device scale) centred on the auto color sample point
+// (0.5 × screenW, 0.06 × screenH) to /var/mobile/Documents/vcam_color_YYYYMMDD_HHmmss.png.
+// afterScreenUpdates:NO — same as the live sampler: captures app UI, excludes camera GPU layer.
+void vcamInstallDebugCaptureListener(void) {
+    static int s_token = NOTIFY_TOKEN_INVALID;
+    if (s_token != NOTIFY_TOKEN_INVALID) return;
+
+    notify_register_dispatch(
+        "com.vcam.debugcapture",
+        &s_token,
+        dispatch_get_main_queue(),
+        ^(int __unused tok) {
+            if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive)
+                return;
+
+            CGSize sz = [UIScreen mainScreen].bounds.size;
+            if (sz.width <= 0 || sz.height <= 0) return;
+
+            UIWindow *targetWindow = nil;
+            for (UIWindow *w in [UIApplication sharedApplication].windows) {
+                if (!w.isHidden && w.alpha > 0.0 && w.windowLevel == UIWindowLevelNormal) {
+                    targetWindow = w; break;
+                }
+            }
+            if (!targetWindow) targetWindow = [[UIApplication sharedApplication] keyWindow];
+            if (!targetWindow) return;
+
+            // Capture 300×300 pt centred on the colour-picker sample point.
+            const CGFloat capW = 300.0, capH = 300.0;
+            CGFloat sampleX = 0.5f * sz.width;
+            CGFloat sampleY = 0.06f * sz.height;
+
+            UIGraphicsBeginImageContextWithOptions(CGSizeMake(capW, capH), YES, 0.0);
+            CGRect viewRect = CGRectMake(-sampleX + capW * 0.5f,
+                                         -sampleY + capH * 0.5f,
+                                         sz.width, sz.height);
+            [targetWindow drawViewHierarchyInRect:viewRect afterScreenUpdates:NO];
+            UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+
+            if (!img) return;
+            NSData *png = UIImagePNGRepresentation(img);
+            if (!png) return;
+
+            NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+            [fmt setDateFormat:@"yyyyMMdd_HHmmss"];
+            NSString *ts = [fmt stringFromDate:[NSDate date]];
+            [fmt release];
+
+            NSString *dir  = @"/var/mobile/Documents";
+            NSString *path = [NSString stringWithFormat:@"%@/vcam_color_%@.png", dir, ts];
+            [[NSFileManager defaultManager]
+                createDirectoryAtPath:dir
+                withIntermediateDirectories:YES attributes:nil error:nil];
+            [png writeToFile:path atomically:YES];
+        }
+    );
+}

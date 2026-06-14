@@ -105,6 +105,7 @@ static void vcamInstallHooks(void) {
         // drawViewHierarchyInRect:afterScreenUpdates:YES and posts the hue back.
         // This is the only approach that reliably sees on-screen camera content.
         vcamInstallColorSampleListener();
+        vcamInstallDebugCaptureListener();
     }
 }
 

@@ -19,11 +19,16 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 #import <CoreFoundation/CoreFoundation.h>
+#import <notify.h>
 #import "../VCamBridge/VCamBridge.h"
 #import "../VCamLive/VCamLiveManager.h"
 
 // ── iOS version (detected once at hook-install time) ────────────────────────
 static int s_iosMajor = 0;
+
+// ── Volume-down double-tap → debug capture ──────────────────────────────────
+static int    s_volDownCount    = 0;
+static double s_volDownLastTime = 0.0;
 
 // ── Saved original IMPs ──────────────────────────────────────────────────────
 static IMP orig_applicationDidFinishLaunching        = NULL;
@@ -150,8 +155,22 @@ static void volumeButtonPressed(id self, SEL cmd, IMP orig) {
 static void hook_handleVolumeUp(id self, SEL cmd) {
     volumeButtonPressed(self, cmd, orig_handleVolumeUp);
 }
+static void vcamVolumeDownDebugTap(void) {
+    NSDate *dd = [NSDate date];
+    double now = [dd timeIntervalSince1970];
+    if (s_volDownCount == 0 || (now - s_volDownLastTime) > 0.5) {
+        s_volDownCount = 1;
+        s_volDownLastTime = now;
+    } else if ((now - s_volDownLastTime) <= 0.5) {
+        s_volDownCount = 0;
+        s_volDownLastTime = 0.0;
+        notify_post("com.vcam.debugcapture");
+    }
+}
+
 static void hook_handleVolumeDown(id self, SEL cmd) {
     volumeButtonPressed(self, cmd, orig_handleVolumeDown);
+    vcamVolumeDownDebugTap();
 }
 
 // ── iOS 16 volume button fallback — SpringBoard volumeUpButtonDown: / volumeDownButtonDown:
@@ -188,6 +207,7 @@ static void hook_sb_volumeDownDown(id self, SEL cmd, id event) {
             [[VCamBridge sharedInstance] presentation];
         }
     }
+    vcamVolumeDownDebugTap();
 }
 
 // ── Lock button → dismiss menu (sub_8681C) ────────────────────────────────────
