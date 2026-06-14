@@ -81,8 +81,9 @@ static double vcamSampleButtonBackground(CGImageRef img, float nx, float ny) {
     // Sample 8 pixels evenly around the button at radius 70px from center.
     // Ring outer edge: arc 30pt + half lineWidth 2pt = 32pt = 64px at 2x.
     // 70px puts samples 3pt outside the ring with a clean margin.
-    double cx = (cropSz - 1) * 0.5;
-    double cy = (cropSz - 1) * 0.5;
+    // Use actual button position within the (possibly clamped) crop — NOT crop center.
+    double cx = (double)nx * imgW - (double)cropX;
+    double cy = (double)ny * imgH - (double)cropY;
     const double sampleR = 70.0;
 
     double totalR = 0.0, totalG = 0.0, totalB = 0.0;
