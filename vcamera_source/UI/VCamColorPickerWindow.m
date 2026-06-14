@@ -12,6 +12,7 @@
 #import "VCamFloatButton.h"
 #import "../BINFlash/BINFlashPrefs.h"
 #import <IOSurface/IOSurfaceRef.h>
+#import <substrate.h>
 #import <notify.h>
 #include <dlfcn.h>
 #include <string.h>
@@ -58,7 +59,12 @@ static double vcamSampleDisplayHue(CGPoint pt) {
                            "IOMobileFramebufferGetLayerDefaultSurface");
         if (!fbOpen || !s_getSurface) return;
 
-        const char *names[] = {"IOMobileFramebuffer", "IOMobileFramebufferShim", NULL};
+        // IOMobileFramebuffer  — classic name
+        // IOMobileFramebufferShim — shim layer on some iOS versions
+        // AppleH10IOMFB           — A10 Fusion (iPhone 7/8) concrete driver class on iOS 14-15
+        const char *names[] = {
+            "IOMobileFramebuffer", "IOMobileFramebufferShim", "AppleH10IOMFB", NULL
+        };
         for (int i = 0; names[i] && !s_fb; i++) {
             CFMutableDictionaryRef m = ioMatching(names[i]);
             if (!m) continue;
@@ -109,7 +115,10 @@ static double vcamSampleDisplayHue(CGPoint pt) {
 // Fast path 2: UIGetScreenImage() — UIKit private API.
 // Captures the full hardware compositor output (foreground app + all overlays)
 // from SpringBoard context. Works on iOS 15 and 16 on jailbroken devices.
-// Resolved at runtime via dlsym so we degrade gracefully if unavailable.
+//
+// On iOS 15 the symbol is NOT in UIKit's dyld export table, so
+// dlsym(RTLD_DEFAULT) always returns NULL.  MSFindSymbol (ElleKit/Substrate)
+// searches the private nlist table and reliably finds unexported symbols.
 // ─────────────────────────────────────────────────────────────────────────────
 typedef CGImageRef (*vcamUIGetScreenImage_t)(void);
 
@@ -117,7 +126,16 @@ static vcamUIGetScreenImage_t vcamGetScreenImageFn(void) {
     static vcamUIGetScreenImage_t s_fn = NULL;
     static dispatch_once_t        s_once = 0;
     dispatch_once(&s_once, ^{
+        // First try the export table (works on older iOS versions).
         s_fn = (vcamUIGetScreenImage_t)dlsym(RTLD_DEFAULT, "UIGetScreenImage");
+        if (!s_fn) {
+            // Fallback: search UIKit's private nlist symbol table.
+            // MSFindSymbol requires the leading underscore.
+            MSImageRef uikit = MSGetImageByName(
+                "/System/Library/Frameworks/UIKit.framework/UIKit");
+            if (uikit)
+                s_fn = (vcamUIGetScreenImage_t)MSFindSymbol(uikit, "_UIGetScreenImage");
+        }
     });
     return s_fn;
 }
