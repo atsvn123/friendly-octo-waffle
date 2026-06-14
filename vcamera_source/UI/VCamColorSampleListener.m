@@ -10,11 +10,24 @@
 #define HUE_BINS 12
 
 static UIWindow *vcamFindTargetWindow(void) {
+    // iOS 13-15: [UIApplication windows] works reliably.
     NSArray *windows = [[UIApplication sharedApplication] windows];
     for (UIWindow *w in windows) {
         if (!w.isHidden && w.alpha > 0.0 && w.windowLevel == UIWindowLevelNormal)
             return w;
     }
+
+    // iOS 16+: many apps migrate to UIWindowScene; [UIApplication windows]
+    // returns an empty array for scene-based apps.  Enumerate via connectedScenes.
+    for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
+        if (![scene isKindOfClass:NSClassFromString(@"UIWindowScene")]) continue;
+        NSArray *sceneWindows = [scene valueForKey:@"windows"];
+        for (UIWindow *w in sceneWindows) {
+            if (!w.isHidden && w.alpha > 0.0 && w.windowLevel == UIWindowLevelNormal)
+                return w;
+        }
+    }
+
     return [[UIApplication sharedApplication] keyWindow];
 }
 
