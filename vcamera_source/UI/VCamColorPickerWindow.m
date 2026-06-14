@@ -1,6 +1,12 @@
 // VCamColorPickerWindow.m
-// Pass-through window + Darwin notify infrastructure for screen color sampling.
+// Pass-through window + color sampling infrastructure for the float button.
 // The float button (VCamFloatButton) lives inside this window.
+//
+// Sampling priority (all run in SpringBoard, no foreground-app injection needed):
+//   1. IOMobileFramebuffer IOSurface direct pixel read  — fastest, 1 pixel
+//   2. UIGetScreenImage() + 16x16pt region sample       — works on all apps
+//                                                          including RootHide-protected ones
+//   3. Darwin notify cross-process fallback             — last resort, non-RootHide only
 
 #import "VCamColorPickerWindow.h"
 #import "VCamFloatButton.h"
@@ -13,11 +19,10 @@
 #include <mach/mach.h>
 
 // ─────────────────────────────────────────────────────────────────────────────
-// vcamSampleDisplayHue — direct IOSurface read (SpringBoard only).
-// Returns [0,1) = hue, -1.0 = achromatic pixel, -2.0 = IOSurface unavailable.
-// On this device (A10/iOS 15) IOMobileFramebufferOpen needs an entitlement we
-// don't have, so this always returns -2.0 and the Darwin notify path is used.
-// Kept for forward compatibility.
+// Fast path 1: IOMobileFramebuffer IOSurface direct read.
+// Returns [0,1) = hue, -1.0 = achromatic, -2.0 = IOSurface unavailable.
+// On A10/iOS 15 IOMobileFramebufferOpen needs an entitlement we don't have;
+// always returns -2.0, falling through to UIGetScreenImage.
 // ─────────────────────────────────────────────────────────────────────────────
 typedef uint32_t vcam_io_object_t;
 typedef vcam_io_object_t vcam_io_service_t;
@@ -101,6 +106,102 @@ static double vcamSampleDisplayHue(CGPoint pt) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Fast path 2: UIGetScreenImage() — UIKit private API.
+// Captures the full hardware compositor output (foreground app + all overlays)
+// from SpringBoard context. Works on iOS 15 and 16 on jailbroken devices.
+// Resolved at runtime via dlsym so we degrade gracefully if unavailable.
+// ─────────────────────────────────────────────────────────────────────────────
+typedef CGImageRef (*vcamUIGetScreenImage_t)(void);
+
+static vcamUIGetScreenImage_t vcamGetScreenImageFn(void) {
+    static vcamUIGetScreenImage_t s_fn = NULL;
+    static dispatch_once_t        s_once = 0;
+    dispatch_once(&s_once, ^{
+        s_fn = (vcamUIGetScreenImage_t)dlsym(RTLD_DEFAULT, "UIGetScreenImage");
+    });
+    return s_fn;
+}
+
+#define VCAM_HUE_BINS 12
+
+// Sample a 16x16pt region centered on pt from a full-screen CGImageRef.
+// Returns dominant hue [0,1) or -1.0 if all pixels are achromatic.
+static double vcamSampleScreenImageHueAt(CGImageRef screenImg, CGPoint pt) {
+    CGFloat scale = [UIScreen mainScreen].scale;
+    size_t imgW = CGImageGetWidth(screenImg);
+    size_t imgH = CGImageGetHeight(screenImg);
+
+    // 8pt half-extent → 16pt square, converted to pixels
+    size_t halfPx = (size_t)(8.0 * scale);
+    size_t sampPx = halfPx * 2;
+
+    size_t px = (size_t)(pt.x * scale);
+    size_t py = (size_t)(pt.y * scale);
+
+    size_t x0 = (px > halfPx) ? (px - halfPx) : 0;
+    size_t y0 = (py > halfPx) ? (py - halfPx) : 0;
+    size_t x1 = (x0 + sampPx < imgW) ? (x0 + sampPx) : imgW;
+    size_t y1 = (y0 + sampPx < imgH) ? (y0 + sampPx) : imgH;
+    size_t cw = x1 - x0;
+    size_t ch = y1 - y0;
+    if (!cw || !ch) return -1.0;
+
+    // Crop to the small region we need
+    CGImageRef crop = CGImageCreateWithImageInRect(screenImg, CGRectMake(x0, y0, cw, ch));
+    if (!crop) return -1.0;
+
+    uint8_t *buf = (uint8_t *)malloc(cw * ch * 4);
+    if (!buf) { CGImageRelease(crop); return -1.0; }
+
+    CGColorSpaceRef cs  = CGColorSpaceCreateDeviceRGB();
+    // ByteOrder32Little | AlphaPremultipliedFirst → bytes in memory: [B, G, R, A]
+    CGContextRef ctx = CGBitmapContextCreate(buf, cw, ch, 8, cw * 4, cs,
+        kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+    CGColorSpaceRelease(cs);
+    if (!ctx) { free(buf); CGImageRelease(crop); return -1.0; }
+
+    CGContextDrawImage(ctx, CGRectMake(0, 0, (CGFloat)cw, (CGFloat)ch), crop);
+    CGContextRelease(ctx);
+    CGImageRelease(crop);
+
+    double binSin[VCAM_HUE_BINS];
+    double binCos[VCAM_HUE_BINS];
+    int    binCnt[VCAM_HUE_BINS];
+    memset(binSin, 0, sizeof(binSin));
+    memset(binCos, 0, sizeof(binCos));
+    memset(binCnt, 0, sizeof(binCnt));
+
+    size_t total = cw * ch;
+    for (size_t i = 0; i < total; i++) {
+        // [B, G, R, A] byte order
+        UIColor *c = [UIColor colorWithRed:buf[i*4+2]/255.0
+                                     green:buf[i*4+1]/255.0
+                                      blue:buf[i*4+0]/255.0
+                                     alpha:1.0];
+        CGFloat h=0, s=0, v=0, a=0;
+        if (![c getHue:&h saturation:&s brightness:&v alpha:&a]) continue;
+        if (s < 0.08 || v < 0.05 || v > 0.97) continue;
+        int bin = (int)(h * VCAM_HUE_BINS) % VCAM_HUE_BINS;
+        double angle = h * 2.0 * M_PI;
+        binSin[bin] += sin(angle);
+        binCos[bin] += cos(angle);
+        binCnt[bin]++;
+    }
+    free(buf);
+
+    int bestBin = -1, bestCount = 0;
+    for (int i = 0; i < VCAM_HUE_BINS; i++) {
+        if (binCnt[i] > bestCount) { bestCount = binCnt[i]; bestBin = i; }
+    }
+    if (bestBin < 0) return -1.0;
+
+    double meanAngle = atan2(binSin[bestBin] / bestCount, binCos[bestBin] / bestCount);
+    if (meanAngle < 0.0) meanAngle += 2.0 * M_PI;
+    double hue = meanAngle / (2.0 * M_PI);
+    return (hue >= 0.0 && hue <= 1.0) ? hue : -1.0;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Darwin notify infrastructure
 // ─────────────────────────────────────────────────────────────────────────────
 static int s_reqToken  = NOTIFY_TOKEN_INVALID;
@@ -139,25 +240,57 @@ void vcamInstallPickerNotifyHandler(void) {
 }
 
 void vcamSendPickerSampleRequest(float nx, float ny) {
-    // Fast path: try IOSurface direct read in SpringBoard (no cross-process overhead).
     CGSize sz = [UIScreen mainScreen].bounds.size;
-    if (sz.width > 0 && sz.height > 0) {
-        CGPoint pt = CGPointMake((CGFloat)nx * sz.width, (CGFloat)ny * sz.height);
-        double hue = vcamSampleDisplayHue(pt);
-        if (hue >= 0.0) {
-            [g_floatButton setRingHue:hue];
-            BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });
+    if (sz.width <= 0 || sz.height <= 0) return;
+
+    CGPoint pt = CGPointMake((CGFloat)nx * sz.width, (CGFloat)ny * sz.height);
+
+    // ── Fast path 1: IOSurface direct pixel read ──────────────────────────────
+    double hue = vcamSampleDisplayHue(pt);
+    if (hue >= -1.5) {
+        // >= -1.5 means IOSurface is working (-1.0 = achromatic, [0,1) = hue)
+        [g_floatButton setRingHue:hue];
+        BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });
+        return;
+    }
+    // -2.0 → IOSurface unavailable (entitlement not present); fall through.
+
+    // ── Fast path 2: UIGetScreenImage() ──────────────────────────────────────
+    // Captures full compositor output from SpringBoard: foreground app content
+    // is visible regardless of whether our dylib is injected into that app.
+    // This makes it work for RootHide-protected apps (Sileo, Dopamine, etc.)
+    // where dylib injection is blocked.
+    //
+    // Sample 60pt INWARD from the button's edge, NOT at the button center.
+    // The button always snaps to the left or right screen edge; 60pt inward
+    // always lands on app content, never on the button's own pink background.
+    vcamUIGetScreenImage_t getScreenImage = vcamGetScreenImageFn();
+    if (getScreenImage) {
+        CGFloat sampleX = (pt.x > sz.width * 0.5f)
+            ? (pt.x - 60.0f)   // button on right edge → sample left
+            : (pt.x + 60.0f);  // button on left edge  → sample right
+        sampleX = (sampleX < 16.0f)            ? 16.0f            : sampleX;
+        sampleX = (sampleX > sz.width - 16.0f) ? sz.width - 16.0f : sampleX;
+        CGFloat sampleY = pt.y;
+        sampleY = (sampleY < 16.0f)             ? 16.0f             : sampleY;
+        sampleY = (sampleY > sz.height - 16.0f) ? sz.height - 16.0f : sampleY;
+
+        CGImageRef screenImg = getScreenImage();
+        if (screenImg) {
+            double screenHue = vcamSampleScreenImageHueAt(screenImg,
+                                   CGPointMake(sampleX, sampleY));
+            CGImageRelease(screenImg);
+            [g_floatButton setRingHue:screenHue];
+            BINFlashSavePrefs(@{ kBINFlashKeyHue: @(screenHue) });
             return;
         }
-        if (hue > -1.5) {
-            // -1.0: IOSurface working but pixel is achromatic → clear color
-            [g_floatButton setRingHue:-1.0];
-            BINFlashSavePrefs(@{ kBINFlashKeyHue: @(-1.0) });
-            return;
-        }
-        // -2.0: IOSurface unavailable → fall through to Darwin notify
     }
 
+    // ── Fallback: cross-process Darwin notify ─────────────────────────────────
+    // The foreground app's vcamInstallColorSampleListener() receives this,
+    // renders an 8x8pt region at (nx, ny) with drawViewHierarchyInRect:, and
+    // posts com.vcam.sampleresponse. Only works when our dylib is injected
+    // (non-RootHide apps). vcamInstallPickerNotifyHandler() handles the response.
     if (s_reqToken == NOTIFY_TOKEN_INVALID) return;
     uint32_t xBits = 0, yBits = 0;
     memcpy(&xBits, &nx, 4);
