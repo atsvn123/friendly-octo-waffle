@@ -381,7 +381,7 @@ static UIColor *BorderColor(void) {
 
     // Version label (visible through transparent handleView above it)
     _versionLabel = [[UILabel alloc] initWithFrame:CGRectMake(pad, y, cw, 15)];
-    _versionLabel.text = @"v2.126-VCAM";
+    _versionLabel.text = @"v2.127-VCAM";
     _versionLabel.font = [UIFont systemFontOfSize:11.0];
     _versionLabel.textColor = [UIColor lightGrayColor];
     _versionLabel.textAlignment = NSTextAlignmentCenter;
@@ -629,12 +629,16 @@ static UIColor *BorderColor(void) {
     [_flashPanel addSubview:_autoColorRow];
     y += 50.0;
 
-    // Static flash (no strobe) toggle
+    // Static flash (no strobe) toggle — disabled while auto color is active.
     BOOL staticOn = BINFlashBoolForKey(fp, kBINFlashKeyStaticFlash, kBINFlashDefaultStaticFlash);
     _staticFlashRow = [[VCamToggleRow alloc] initWithTitle:@"Ánh sáng tĩnh (tắt nhấp nháy)" on:staticOn];
     _staticFlashRow.frame = CGRectMake(0, y, cw, 44);
     [_staticFlashRow.toggle addTarget:self action:@selector(staticFlashToggled:)
                     forControlEvents:UIControlEventValueChanged];
+    if (autoOn) {
+        _staticFlashRow.toggle.enabled = NO;
+        _staticFlashRow.alpha = 0.4;
+    }
     [_flashPanel addSubview:_staticFlashRow];
     y += 50.0;
 
@@ -809,24 +813,32 @@ static UIColor *BorderColor(void) {
 // When flash is ON: restore to full interaction.
 - (void)updateFlashSubOptionState {
     BOOL on = _flashSwitch.on;
+    BOOL autoColor = _autoColorRow ? _autoColorRow.toggle.on : NO;
     if (_autoColorRow) {
         _autoColorRow.alpha = on ? 1.0 : 0.4;
         _autoColorRow.toggle.enabled = on;
     }
     if (_staticFlashRow) {
-        _staticFlashRow.alpha = on ? 1.0 : 0.4;
-        _staticFlashRow.toggle.enabled = on;
+        // Disabled when flash is off OR when auto color is on (auto color locks it ON).
+        BOOL canEdit = on && !autoColor;
+        _staticFlashRow.alpha = canEdit ? 1.0 : 0.4;
+        _staticFlashRow.toggle.enabled = canEdit;
     }
 }
 
 - (void)autoColorToggled:(UISwitch *)sw {
     if (sw.on) {
-        // Auto color needs strobing to look natural — disable static flash.
+        // Auto color forces static flash ON (constant light, no strobing).
+        // Static flash row is disabled until auto color is turned off.
         BINFlashSavePrefs(@{ kBINFlashKeyAutoColor: @(YES),
-                             kBINFlashKeyStaticFlash: @(NO) });
-        _staticFlashRow.toggle.on = NO;
+                             kBINFlashKeyStaticFlash: @(YES) });
+        _staticFlashRow.toggle.on = YES;
+        _staticFlashRow.toggle.enabled = NO;
+        _staticFlashRow.alpha = 0.4;
     } else {
         BINFlashSavePrefs(@{ kBINFlashKeyAutoColor: @(NO) });
+        _staticFlashRow.toggle.enabled = YES;
+        _staticFlashRow.alpha = 1.0;
     }
 }
 

@@ -95,14 +95,4 @@
 // ── Background run loop ───────────────────────────────────────────────────────
 - (void)run;
 
-// ── RTMP color sampling (called from vcamInstallRTMPColorSampler) ─────────────
-// Samples the hue of the RTMP pixel buffer at normalized screen position (0..1).
-// Returns hue in [0,1], or -1.0 if no frame or color is achromatic.
-- (double)sampleHueAtNormalizedX:(double)nx y:(double)ny;
-
 @end
-
-// Registers Darwin notify listener for com.vcam.samplerequest in mediaserverd.
-// Samples the RTMP pixel buffer instead of UIKit window layers, which cannot
-// capture GPU-rendered camera preview content (AVCaptureVideoPreviewLayer).
-void vcamInstallRTMPColorSampler(void);

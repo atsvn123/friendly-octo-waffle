@@ -131,13 +131,7 @@ void vcamInstallPickerNotifyHandler(void) {
             float hf = 0.0f;
             memcpy(&hf, &hueBits, 4);
             double h = (double)hf;
-            if (h > 1.0) return;
-            if (h < 0.0) {
-                // RTMP sampler returned achromatic (-1.0 float bits)
-                [g_floatButton setRingHue:-1.0];
-                BINFlashSavePrefs(@{ kBINFlashKeyHue: @(-1.0) });
-                return;
-            }
+            if (h < 0.0 || h > 1.0) return;
 
             [g_floatButton setRingHue:h];
             BINFlashSavePrefs(@{ kBINFlashKeyHue: @(h) });
