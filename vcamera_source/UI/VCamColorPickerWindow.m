@@ -46,98 +46,44 @@ static void vcamPickerDiag(NSString *msg) {
 // edge (32pt = 64px at 2x). Averages their RGB and returns the hue, or -1 if
 // the area is achromatic (white/black/gray).
 // ─────────────────────────────────────────────────────────────────────────────
-// Sample a 20×20 px cluster at the donut center from a full-screen CGImage.
-// The donut hole is transparent so the background shows through at (nx,ny).
+// Compute hue from a pre-extracted raw pixel buffer.
+// bytes: raw pixel data from CGDataProviderCopyData (row 0 = screen TOP).
+// Channel offsets depend on bitmapInfo — passed pre-computed.
 // Returns hue [0,1) or -1.0 if achromatic.
-static double vcamSampleCenterCluster(CGImageRef img, float nx, float ny,
-                                      NSString **diagOut) {
-    size_t imgW = CGImageGetWidth(img);
-    size_t imgH = CGImageGetHeight(img);
-    if (!imgW || !imgH) return -1.0;
-
+static double vcamComputeHueFromRaw(const uint8_t *bytes,
+                                     size_t imgW, size_t imgH,
+                                     size_t bpr, size_t bpp,
+                                     int rOff, int gOff, int bOff,
+                                     float nx, float ny,
+                                     NSString **diagOut) {
     int px = (int)(nx * (double)imgW + 0.5);
     int py = (int)(ny * (double)imgH + 0.5);
 
     const int SZ = 20;
     int x0 = px - SZ/2; if (x0 < 0) x0 = 0;
     int y0 = py - SZ/2; if (y0 < 0) y0 = 0;
-    int x1 = x0 + SZ; if (x1 > (int)imgW) { x1 = (int)imgW; x0 = x1 - SZ; if (x0 < 0) x0 = 0; }
-    int y1 = y0 + SZ; if (y1 > (int)imgH) { y1 = (int)imgH; y0 = y1 - SZ; if (y0 < 0) y0 = 0; }
-    int w = x1 - x0, h = y1 - y0;
-    if (w <= 0 || h <= 0) return -1.0;
+    int x1 = x0 + SZ; if (x1 > (int)imgW) { x1 = (int)imgW; x0 = x1-SZ; if (x0<0) x0=0; }
+    int y1 = y0 + SZ; if (y1 > (int)imgH) { y1 = (int)imgH; y0 = y1-SZ; if (y0<0) y0=0; }
 
-    double r = 0.0, g = 0.0, b = 0.0;
+    double tR = 0.0, tG = 0.0, tB = 0.0;
     int count = 0;
-    BOOL usedDirect = NO;
-
-    // Primary path: read directly from the data provider.
-    // CGImageRef stores row 0 at screen TOP (standard image convention).
-    // Direct access: pixel at (col, row) = bytes + row*bpr + col*bpp.
-    // No CGContext → no coordinate-system ambiguity.
-    CFDataRef rawData = CGDataProviderCopyData(CGImageGetDataProvider(img));
-    if (rawData) {
-        size_t bpr = CGImageGetBytesPerRow(img);
-        size_t bpp = CGImageGetBitsPerPixel(img) / 8;
-        if (bpp >= 3) {
-            const uint8_t *bytes = CFDataGetBytePtr(rawData);
-            CGBitmapInfo bi = CGImageGetBitmapInfo(img);
-            // kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst = BGRA
-            // kCGBitmapByteOrder32Big   | kCGImageAlphaPremultipliedFirst = ARGB
-            int rOff, gOff, bOff;
-            if ((bi & kCGBitmapByteOrderMask) == kCGBitmapByteOrder32Little) {
-                rOff = 2; gOff = 1; bOff = 0; // BGRA
-            } else {
-                rOff = 1; gOff = 2; bOff = 3; // ARGB
-            }
-            double tR = 0.0, tG = 0.0, tB = 0.0;
-            for (int row = y0; row < y1; row++) {
-                const uint8_t *rp = bytes + (size_t)row * bpr;
-                for (int col = x0; col < x1; col++) {
-                    const uint8_t *p = rp + (size_t)col * bpp;
-                    tR += p[rOff]; tG += p[gOff]; tB += p[bOff];
-                    count++;
-                }
-            }
-            if (count > 0) {
-                r = tR / (count * 255.0);
-                g = tG / (count * 255.0);
-                b = tB / (count * 255.0);
-                usedDirect = YES;
-            }
+    for (int row = y0; row < y1; row++) {
+        const uint8_t *rp = bytes + (size_t)row * bpr;
+        for (int col = x0; col < x1; col++) {
+            const uint8_t *p = rp + (size_t)col * bpp;
+            tR += p[rOff]; tG += p[gOff]; tB += p[bOff];
+            count++;
         }
-        CFRelease(rawData);
     }
+    if (count == 0) return -1.0;
 
-    // Fallback: CGContext with Y-flip (sequential-access data providers).
-    if (!usedDirect) {
-        uint8_t buf[20*20*4];
-        memset(buf, 0, sizeof(buf));
-        CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
-        CGContextRef ctx = CGBitmapContextCreate(buf, (size_t)w, (size_t)h, 8,
-            (size_t)w * 4, cs, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
-        CGColorSpaceRelease(cs);
-        if (!ctx) return -1.0;
-        CGContextTranslateCTM(ctx, 0, (CGFloat)h);
-        CGContextScaleCTM(ctx, 1.0, -1.0);
-        CGContextSetInterpolationQuality(ctx, kCGInterpolationNone);
-        CGContextDrawImage(ctx, CGRectMake(-(CGFloat)x0, -(CGFloat)y0,
-                                           (CGFloat)imgW, (CGFloat)imgH), img);
-        CGContextRelease(ctx);
-        count = w * h;
-        double tR = 0.0, tG = 0.0, tB = 0.0;
-        for (int i = 0; i < count; i++) {
-            tR += buf[i*4+2]; tG += buf[i*4+1]; tB += buf[i*4+0];
-        }
-        r = tR / (count * 255.0);
-        g = tG / (count * 255.0);
-        b = tB / (count * 255.0);
-    }
+    double r = tR / (count * 255.0);
+    double g = tG / (count * 255.0);
+    double b = tB / (count * 255.0);
 
     if (diagOut)
-        *diagOut = [NSString stringWithFormat:@"%s %zux%zu px=%d py=%d R=%.2f G=%.2f B=%.2f",
-                    usedDirect ? "DIR" : "CTX", imgW, imgH, px, py, r, g, b];
-
-    if (count == 0) return -1.0;
+        *diagOut = [NSString stringWithFormat:@"%zux%zu px=%d py=%d R=%.2f G=%.2f B=%.2f",
+                    imgW, imgH, px, py, r, g, b];
 
     double maxC  = r > g ? (r > b ? r : b) : (g > b ? g : b);
     double minC  = r < g ? (r < b ? r : b) : (g < b ? g : b);
@@ -337,22 +283,57 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
     if (getScreenImage) {
         if (!s_fp2Running) {
             s_fp2Running = YES;
-            // Capture screen on main thread (UIKit API requirement).
-            // We're already on the main thread here (called from NSTimer).
-            // Only the hue computation runs on the background queue.
+
+            // ── ALL image I/O on main thread ──────────────────────────────────
+            // UICreateScreenImage must be called here (UIKit requirement).
+            // CGDataProviderCopyData is also called here immediately after so
+            // the IOSurface lock is held while we're still on the render thread.
             CGImageRef screenImg = getScreenImage();
-            if (!screenImg) {
-                s_fp2Running = NO;
-                return;
+            if (!screenImg) { s_fp2Running = NO; return; }
+
+            size_t imgW = CGImageGetWidth(screenImg);
+            size_t imgH = CGImageGetHeight(screenImg);
+            size_t bpr  = CGImageGetBytesPerRow(screenImg);
+            size_t bpp  = CGImageGetBitsPerPixel(screenImg) / 8;
+            CGBitmapInfo bi = CGImageGetBitmapInfo(screenImg);
+            CFDataRef rawData = CGDataProviderCopyData(CGImageGetDataProvider(screenImg));
+            CGImageRelease(screenImg);
+
+            // Determine channel offsets from bitmapInfo.
+            // Most common on iOS: kCGBitmapByteOrder32Little | PremultFirst = BGRA
+            // memory layout: p[0]=B p[1]=G p[2]=R p[3]=A
+            int rOff = 2, gOff = 1, bOff = 0; // BGRA default
+            if ((bi & kCGBitmapByteOrderMask) != kCGBitmapByteOrder32Little) {
+                rOff = 1; gOff = 2; bOff = 3; // ARGB (big-endian)
             }
+            CGImageAlphaInfo ai = bi & kCGBitmapAlphaInfoMask;
+            if ((bi & kCGBitmapByteOrderMask) == kCGBitmapByteOrder32Little
+                && (ai == kCGImageAlphaPremultipliedLast || ai == kCGImageAlphaNoneSkipLast
+                    || ai == kCGImageAlphaLast)) {
+                // RGBA little-endian: p[0]=R p[1]=G p[2]=B p[3]=A
+                rOff = 0; gOff = 1; bOff = 2;
+            }
+
+            if (shouldLog)
+                vcamPickerDiag([NSString stringWithFormat:
+                    @"[FP2-FMT] %zux%zu bpp=%zu bpr=%zu bi=0x%X %@",
+                    imgW, imgH, bpp, bpr, (unsigned)bi, rawData ? @"GOT" : @"NODATA"]);
+
+            if (!rawData || bpp < 3) { s_fp2Running = NO; return; }
+
             float capturedNx = nx;
             float capturedNy = ny;
             BOOL log = shouldLog;
+
+            // ── Hue math on background queue (CPU only, no I/O) ──────────────
             dispatch_async(s_q, ^{
                 NSString *diag = nil;
-                double hue = vcamSampleCenterCluster(screenImg, capturedNx, capturedNy,
-                                                     log ? &diag : NULL);
-                CGImageRelease(screenImg);
+                const uint8_t *bytes = CFDataGetBytePtr(rawData);
+                double hue = vcamComputeHueFromRaw(bytes, imgW, imgH, bpr, bpp,
+                                                    rOff, gOff, bOff,
+                                                    capturedNx, capturedNy,
+                                                    log ? &diag : NULL);
+                CFRelease(rawData);
                 s_fp2Running = NO;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [g_floatButton setRingHue:hue];
