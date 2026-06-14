@@ -18,34 +18,43 @@ static UIWindow *vcamFindTargetWindow(void) {
     return [[UIApplication sharedApplication] keyWindow];
 }
 
-// Downscales the FULL app window into a 48x86 px bitmap and finds the dominant
-// chromatic hue across all pixels.  Sampling the entire window avoids the
-// status-bar / navigation-bar area which is transparent in the app own view
-// hierarchy and always renders as white in a fixed-position capture.
+// Captures the FULL app window and finds the dominant chromatic hue across the
+// LEFT 25% and RIGHT 25% of screen columns (centre 50% excluded).
 //
-// afterScreenUpdates:NO -- excludes AVCaptureVideoPreviewLayer and other
-// GPU-rendered camera/RTMP layers; we want the app background UI colour only.
+// Two-step approach avoids the CGContextScaleCTM issue:
+// drawViewHierarchyInRect: ignores the current CTM on some iOS versions, so
+// scaling the context before calling it just clips to the top-left corner
+// instead of downscaling.  We instead render at full size (375x667 pt = ~971 KB)
+// then downsample via [UIImage drawInRect:] which DOES respect the context size.
+//
+// Column filter (left 25% + right 25%):
+//   * Excludes the centre where the face/camera-preview oval lives in KYC apps
+//   * The background colour (green, white, etc.) always extends to both edges
+//   * Navigation bar colours at the top are included but typically white ->
+//     achromatic -> filtered by the s/v thresholds anyway
+//
+// afterScreenUpdates:NO -- avoids AVCaptureVideoPreviewLayer GPU content AND
+// avoids capturing the springboard wallpaper that bleeds through during the
+// home-screen transition animation.
 //
 // Returns hue in [0, 1] if a chromatic dominant colour exists, -1.0 otherwise.
 static double vcamSampleFullScreenHue(UIWindow *targetWindow) {
     CGSize sz = [UIScreen mainScreen].bounds.size;
     if (sz.width <= 0 || sz.height <= 0) return -1.0;
 
-    // Fixed small canvas: ~1/8 of a 375x667 screen.
-    // Each output pixel represents ~8 pt of screen area.
-    const int SAMP_W = 48;
-    const int SAMP_H = 86;
-
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(SAMP_W, SAMP_H), YES, 1.0);
-    CGContextRef ctx = UIGraphicsGetCurrentContext();
-    if (!ctx) { UIGraphicsEndImageContext(); return -1.0; }
-
-    // Scale the CTM so the full-size window fits into the canvas.
-    CGContextScaleCTM(ctx, SAMP_W / sz.width, SAMP_H / sz.height);
-
+    // Step 1: render window at full layout size (no CTM trickery).
+    UIGraphicsBeginImageContextWithOptions(sz, YES, 1.0);
     [targetWindow drawViewHierarchyInRect:CGRectMake(0, 0, sz.width, sz.height)
                        afterScreenUpdates:NO];
+    UIImage *fullImg = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    if (!fullImg) return -1.0;
 
+    // Step 2: downscale to a small analysis canvas (~1/8 linear scale).
+    const int SAMP_W = 48;
+    const int SAMP_H = 86;
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(SAMP_W, SAMP_H), YES, 1.0);
+    [fullImg drawInRect:CGRectMake(0, 0, SAMP_W, SAMP_H)];
     UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     if (!img || !img.CGImage) return -1.0;
@@ -58,12 +67,19 @@ static double vcamSampleFullScreenHue(UIWindow *targetWindow) {
     size_t height = CGImageGetHeight(img.CGImage);
     size_t width  = CGImageGetWidth(img.CGImage);
 
+    // Column thresholds for the left-25% and right-25% strips.
+    size_t colLeftEnd  = (size_t)(width * 0.25);   // 0 .. colLeftEnd-1
+    size_t colRightBeg = (size_t)(width * 0.75);   // colRightBeg .. width-1
+
     double binSin[HUE_BINS] = {0};
     double binCos[HUE_BINS] = {0};
     int    binCnt[HUE_BINS] = {0};
 
     for (size_t row = 0; row < height; row++) {
         for (size_t col = 0; col < width; col++) {
+            // Only analyse left-25% and right-25% columns.
+            if (col >= colLeftEnd && col < colRightBeg) continue;
+
             const uint8_t *p = bytes + row * bpr + col * 4;
             // UIGraphicsBeginImageContextWithOptions on ARM: BGRA byte order.
             CGFloat r = p[2] / 255.0;
