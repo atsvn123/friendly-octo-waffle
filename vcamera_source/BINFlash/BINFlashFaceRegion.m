@@ -145,13 +145,20 @@ void BINFlashUpdateFaceFromLandmarks(NSArray *landmarks) {
 }
 
 // ── Vision face detection ─────────────────────────────────────────────────────
-// Atomic busy flag: __sync_bool_compare_and_swap — no header needed, always
-// available in Clang. Bounds memory to exactly one Y-plane copy at any time.
+// Persistent Y-plane buffer: allocated once, grown only when camera resolution
+// increases, never freed between calls. Eliminates per-call malloc/free and
+// prevents heap fragmentation that caused progressive lag under sustained use.
+//
+// Safety: s_visionBusy stays 1 from CAS→dispatch until __sync_lock_release
+// inside the block. Nothing can realloc/overwrite s_visionCopyBuf while the
+// block is in flight, so the captured pointer is always valid during Vision.
+static void   *s_visionCopyBuf  = NULL;
+static size_t  s_visionCopySize = 0;
 static volatile int s_visionBusy = 0;
 
-static void vcamReleaseVisionBuf(void *ctx, const void *addr) {
-    (void)ctx;
-    free((void *)addr);
+// Noop: s_visionCopyBuf is owned by this file, not by the CVPixelBuffer.
+static void vcamVisionBufNoop(void *ctx, const void *addr) {
+    (void)ctx; (void)addr;
 }
 
 void BINFlashScheduleVisionDetection(const void *yBytes,
@@ -162,24 +169,34 @@ void BINFlashScheduleVisionDetection(const void *yBytes,
     // Skip if previous detection still running — prevents queue accumulation.
     if (!__sync_bool_compare_and_swap(&s_visionBusy, 0, 1)) return;
 
-    size_t copySize = yStride * yHeight;
-    void *copy = malloc(copySize);
-    if (!copy) { __sync_lock_release(&s_visionBusy); return; }
-    memcpy(copy, yBytes, copySize);
+    size_t need = yStride * yHeight;
 
+    // Grow the persistent buffer only when needed — never shrink, never free.
+    if (need > s_visionCopySize) {
+        void *nb = realloc(s_visionCopyBuf, need);
+        if (!nb) { __sync_lock_release(&s_visionBusy); return; }
+        s_visionCopyBuf  = nb;
+        s_visionCopySize = need;
+    }
+
+    memcpy(s_visionCopyBuf, yBytes, need);
+
+    // Snapshot the pointer value — safe because busy flag blocks any realloc
+    // until __sync_lock_release fires at the end of the dispatch block.
+    void *bufPtr = s_visionCopyBuf;
     size_t w = yWidth, h = yHeight, stride = yStride;
+
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
         @autoreleasepool {
-            // CVPixelBufferCreateWithBytes: CPU-only buffer (no IOSurface).
-            // vcamReleaseVisionBuf frees `copy` when the buffer is released.
+            // CPU-only CVPixelBuffer wrapping our persistent buffer.
+            // Noop release: we manage bufPtr lifetime, not CVPixelBuffer.
             CVPixelBufferRef visionBuf = NULL;
             CVPixelBufferCreateWithBytes(kCFAllocatorDefault, w, h,
                 kCVPixelFormatType_OneComponent8,
-                copy, stride,
-                vcamReleaseVisionBuf, NULL, NULL, &visionBuf);
+                bufPtr, stride,
+                vcamVisionBufNoop, NULL, NULL, &visionBuf);
 
             if (!visionBuf) {
-                free(copy);
                 __sync_lock_release(&s_visionBusy);
                 return;
             }
@@ -191,9 +208,11 @@ void BINFlashScheduleVisionDetection(const void *yBytes,
                     initWithCVPixelBuffer:visionBuf
                               orientation:kCGImagePropertyOrientationUp
                                   options:@{}];
-            CVPixelBufferRelease(visionBuf);
 
+            // Release visionBuf AFTER performRequests: — VNImageRequestHandler
+            // may hold only a weak reference, so we must keep it alive ourselves.
             [hdlr performRequests:@[req] error:nil];
+            CVPixelBufferRelease(visionBuf);
 
             NSArray *results = req.results;
             if (results.count > 0) {
@@ -214,6 +233,8 @@ void BINFlashScheduleVisionDetection(const void *yBytes,
             [req release];
             [hdlr release];
         }
+        // Release busy flag after autorelease pool drains — ensures all Vision
+        // objects (and their CVPixelBuffer refs) are gone before next call.
         __sync_lock_release(&s_visionBusy);
     });
 }
