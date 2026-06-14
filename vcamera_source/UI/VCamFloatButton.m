@@ -18,6 +18,7 @@ static const CGFloat kInnerR = 15.0;
 
 @implementation VCamFloatButton {
     CAShapeLayer *_donutLayer;
+    CGPoint       _dragStartCenter;   // button center when pan began
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -30,8 +31,16 @@ static const CGFloat kInnerR = 15.0;
 
     [self _buildDonut];
 
-    [self addTarget:self action:@selector(buttonClicked)
-   forControlEvents:UIControlEventTouchUpInside];
+    // Use gesture recognizers instead of UIControl events — more reliable on iOS 15/16.
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc]
+        initWithTarget:self action:@selector(_handlePan:)];
+    [self addGestureRecognizer:pan];
+    [pan release];
+
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
+        initWithTarget:self action:@selector(_handleTap:)];
+    [self addGestureRecognizer:tap];
+    [tap release];
 
     return self;
 }
@@ -69,13 +78,10 @@ static const CGFloat kInnerR = 15.0;
     [_donutLayer release];
 }
 
-// Full circle hit zone: ring + center all register touches (tap/drag works everywhere).
-// The center is visually transparent but functionally interactive.
+// Full-bounds hit zone so every pixel in the frame registers, regardless of whether
+// the pixel is transparent or part of the center hole.
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
-    CGFloat cx = self.bounds.size.width  * 0.5;
-    CGFloat cy = self.bounds.size.height * 0.5;
-    CGFloat d  = sqrt((point.x - cx)*(point.x - cx) + (point.y - cy)*(point.y - cy));
-    return d <= kOuterR + 4.0;
+    return CGRectContainsPoint(self.bounds, point);
 }
 
 // ── Ring color ────────────────────────────────────────────────────────────────
@@ -97,49 +103,46 @@ static const CGFloat kInnerR = 15.0;
 
 // ── Tap ───────────────────────────────────────────────────────────────────────
 - (void)buttonClicked {
-    if (!self.isMoving) {
-        [[VCamBridge sharedInstance] presentation];
-    }
+    [[VCamBridge sharedInstance] presentation];
+}
+
+- (void)_handleTap:(UITapGestureRecognizer *)gr {
+    if (gr.state == UIGestureRecognizerStateRecognized)
+        [self buttonClicked];
 }
 
 // ── Drag ──────────────────────────────────────────────────────────────────────
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    [super touchesBegan:touches withEvent:event];
-    self.isMoving = NO;
-    self.beginPosition = [[touches anyObject] locationInView:self.superview];
-}
+- (void)_handlePan:(UIPanGestureRecognizer *)gr {
+    if (gr.state == UIGestureRecognizerStateBegan) {
+        _dragStartCenter = self.center;
+        self.isMoving = NO;
+    }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-    [super touchesMoved:touches withEvent:event];
+    CGPoint t = [gr translationInView:self.superview];
 
-    CGPoint cur = [[touches anyObject] locationInView:self.superview];
-    float dx = (float)(cur.x - self.beginPosition.x);
-    float dy = (float)(cur.y - self.beginPosition.y);
-
-    if (!self.isMoving && (fabsf(dx) > 2.0f || fabsf(dy) > 2.0f))
+    if (!self.isMoving && (fabsf(t.x) > 2.0f || fabsf(t.y) > 2.0f))
         self.isMoving = YES;
 
     if (self.isMoving) {
         CGFloat screenW = [UIScreen mainScreen].bounds.size.width;
         CGFloat screenH = [UIScreen mainScreen].bounds.size.height;
-        CGFloat half    = self.frame.size.width * 0.5;
+        CGFloat half    = self.frame.size.width  * 0.5;
         CGFloat halfH   = self.frame.size.height * 0.5;
 
-        CGPoint c = self.center;
-        c.x += dx;
-        c.y += dy;
-        if (c.x < half)              c.x = half;
-        if (c.x > screenW - half)    c.x = screenW - half;
-        CGFloat minY = halfH + 20.0;
-        if (c.y < minY)              c.y = minY;
-        if (c.y > screenH - halfH)   c.y = screenH - halfH;
+        CGPoint c;
+        c.x = _dragStartCenter.x + t.x;
+        c.y = _dragStartCenter.y + t.y;
+        if (c.x < half)           c.x = half;
+        if (c.x > screenW - half) c.x = screenW - half;
+        if (c.y < halfH + 20.0)   c.y = halfH + 20.0;
+        if (c.y > screenH - halfH) c.y = screenH - halfH;
         self.center = c;
-        self.beginPosition = cur;
     }
-}
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-    [super touchesEnded:touches withEvent:event];
+    if (gr.state == UIGestureRecognizerStateEnded ||
+        gr.state == UIGestureRecognizerStateCancelled) {
+        self.isMoving = NO;
+    }
 }
 
 @end

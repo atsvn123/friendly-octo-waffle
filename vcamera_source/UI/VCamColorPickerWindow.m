@@ -77,12 +77,10 @@ static double vcamSampleCenterCluster(CGImageRef img, float nx, float ny) {
     CGColorSpaceRelease(cs);
     if (!ctx) return -1.0;
 
-    // Flip Y so the context matches UIKit screen coordinates (Y=0 at top).
-    // After flip: drawing at (0,0) in the adjusted context = top-left of our cluster.
-    CGContextTranslateCTM(ctx, 0, (CGFloat)h);
-    CGContextScaleCTM(ctx, 1.0, -1.0);
-
-    // Draw the full image offset so the cluster region lands at (0,0).
+    // No Y-flip: CGContextDrawImage places image row 0 at rect.origin.y (CG bottom).
+    // Rect at (-x0, -y0) → image row y0 lands at CG y=0 → buf row 0. Correct.
+    // A Y-flip would mirror the sample to row (imgH - y0), causing wrong color on
+    // devices where the content at the mirrored position differs (e.g. iPhone 8 Plus).
     CGContextSetInterpolationQuality(ctx, kCGInterpolationNone);
     CGContextDrawImage(ctx, CGRectMake(-(CGFloat)x0, -(CGFloat)y0,
                                        (CGFloat)imgW, (CGFloat)imgH), img);

@@ -10,8 +10,8 @@
 
 @interface VCamFloatButton : UIButton
 
-@property (nonatomic, assign) BOOL    isMoving;
-@property (nonatomic, assign) CGPoint beginPosition;
+// Set by UIPanGestureRecognizer. Reset to NO on tap/end.
+@property (nonatomic, assign) BOOL isMoving;
 
 // Update ring fill color to match sampled hue [0,1). -1.0 → white (no color).
 - (void)setRingHue:(double)hue;
