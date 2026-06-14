@@ -42,7 +42,11 @@ static void vcamPickerDiag(NSString *msg) {
 // ─────────────────────────────────────────────────────────────────────────────
 #define VCAM_HUE_BINS 12
 
-static double vcamSampleImageHueFull(CGImageRef img, size_t dstW, size_t dstH) {
+// excCenterFrac: fraction of dst half-width to exclude from center as a circle.
+// Pass 0.0 for no exclusion. Used to skip the float button's own pixels when
+// the crop is centered on the button.
+static double vcamSampleImageHueFull(CGImageRef img, size_t dstW, size_t dstH,
+                                      float excCenterFrac) {
     if (!img || !dstW || !dstH) return -1.0;
 
     uint8_t *buf = (uint8_t *)malloc(dstW * dstH * 4);
@@ -63,7 +67,23 @@ static double vcamSampleImageHueFull(CGImageRef img, size_t dstW, size_t dstH) {
     memset(binCnt, 0, sizeof(binCnt));
     int chromatic = 0;
 
+    // Precompute exclusion circle in dst pixel coords.
+    float excR2 = 0.0f;
+    float excCx = 0.0f, excCy = 0.0f;
+    if (excCenterFrac > 0.0f) {
+        excCx = (float)(dstW - 1) * 0.5f;
+        excCy = (float)(dstH - 1) * 0.5f;
+        float excR = excCenterFrac * (float)(dstW < dstH ? dstW : dstH) * 0.5f;
+        excR2 = excR * excR;
+    }
+
     for (size_t i = 0, n = dstW * dstH; i < n; i++) {
+        // Skip pixels inside the exclusion circle (float button + ring halo).
+        if (excR2 > 0.0f) {
+            float dx = (float)(i % dstW) - excCx;
+            float dy = (float)(i / dstW) - excCy;
+            if (dx*dx + dy*dy < excR2) continue;
+        }
         // kCGBitmapByteOrder32Little | AlphaPremultipliedFirst => [B,G,R,A] in memory
         double r = buf[i*4+2] / 255.0;
         double g = buf[i*4+1] / 255.0;
@@ -283,15 +303,38 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
     if (getScreenImage) {
         if (!s_fp2Running) {
             s_fp2Running = YES;
+            // Capture position on main thread — used in background to crop the image.
+            float capturedNx = nx;
+            float capturedNy = ny;
             dispatch_async(s_q, ^{
                 CGImageRef screenImg = getScreenImage();
                 double hue = -1.0;
                 if (screenImg) {
-                    hue = vcamSampleImageHueFull(screenImg, 60, 90);
+                    // Crop a 300×300 px region centered on the float button.
+                    // Sampling the full screen picks up hues from distant UI elements
+                    // and gives wrong results when the area under the button is white.
+                    size_t imgW = CGImageGetWidth(screenImg);
+                    size_t imgH = CGImageGetHeight(screenImg);
+                    CGFloat cropSz = 300.0;
+                    CGFloat cropX = (CGFloat)capturedNx * imgW - cropSz * 0.5;
+                    CGFloat cropY = (CGFloat)capturedNy * imgH - cropSz * 0.5;
+                    if (cropX < 0) cropX = 0;
+                    if (cropY < 0) cropY = 0;
+                    if (cropX + cropSz > imgW) cropX = (CGFloat)imgW - cropSz;
+                    if (cropY + cropSz > imgH) cropY = (CGFloat)imgH - cropSz;
+                    CGImageRef crop = CGImageCreateWithImageInRect(
+                        screenImg, CGRectMake(cropX, cropY, cropSz, cropSz));
                     CGImageRelease(screenImg);
+                    if (crop) {
+                        // excCenterFrac=0.40: button(52pt)+ring(4pt) = 56pt radius
+                        // out of 150pt crop half-width → exclude central 37% radius.
+                        hue = vcamSampleImageHueFull(crop, 20, 20, 0.40f);
+                        CGImageRelease(crop);
+                    }
                 }
                 s_fp2Running = NO;
-                if (hue < 0.0) return;
+                // Always dispatch — hue=-1 hides ring and sets noColor bit in prefs
+                // so BINFlashPixelEffect returns early → flash off on black/white.
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [g_floatButton setRingHue:hue];
                     BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });
