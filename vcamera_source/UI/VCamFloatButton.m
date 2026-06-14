@@ -41,20 +41,27 @@ static const CGFloat kInnerR = 22.0;
     CGFloat cy = self.bounds.size.height * 0.5;
     CGPoint center = CGPointMake(cx, cy);
 
-    // Even-odd donut path: outer circle minus inner circle → ring with transparent hole.
-    UIBezierPath *path = [UIBezierPath bezierPath];
-    [path addArcWithCenter:center radius:kOuterR startAngle:0 endAngle:M_PI*2 clockwise:YES];
-    [path addArcWithCenter:center radius:kInnerR startAngle:0 endAngle:M_PI*2 clockwise:NO];
-    path.usesEvenOddFillRule = YES;
+    // Use stroke-only circle: fillColor=clear so the center is truly transparent.
+    // Ring is centered on arcR with lineWidth on each side:
+    //   arcR = (kOuterR + kInnerR) / 2 = 28.5pt → lineWidth = kOuterR - kInnerR = 13pt
+    CGFloat arcR      = (kOuterR + kInnerR) * 0.5;   // 28.5pt arc center
+    CGFloat ringWidth = kOuterR - kInnerR;             // 13pt ring thickness
+
+    UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:center
+                                                        radius:arcR
+                                                    startAngle:0
+                                                      endAngle:M_PI * 2.0
+                                                     clockwise:YES];
 
     _donutLayer = [[CAShapeLayer alloc] init];
-    _donutLayer.path     = path.CGPath;
-    _donutLayer.fillRule = kCAFillRuleEvenOdd;
-    _donutLayer.fillColor = [[UIColor colorWithWhite:1.0 alpha:0.90] CGColor];
+    _donutLayer.path        = path.CGPath;
+    _donutLayer.fillColor   = [[UIColor clearColor] CGColor];   // center transparent
+    _donutLayer.strokeColor = [[UIColor colorWithWhite:1.0 alpha:0.90] CGColor];
+    _donutLayer.lineWidth   = ringWidth;
 
-    // Subtle shadow so ring is visible on any background.
+    // Shadow follows the stroke so ring is visible on any background.
     _donutLayer.shadowColor   = [[UIColor blackColor] CGColor];
-    _donutLayer.shadowOpacity = 0.35f;
+    _donutLayer.shadowOpacity = 0.40f;
     _donutLayer.shadowOffset  = CGSizeMake(0, 1);
     _donutLayer.shadowRadius  = 4.0;
 
@@ -84,7 +91,7 @@ static const CGFloat kInnerR = 22.0;
     }
     [CATransaction begin];
     [CATransaction setAnimationDuration:0.15];
-    _donutLayer.fillColor = [color CGColor];
+    _donutLayer.strokeColor = [color CGColor];
     [CATransaction commit];
 }
 
