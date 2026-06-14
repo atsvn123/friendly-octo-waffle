@@ -8,6 +8,8 @@
 #import <math.h>
 #import <stdlib.h>
 
+extern void vcamSendDiag(NSString *msg);
+
 #define clamp(x, lo, hi) fmax((lo), fmin((hi), (x)))
 
 // Epoch base — prevents int32 overflow in phase math.
@@ -93,6 +95,17 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
 
     if (CVPixelBufferLockBaseAddress(pixbuf, 0) != kCVReturnSuccess) return;
 
+    // ── Format diagnostic (camera thread, throttled 2s) ───────────────────────
+    {
+        static double s_fmtLogTime = 0;
+        double fmtNow = CFAbsoluteTimeGetCurrent();
+        if (fmtNow - s_fmtLogTime >= 2.0) {
+            s_fmtLogTime = fmtNow;
+            vcamSendDiag([NSString stringWithFormat:@"flash:fmt=%08X %zux%zu",
+                (unsigned int)pixelFormat, width, height]);
+        }
+    }
+
     if ((pixelFormat & 0xFFFFFFEFU) == 0x34323066U) {
         // ── YUV 420 biplanar (420v / 420f) ────────────────────────────
         uint8_t *yPlane  = (uint8_t *)CVPixelBufferGetBaseAddressOfPlane(pixbuf, 0);
@@ -102,12 +115,10 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
 
         // Vision face detection every 9 frames (~3Hz at 30fps).
         // Called while CVPixelBufferLockBaseAddress is held — safe to read yPlane.
-        // Copies Y-plane bytes (CPU memory) then dispatches Vision on a background thread.
-        // Busy flag in BINFlashScheduleVisionDetection prevents queue accumulation.
         static int s_visionThrottle = 0;
         if (++s_visionThrottle >= 9) {
             s_visionThrottle = 0;
-            BINFlashScheduleVisionDetection(yPlane, width, height, yStride);
+            BINFlashScheduleVisionDetection(yPlane, width, height, yStride, 0);
         }
 
         double brightFactor = clamp(brightness * 0.72, 0.0, 0.82);
@@ -175,6 +186,14 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
         }
         uint8_t *base   = (uint8_t *)CVPixelBufferGetBaseAddress(pixbuf);
         size_t   stride = CVPixelBufferGetBytesPerRow(pixbuf);
+
+        // Vision face detection — same throttle as YUV path.
+        // Pass fmt=1 so BINFlashScheduleVisionDetection wraps as BGRA CGImage.
+        static int s_visionThrottleRGB = 0;
+        if (++s_visionThrottleRGB >= 9) {
+            s_visionThrottleRGB = 0;
+            BINFlashScheduleVisionDetection(base, width, height, stride, 1);
+        }
 
         double brightFactor = clamp(brightness * 0.70, 0.0, 0.78);
         double chromaFactor = clamp(brightness * 0.90, 0.0, 0.96);

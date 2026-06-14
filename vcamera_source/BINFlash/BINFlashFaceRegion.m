@@ -156,15 +156,16 @@ static void   *s_visionCopyBuf  = NULL;
 static size_t  s_visionCopySize = 0;
 static volatile int s_visionBusy = 0;
 
-void BINFlashScheduleVisionDetection(const void *yBytes,
-                                      size_t yWidth, size_t yHeight,
-                                      size_t yStride) {
-    if (!yBytes || yWidth == 0 || yHeight == 0) return;
+void BINFlashScheduleVisionDetection(const void *pixels,
+                                      size_t width, size_t height,
+                                      size_t bytesPerRow,
+                                      int fmt) {
+    if (!pixels || width == 0 || height == 0) return;
 
     // Skip if previous detection still running — prevents queue accumulation.
     if (!__sync_bool_compare_and_swap(&s_visionBusy, 0, 1)) return;
 
-    size_t need = yStride * yHeight;
+    size_t need = bytesPerRow * height;
 
     // Grow the persistent buffer only when needed — never shrink, never free.
     if (need > s_visionCopySize) {
@@ -174,33 +175,36 @@ void BINFlashScheduleVisionDetection(const void *yBytes,
         s_visionCopySize = need;
     }
 
-    memcpy(s_visionCopyBuf, yBytes, need);
+    memcpy(s_visionCopyBuf, pixels, need);
 
-    // Snapshot the pointer value — safe because busy flag blocks any realloc
-    // until __sync_lock_release fires at the end of the dispatch block.
+    // Log on camera thread (always works) so we can confirm this function is reached.
+    vcamSendDiag([NSString stringWithFormat:@"vis:sched %zux%zu fmt=%d", width, height, fmt]);
+
     void *bufPtr = s_visionCopyBuf;
-    size_t w = yWidth, h = yHeight, stride = yStride;
+    size_t w = width, h = height, stride = bytesPerRow;
+    int pixFmt = fmt;
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
         @autoreleasepool {
-            // Log once to confirm the dispatch block IS executing.
-            // If this appears but vis:ok/miss do not, Vision itself is broken here.
-            static BOOL s_visionInitLogged = NO;
-            if (!s_visionInitLogged) {
-                s_visionInitLogged = YES;
-                vcamSendDiag([NSString stringWithFormat:@"vis:init %zux%zu", w, h]);
+            // Build CGImage from the CPU copy — supports both gray (fmt=0) and BGRA (fmt=1).
+            CGColorSpaceRef cs;
+            CGBitmapInfo   bi;
+            size_t bpc, bpp;
+            if (pixFmt == 1) {
+                // BGRA: 4 bytes/pixel, DeviceRGB, little-endian 32-bit, skip alpha
+                cs  = CGColorSpaceCreateDeviceRGB();
+                bi  = (CGBitmapInfo)(kCGBitmapByteOrder32Little | kCGImageAlphaNoneSkipFirst);
+                bpc = 8; bpp = 32;
+            } else {
+                // Grayscale Y-plane: 1 byte/pixel
+                cs  = CGColorSpaceCreateDeviceGray();
+                bi  = (CGBitmapInfo)(kCGBitmapByteOrderDefault | kCGImageAlphaNone);
+                bpc = 8; bpp = 8;
             }
-
-            // Build a grayscale CGImage from the Y-plane CPU copy.
-            // CGImage works in mediaserverd; CVPixelBufferCreateWithBytes with
-            // kCVPixelFormatType_OneComponent8 silently returns NULL there.
-            CGColorSpaceRef cs = CGColorSpaceCreateDeviceGray();
             CGDataProviderRef dp = CGDataProviderCreateWithData(
-                NULL, bufPtr, stride * h, NULL /* bufPtr is persistent, no free */);
+                NULL, bufPtr, stride * h, NULL);
             CGImageRef cgImg = CGImageCreate(
-                w, h, 8 /* bitsPerComponent */, 8 /* bitsPerPixel */, stride,
-                cs, (CGBitmapInfo)(kCGBitmapByteOrderDefault | kCGImageAlphaNone),
-                dp, NULL, true, kCGRenderingIntentDefault);
+                w, h, bpc, bpp, stride, cs, bi, dp, NULL, true, kCGRenderingIntentDefault);
             CGColorSpaceRelease(cs);
             CGDataProviderRelease(dp);
 
@@ -217,8 +221,6 @@ void BINFlashScheduleVisionDetection(const void *yBytes,
                     initWithCGImage:cgImg
                          orientation:kCGImagePropertyOrientationUp
                              options:@{}];
-            // Release cgImg AFTER performRequests: — Vision may defer pixel
-            // access to performRequests time.
             [hdlr performRequests:@[req] error:nil];
             CGImageRelease(cgImg);
 
