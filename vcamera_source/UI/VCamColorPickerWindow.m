@@ -40,83 +40,84 @@ static void vcamPickerDiag(NSString *msg) {
 // Renders img into a dstW x dstH buffer and finds the dominant hue
 // across ALL pixels. Returns [0,1) or -1.0 if no chromatic pixels found.
 // ─────────────────────────────────────────────────────────────────────────────
-#define VCAM_HUE_BINS 12
+// Sample the background color directly adjacent to the float button.
+// Crops a 300×300 px region centered on (nx,ny), draws it to a full-res bitmap,
+// then reads 8 pixels in a circle at sampleR px — just outside the ring outer
+// edge (32pt = 64px at 2x). Averages their RGB and returns the hue, or -1 if
+// the area is achromatic (white/black/gray).
+// ─────────────────────────────────────────────────────────────────────────────
+static double vcamSampleButtonBackground(CGImageRef img, float nx, float ny) {
+    size_t imgW = CGImageGetWidth(img);
+    size_t imgH = CGImageGetHeight(img);
+    if (!imgW || !imgH) return -1.0;
 
-// excCenterFrac: fraction of dst half-width to exclude from center as a circle.
-// Pass 0.0 for no exclusion. Used to skip the float button's own pixels when
-// the crop is centered on the button.
-static double vcamSampleImageHueFull(CGImageRef img, size_t dstW, size_t dstH,
-                                      float excCenterFrac) {
-    if (!img || !dstW || !dstH) return -1.0;
+    // Crop 300×300 px centered on button position.
+    const size_t cropSz = 300;
+    CGFloat cropX = (CGFloat)nx * imgW - cropSz * 0.5;
+    CGFloat cropY = (CGFloat)ny * imgH - cropSz * 0.5;
+    if (cropX < 0) cropX = 0;
+    if (cropY < 0) cropY = 0;
+    if (cropX + cropSz > imgW) cropX = (CGFloat)imgW - cropSz;
+    if (cropY + cropSz > imgH) cropY = (CGFloat)imgH - cropSz;
 
-    uint8_t *buf = (uint8_t *)malloc(dstW * dstH * 4);
-    if (!buf) return -1.0;
+    CGImageRef crop = CGImageCreateWithImageInRect(img,
+        CGRectMake(cropX, cropY, (CGFloat)cropSz, (CGFloat)cropSz));
+    if (!crop) return -1.0;
+
+    // Render to full-res BGRA bitmap (300×300 × 4 = 360 KB).
+    uint8_t *buf = (uint8_t *)malloc(cropSz * cropSz * 4);
+    if (!buf) { CGImageRelease(crop); return -1.0; }
 
     CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
-    CGContextRef ctx = CGBitmapContextCreate(buf, dstW, dstH, 8, dstW * 4, cs,
+    CGContextRef ctx = CGBitmapContextCreate(buf, cropSz, cropSz, 8, cropSz * 4, cs,
         kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
     CGColorSpaceRelease(cs);
-    if (!ctx) { free(buf); return -1.0; }
-    CGContextDrawImage(ctx, CGRectMake(0, 0, (CGFloat)dstW, (CGFloat)dstH), img);
+    if (!ctx) { free(buf); CGImageRelease(crop); return -1.0; }
+    CGContextSetInterpolationQuality(ctx, kCGInterpolationNone);
+    CGContextDrawImage(ctx, CGRectMake(0, 0, (CGFloat)cropSz, (CGFloat)cropSz), crop);
     CGContextRelease(ctx);
+    CGImageRelease(crop);
 
-    double binSin[VCAM_HUE_BINS], binCos[VCAM_HUE_BINS];
-    int    binCnt[VCAM_HUE_BINS];
-    memset(binSin, 0, sizeof(binSin));
-    memset(binCos, 0, sizeof(binCos));
-    memset(binCnt, 0, sizeof(binCnt));
-    int chromatic = 0;
+    // Sample 8 pixels evenly around the button at radius 70px from center.
+    // Ring outer edge: arc 30pt + half lineWidth 2pt = 32pt = 64px at 2x.
+    // 70px puts samples 3pt outside the ring with a clean margin.
+    double cx = (cropSz - 1) * 0.5;
+    double cy = (cropSz - 1) * 0.5;
+    const double sampleR = 70.0;
 
-    // Precompute exclusion circle in dst pixel coords.
-    float excR2 = 0.0f;
-    float excCx = 0.0f, excCy = 0.0f;
-    if (excCenterFrac > 0.0f) {
-        excCx = (float)(dstW - 1) * 0.5f;
-        excCy = (float)(dstH - 1) * 0.5f;
-        float excR = excCenterFrac * (float)(dstW < dstH ? dstW : dstH) * 0.5f;
-        excR2 = excR * excR;
-    }
-
-    for (size_t i = 0, n = dstW * dstH; i < n; i++) {
-        // Skip pixels inside the exclusion circle (float button + ring halo).
-        if (excR2 > 0.0f) {
-            float dx = (float)(i % dstW) - excCx;
-            float dy = (float)(i / dstW) - excCy;
-            if (dx*dx + dy*dy < excR2) continue;
-        }
-        // kCGBitmapByteOrder32Little | AlphaPremultipliedFirst => [B,G,R,A] in memory
-        double r = buf[i*4+2] / 255.0;
-        double g = buf[i*4+1] / 255.0;
-        double b = buf[i*4+0] / 255.0;
-        double maxC  = r > g ? (r > b ? r : b) : (g > b ? g : b);
-        double minC  = r < g ? (r < b ? r : b) : (g < b ? g : b);
-        double delta = maxC - minC;
-        // Relaxed thresholds: s>=0.05, v in [0.04, 0.97]
-        if (delta < 0.05 || maxC < 0.04 || minC > 0.97) continue;
-        chromatic++;
-        double h;
-        if      (maxC == r) h = fmod((g - b) / delta, 6.0);
-        else if (maxC == g) h = (b - r) / delta + 2.0;
-        else                h = (r - g) / delta + 4.0;
-        h /= 6.0;
-        if (h < 0.0) h += 1.0;
-        int bin = (int)(h * VCAM_HUE_BINS) % VCAM_HUE_BINS;
-        binSin[bin] += sin(h * 2.0 * M_PI);
-        binCos[bin] += cos(h * 2.0 * M_PI);
-        binCnt[bin]++;
+    double totalR = 0.0, totalG = 0.0, totalB = 0.0;
+    int count = 0;
+    for (int a = 0; a < 8; a++) {
+        double angle = a * M_PI * 0.25;
+        int sx = (int)(cx + sampleR * cos(angle) + 0.5);
+        int sy = (int)(cy + sampleR * sin(angle) + 0.5);
+        if (sx < 0 || sx >= (int)cropSz || sy < 0 || sy >= (int)cropSz) continue;
+        size_t idx = (size_t)sy * cropSz + (size_t)sx;
+        // kCGBitmapByteOrder32Little | AlphaPremultipliedFirst → [B,G,R,A]
+        totalR += buf[idx*4+2] / 255.0;
+        totalG += buf[idx*4+1] / 255.0;
+        totalB += buf[idx*4+0] / 255.0;
+        count++;
     }
     free(buf);
 
-    if (chromatic < 3) return -1.0;
-    int bestBin = -1, bestCnt = 0;
-    for (int i = 0; i < VCAM_HUE_BINS; i++) {
-        if (binCnt[i] > bestCnt) { bestCnt = binCnt[i]; bestBin = i; }
-    }
-    if (bestBin < 0) return -1.0;
-    double ang = atan2(binSin[bestBin] / bestCnt, binCos[bestBin] / bestCnt);
-    if (ang < 0.0) ang += 2.0 * M_PI;
-    double hue = ang / (2.0 * M_PI);
-    return (hue >= 0.0 && hue <= 1.0) ? hue : -1.0;
+    if (count == 0) return -1.0;
+    double r = totalR / count;
+    double g = totalG / count;
+    double b = totalB / count;
+
+    double maxC  = r > g ? (r > b ? r : b) : (g > b ? g : b);
+    double minC  = r < g ? (r < b ? r : b) : (g < b ? g : b);
+    double delta = maxC - minC;
+    if (delta < 0.05 || maxC < 0.04 || minC > 0.97) return -1.0;
+
+    double h;
+    if      (maxC == r) h = fmod((g - b) / delta, 6.0);
+    else if (maxC == g) h = (b - r) / delta + 2.0;
+    else                h = (r - g) / delta + 4.0;
+    h /= 6.0;
+    if (h < 0.0) h += 1.0;
+    return (h >= 0.0 && h <= 1.0) ? h : -1.0;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -310,28 +311,8 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
                 CGImageRef screenImg = getScreenImage();
                 double hue = -1.0;
                 if (screenImg) {
-                    // Crop a 300×300 px region centered on the float button.
-                    // Sampling the full screen picks up hues from distant UI elements
-                    // and gives wrong results when the area under the button is white.
-                    size_t imgW = CGImageGetWidth(screenImg);
-                    size_t imgH = CGImageGetHeight(screenImg);
-                    CGFloat cropSz = 300.0;
-                    CGFloat cropX = (CGFloat)capturedNx * imgW - cropSz * 0.5;
-                    CGFloat cropY = (CGFloat)capturedNy * imgH - cropSz * 0.5;
-                    if (cropX < 0) cropX = 0;
-                    if (cropY < 0) cropY = 0;
-                    if (cropX + cropSz > imgW) cropX = (CGFloat)imgW - cropSz;
-                    if (cropY + cropSz > imgH) cropY = (CGFloat)imgH - cropSz;
-                    CGImageRef crop = CGImageCreateWithImageInRect(
-                        screenImg, CGRectMake(cropX, cropY, cropSz, cropSz));
+                    hue = vcamSampleButtonBackground(screenImg, capturedNx, capturedNy);
                     CGImageRelease(screenImg);
-                    if (crop) {
-                        // Ring outer edge: arc radius 30pt + half lineWidth 2pt = 32pt.
-                        // At 2x: 64px. Crop half-width: 150px. → excCenterFrac=64/150=0.427.
-                        // Add 1px dst buffer for anti-aliasing: 0.43f.
-                        hue = vcamSampleImageHueFull(crop, 20, 20, 0.43f);
-                        CGImageRelease(crop);
-                    }
                 }
                 s_fp2Running = NO;
                 // Always dispatch — hue=-1 hides ring and sets noColor bit in prefs
