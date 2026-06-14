@@ -36,8 +36,8 @@
 #define kBINFlashDefaultAutoColor     NO
 #define kBINFlashDefaultStaticFlash   NO
 
-// Cache TTL for per-frame reads (100ms)
-#define kBINFlashPrefsCacheTTL  0.1
+// Cache TTL for per-frame reads (33ms = 1 frame at 30fps)
+#define kBINFlashPrefsCacheTTL  0.033
 
 // Load prefs (100ms cache). Safe to call at 30fps from mediaserverd.
 NSDictionary *BINFlashLoadPrefs(void);

@@ -326,9 +326,10 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
                         screenImg, CGRectMake(cropX, cropY, cropSz, cropSz));
                     CGImageRelease(screenImg);
                     if (crop) {
-                        // excCenterFrac=0.40: button(52pt)+ring(4pt) = 56pt radius
-                        // out of 150pt crop half-width → exclude central 37% radius.
-                        hue = vcamSampleImageHueFull(crop, 20, 20, 0.40f);
+                        // Ring outer edge: arc radius 30pt + half lineWidth 2pt = 32pt.
+                        // At 2x: 64px. Crop half-width: 150px. → excCenterFrac=64/150=0.427.
+                        // Add 1px dst buffer for anti-aliasing: 0.43f.
+                        hue = vcamSampleImageHueFull(crop, 20, 20, 0.43f);
                         CGImageRelease(crop);
                     }
                 }
