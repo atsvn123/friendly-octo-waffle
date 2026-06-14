@@ -381,7 +381,7 @@ static UIColor *BorderColor(void) {
 
     // Version label (visible through transparent handleView above it)
     _versionLabel = [[UILabel alloc] initWithFrame:CGRectMake(pad, y, cw, 15)];
-    _versionLabel.text = @"v2.116-VCAM";
+    _versionLabel.text = @"v2.117-VCAM";
     _versionLabel.font = [UIFont systemFontOfSize:11.0];
     _versionLabel.textColor = [UIColor lightGrayColor];
     _versionLabel.textAlignment = NSTextAlignmentCenter;
@@ -416,8 +416,8 @@ static UIColor *BorderColor(void) {
     [_contentView addSubview:_rtmpField];
     y += 48.0;
 
-    // LIVE section
-    UIView *liveSec = [self sectionBox:CGRectMake(pad, y, cw, 72)];
+    // LIVE section (includes rotation control)
+    UIView *liveSec = [self sectionBox:CGRectMake(pad, y, cw, 128)];
     [_contentView addSubview:liveSec];
 
     UILabel *liveDot = [self dotLabel:@"LIVE" dotColor:[UIColor systemGreenColor]];
@@ -437,13 +437,49 @@ static UIColor *BorderColor(void) {
     [liveSec addSubview:_liveSwitch];
     [_liveSwitch release];
 
-    _liveStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake(12, 40, cw - 24, 20)];
+    _liveStatusLabel = [[UILabel alloc] initWithFrame:CGRectMake(12, 40, cw - 24, 18)];
     _liveStatusLabel.font = [UIFont systemFontOfSize:11.5];
     _liveStatusLabel.textColor = [UIColor grayColor];
     [liveSec addSubview:_liveStatusLabel];
     [_liveStatusLabel release];
 
-    y += 80.0;
+    // Hairline separator
+    UIView *liveSep = [[UIView alloc] initWithFrame:CGRectMake(12, 62, cw - 24, 0.5)];
+    liveSep.backgroundColor = BorderColor();
+    [liveSec addSubview:liveSep];
+    [liveSep release];
+
+    // "Xoay RTMP" label + rotation segmented control — enabled only when LIVE is on
+    UILabel *rotInLive = [[UILabel alloc] initWithFrame:CGRectMake(12, 66, 90, 16)];
+    rotInLive.text = @"Xoay RTMP";
+    rotInLive.font = [UIFont systemFontOfSize:10.5 weight:UIFontWeightMedium];
+    rotInLive.textColor = [UIColor lightGrayColor];
+    [liveSec addSubview:rotInLive];
+    [rotInLive release];
+
+    NSInteger savedRotIdx = [[NSUserDefaults standardUserDefaults]
+                              integerForKey:@"vcam.rtmp.rotation.idx"];
+    if (savedRotIdx < 0 || savedRotIdx > 4) savedRotIdx = 0;
+
+    _rotationSeg = [[UISegmentedControl alloc]
+                    initWithItems:@[@"Auto", @"0°", @"90°", @"180°", @"270°"]];
+    _rotationSeg.frame = CGRectMake(8, 86, cw - 16, 32);
+    _rotationSeg.selectedSegmentIndex = savedRotIdx;
+    _rotationSeg.enabled = isLiveOn;
+    _rotationSeg.alpha = isLiveOn ? 1.0 : 0.4;
+    _rotationSeg.tintColor = AccentColor();
+    if (@available(iOS 13.0, *)) {
+        _rotationSeg.selectedSegmentTintColor = AccentColor();
+        [_rotationSeg setTitleTextAttributes:@{NSForegroundColorAttributeName: [UIColor darkGrayColor]}
+                                    forState:UIControlStateNormal];
+        [_rotationSeg setTitleTextAttributes:@{NSForegroundColorAttributeName: [UIColor whiteColor]}
+                                    forState:UIControlStateSelected];
+    }
+    [_rotationSeg addTarget:self action:@selector(rotationSegChanged:)
+           forControlEvents:UIControlEventValueChanged];
+    [liveSec addSubview:_rotationSeg];
+
+    y += 136.0;
 
     if (isLiveOn) {
         _rtmpField.text = [NSString stringWithFormat:@"rtmp://%@:1935/live", [self deviceWifiIP]];
@@ -500,39 +536,6 @@ static UIColor *BorderColor(void) {
 
     y += 58.0;   // opacity row + gap
 
-    // ── RTMP rotation selector ──────────────────────────────────────────────────
-    UILabel *rotLbl = [[UILabel alloc] initWithFrame:CGRectMake(pad, y, cw, 18)];
-    rotLbl.text = @"Xoay RTMP";
-    rotLbl.font = [UIFont systemFontOfSize:10.5 weight:UIFontWeightMedium];
-    rotLbl.textColor = [UIColor lightGrayColor];
-    [_contentView addSubview:rotLbl];
-    [rotLbl release];
-    y += 20.0;
-
-    NSInteger savedRotIdx = [[NSUserDefaults standardUserDefaults]
-                              integerForKey:@"vcam.rtmp.rotation.idx"];
-    if (savedRotIdx < 0 || savedRotIdx > 4) savedRotIdx = 0;
-
-    _rotationSeg = [[UISegmentedControl alloc]
-                    initWithItems:@[@"Auto", @"0°", @"90°", @"180°", @"270°"]];
-    _rotationSeg.frame = CGRectMake(pad, y, cw, 32);
-    _rotationSeg.selectedSegmentIndex = savedRotIdx;
-    _rotationSeg.tintColor = AccentColor();
-    if (@available(iOS 13.0, *)) {
-        _rotationSeg.selectedSegmentTintColor = AccentColor();
-        UIColor *fgNormal   = [UIColor darkGrayColor];
-        UIColor *fgSelected = [UIColor whiteColor];
-        [_rotationSeg setTitleTextAttributes:@{NSForegroundColorAttributeName: fgNormal}
-                                    forState:UIControlStateNormal];
-        [_rotationSeg setTitleTextAttributes:@{NSForegroundColorAttributeName: fgSelected}
-                                    forState:UIControlStateSelected];
-    }
-    [_rotationSeg addTarget:self action:@selector(rotationSegChanged:)
-           forControlEvents:UIControlEventValueChanged];
-    [_contentView addSubview:_rotationSeg];
-
-    y += 40.0;
-
     // ── DEBUG section header (collapsible) ──────────────────────────────────────
     _debugHeaderView = [[UIView alloc] initWithFrame:CGRectMake(pad, y, cw, 44)];
     _debugHeaderView.backgroundColor = SectionBg();
@@ -576,6 +579,8 @@ static UIColor *BorderColor(void) {
     _debugTextView.editable = NO;
     _debugTextView.selectable = NO;
     _debugTextView.scrollEnabled = YES;
+    _debugTextView.showsVerticalScrollIndicator = YES;
+    _debugTextView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
     _debugTextView.text = @"(waiting for data…)";
     [_debugPanel addSubview:_debugTextView];
 
@@ -766,8 +771,7 @@ static UIColor *BorderColor(void) {
 - (void)liveToggled:(UISwitch *)sw {
     int32_t code = sw.on ? 1000 : 1001;
     if (sw.on && _rotationSeg) {
-        // Resend current rotation before enabling LIVE so mediaserverd
-        // has the right setting even after it was restarted.
+        // Resend current rotation before enabling LIVE.
         static const int32_t kAngles[] = {-1, 0, 90, 180, 270};
         NSInteger idx = _rotationSeg.selectedSegmentIndex;
         if (idx >= 0 && idx <= 4) {
@@ -777,6 +781,11 @@ static UIColor *BorderColor(void) {
     }
     [[VCamBridge sharedInstance] send:[self packetCode:code]];
     BINFlashSavePrefs(@{ kBINFlashKeyLive: @(sw.on) });
+    // Enable rotation control only while LIVE is on.
+    if (_rotationSeg) {
+        _rotationSeg.enabled = sw.on;
+        _rotationSeg.alpha   = sw.on ? 1.0 : 0.4;
+    }
     if (sw.on) {
         NSString *ip = [self deviceWifiIP];
         _rtmpField.text = [NSString stringWithFormat:@"rtmp://%@:1935/live", ip];

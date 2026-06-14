@@ -438,14 +438,15 @@ void vcamSendDiag(NSString *msg) {
 }
 
 // ─── -stop (0x8B3C0) ──────────────────────────────────────────────────────────
-// v2.110: calls stopDecoding (pause delivery) instead of stopServer (destroy everything).
-// TCPServer and handleRTMP thread remain alive — OBS stays connected across LIVE toggle.
+// Called at the start of code 1000 (LIVE ON) to reset delivery state before
+// startServerLoop. stopDecoding is safe here because code 1001 (LIVE OFF) already
+// called stopServer async — by the time code 1000 arrives, the server may be mid-teardown
+// but stopDecoding on an already-stopped server is a no-op.
 - (void)stop {
     vcamSendDiag(@"vcam:stop");
     self->_beginTimeYUV = 0.0;
     if ([self server]) {
         [[self server] stopDecoding];
-        // Keep server object and thread — do NOT nil server or cancel thread.
     }
 }
 
@@ -491,11 +492,17 @@ void vcamSendDiag(NSString *msg) {
         }
         else if (code == 1001) {
             [buffer replaceBytesInRange:NSMakeRange(0, 4) withBytes:NULL length:0];
-            // Pause delivery but keep server + thread alive (OBS connection stays up).
-            [[VCamLiveManager sharedInstance] setLiveUserIntent:NO];  // IPC intent tracking
-            if ([self server]) [[self server] stopDecoding];
-            vcamSendDiag(@"LIVE->NO[1001]");
+            [[VCamLiveManager sharedInstance] setLiveUserIntent:NO];
             [[VCamLiveManager sharedInstance] setLive:NO];
+            vcamSendDiag(@"LIVE->NO[1001]");
+            // Full server stop: release port 1935 and drop OBS connection.
+            // Dispatched async because stopServer blocks for ~1s (thread join sleep).
+            RTMPServer *srv = [self server];
+            if (srv) {
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    [srv stopServer];
+                });
+            }
         }
         else if (code == 1002) {
             // Confirmed 0x89A8C: setThinFacePercent (NOT dermabrasion)

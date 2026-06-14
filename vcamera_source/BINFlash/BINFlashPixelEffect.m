@@ -100,6 +100,16 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
         size_t   yStride = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, 0);
         size_t  uvStride = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, 1);
 
+        // Vision face detection every 9 frames (~3Hz at 30fps).
+        // Called while CVPixelBufferLockBaseAddress is held — safe to read yPlane.
+        // Copies Y-plane bytes (CPU memory) then dispatches Vision on a background thread.
+        // Busy flag in BINFlashScheduleVisionDetection prevents queue accumulation.
+        static int s_visionThrottle = 0;
+        if (++s_visionThrottle >= 9) {
+            s_visionThrottle = 0;
+            BINFlashScheduleVisionDetection(yPlane, width, height, yStride);
+        }
+
         double brightFactor = clamp(brightness * 0.72, 0.0, 0.82);
 
         size_t yMinX = (size_t)fmax(0.0, cx - rx - 1.0);
