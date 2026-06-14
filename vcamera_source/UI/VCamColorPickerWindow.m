@@ -282,9 +282,12 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
     // -2.0 → no entitlement; falls through on A10/iOS 15
 
     // ── Fast path 2: UICreateScreenImage (iOS 15+ rename of UIGetScreenImage) ──
-    // GPU compositor readback (~30-50ms). Runs on a background serial queue so it
-    // never blocks SpringBoard's main thread. No caching — ring only updates when a
-    // fresh valid hue arrives. One capture at a time (s_fp2Running gate).
+    // CGDataProviderCopyData copies 8-22MB on the main thread (~60ms per call).
+    // Rate-limit to once per 2s to keep SpringBoard's main thread free.
+    static CFAbsoluteTime s_fp2LastTime = 0.0;
+    CFAbsoluteTime fp2Now = CFAbsoluteTimeGetCurrent();
+    if (fp2Now - s_fp2LastTime < 2.0) return;
+    s_fp2LastTime = fp2Now;
     static dispatch_queue_t s_q          = NULL;
     static volatile BOOL    s_fp2Running = NO;
     static dispatch_once_t  s_qOnce      = 0;
