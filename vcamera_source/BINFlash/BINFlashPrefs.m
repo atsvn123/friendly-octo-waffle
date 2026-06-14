@@ -102,7 +102,10 @@ NSDictionary *BINFlashLoadPrefs(void) {
         }
     }
 
-    s_cachedPrefs    = [result copy];
+    NSDictionary *fresh = [result copy];
+    [result release];           // release the working mutableCopy (MRC)
+    [s_cachedPrefs release];    // release the old cached value before overwriting (MRC)
+    s_cachedPrefs    = fresh;
     s_cacheTimestamp = now;
     return s_cachedPrefs;
 }

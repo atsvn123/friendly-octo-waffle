@@ -208,11 +208,12 @@ void vcamUpdateFloatButton(void) {
     if (hidden) return;
 
     NSDictionary *fp      = BINFlashLoadPrefs();
+    BOOL flashOn          = BINFlashBoolForKey(fp, kBINFlashKeyFlash,     kBINFlashDefaultFlash);
     BOOL autoColor        = BINFlashBoolForKey(fp, kBINFlashKeyAutoColor, kBINFlashDefaultAutoColor);
     BOOL menuPresent      = [[VCamBridge sharedInstance] isPresent];
 
-    if (!autoColor) {
-        // Auto color off — hide ring in case it was showing
+    if (!flashOn || !autoColor) {
+        // Flash off or auto color off — hide ring
         [g_floatButton setRingHue:-1.0];
         return;
     }

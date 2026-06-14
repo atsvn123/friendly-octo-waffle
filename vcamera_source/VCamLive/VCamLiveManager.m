@@ -365,6 +365,18 @@ extern void vcamSendDiag(NSString *msg);
     [_dictionary setObject:[NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]]
                     forKey:key];
 
+    // Prevent unbounded growth: pts is always unique per camera frame, so dedup hits
+    // (and their built-in cleanup) never fire. Purge stale entries whenever we exceed
+    // a reasonable cap (>20 entries = >650ms of frames at 30fps).
+    if ([_dictionary count] > 20) {
+        NSTimeInterval cleanNow = [[NSDate date] timeIntervalSince1970];
+        NSMutableArray *stale = [NSMutableArray arrayWithCapacity:8];
+        for (NSNumber *k in _dictionary) {
+            if (cleanNow - [[_dictionary objectForKey:k] doubleValue] >= 0.2) [stale addObject:k];
+        }
+        for (id k in stale) [_dictionary removeObjectForKey:k];
+    }
+
     // Read source buffer from _liveYUVSampleBuffer (IDA-confirmed).
     CVImageBufferRef srcBuffer = CMSampleBufferGetImageBuffer(_liveYUVSampleBuffer);
     if (!srcBuffer) {
