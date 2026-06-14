@@ -21,8 +21,9 @@ void BINFlashComputeFaceRegion(NSDictionary *prefs,
 void BINFlashUpdateFaceFromLandmarks(NSArray *landmarks);
 
 // Called from BINFlashApplyToPixelBuffer every 9 frames.
-// fmt=0: grayscale Y-plane (YUV frames), bytesPerRow = Y stride.
+// fmt=0: grayscale Y-plane (YUV 420 biplanar), bytesPerRow = Y stride.
 // fmt=1: BGRA packed pixels, bytesPerRow = full BGRA stride (4 bytes/px).
+// fmt=2: YUYV packed 4:2:2, bytesPerRow = 2*width; Y extracted internally.
 // Copies pixels synchronously (while CVPixelBufferLock is held),
 // then dispatches Vision face detection async on a background thread.
 // Atomic busy flag prevents queue accumulation.

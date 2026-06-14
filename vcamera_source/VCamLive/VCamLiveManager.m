@@ -21,6 +21,11 @@
 // Cross-process diagnostic — defined in VCamBridge.m
 extern void vcamSendDiag(NSString *msg);
 
+// Effective rotation applied to the RTMP frame for the current/last modifyImageBuffer: call.
+// 0 = no rotation (or same-orientation auto-branch), 90/180/270 = degrees CW.
+// Read by BINFlashFaceRegion to adjust face ellipse and clear stale position on change.
+int g_effectiveRTMPRotation = 0;
+
 // ─────────────────────────────────────────────────────────────────────────────
 @implementation VCamLiveManager {
     // IDA-confirmed: single NSRecursiveLock that serializes ALL frame operations.
@@ -398,15 +403,19 @@ extern void vcamSendDiag(NSString *msg);
     if (rot == 0) {
         // User selected "no rotation" — inject RTMP landscape as-is.
         transferSrc = srcBuffer;
+        g_effectiveRTMPRotation = 0;
     } else if (rot > 0) {
         // User selected explicit angle — use the pre-rotated buffer.
         transferSrc = (CVImageBufferRef)_pixelYUVBuffer90;
+        g_effectiveRTMPRotation = rot;  // 90, 180, or 270
     } else {
         // Auto (IDA-confirmed 0x92080): same orientation → srcBuffer, different → 90° buffer.
         if ((srcW > srcH) == (dstW > dstH)) {
             transferSrc = srcBuffer;
+            g_effectiveRTMPRotation = 0;
         } else {
             transferSrc = (CVImageBufferRef)_pixelYUVBuffer90;
+            g_effectiveRTMPRotation = 90;
         }
     }
 

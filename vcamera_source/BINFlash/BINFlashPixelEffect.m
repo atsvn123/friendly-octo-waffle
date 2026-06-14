@@ -92,6 +92,9 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
     double hue = BINFlashDoubleForKey(prefs, kBINFlashKeyHue, kBINFlashDefaultHue);
     double hR, hG, hB;
     HueToRGB(hue, &hR, &hG, &hB);
+    double hR_adj = hR * 0.82 + 0.18;
+    double hG_adj = hG * 0.82 + 0.18;
+    double hB_adj = hB * 0.82 + 0.18;
 
     if (CVPixelBufferLockBaseAddress(pixbuf, 0) != kCVReturnSuccess) return;
 
@@ -138,17 +141,15 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
                 double t_fade = clamp((d2 - 0.30) / 0.88, 0.0, 1.0);
                 double inv    = 1.0 - t_fade;
                 double weight = inv * inv * (3.0 - 2.0 * inv);
-                // 3D depth: centre full brightness, edges ~55%
-                double depth  = clamp(1.0 - d2 * 0.45, 0.20, 1.0);
-                double alpha  = brightFactor * weight * depth;
+                double alpha  = brightFactor * weight;
 
                 uint8_t *yp = yPlane + py * yStride + px;
                 *yp = (uint8_t)clamp(alpha * (255.0 - *yp) + *yp, 0.0, 255.0);
             }
         }
 
-        double targetCb     = (-0.168736*hR - 0.331264*hG + 0.5*hB)      * 255.0 + 128.0;
-        double targetCr     = ( 0.5*hR      - 0.418688*hG - 0.081312*hB) * 255.0 + 128.0;
+        double targetCb     = (-0.168736*hR_adj - 0.331264*hG_adj + 0.5*hB_adj)      * 255.0 + 128.0;
+        double targetCr     = ( 0.5*hR_adj      - 0.418688*hG_adj - 0.081312*hB_adj) * 255.0 + 128.0;
         double chromaFactor = clamp(brightness * 1.02, 0.0, 0.98);
 
         size_t uvH = height / 2, uvW = width / 2;
@@ -167,12 +168,62 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
                 double t_fade = clamp((d2 - 0.30) / 0.88, 0.0, 1.0);
                 double inv    = 1.0 - t_fade;
                 double weight = inv * inv * (3.0 - 2.0 * inv);
-                double depth  = clamp(1.0 - d2 * 0.45, 0.20, 1.0);
-                double alpha  = chromaFactor * weight * depth;
+                double alpha  = chromaFactor * weight;
 
                 uint8_t *uvp = uvPlane + vy * uvStride + vx * 2;
                 uvp[0] = (uint8_t)clamp(alpha * (targetCb - uvp[0]) + uvp[0], 0.0, 255.0);
                 uvp[1] = (uint8_t)clamp(alpha * (targetCr - uvp[1]) + uvp[1], 0.0, 255.0);
+            }
+        }
+    } else if (pixelFormat == 0x79757673U || pixelFormat == 0x79757373U) {
+        // ── Packed 4:2:2 YUV, 2 bytes/pixel ────────────────────────────
+        // 0x79757673 = 'yuvs' = kCVPixelFormatType_422YpCbCr8_yuvs
+        // 0x79757373 = 'yuss' = device-specific variant on iOS 15 / iPhone 7 VIDEO mode
+        // Both share the same byte layout: [Y0][Cb][Y1][Cr] per 4-byte group (2 pixels).
+        // Y byte for pixel px: row[px*2].  Stride = 2*width.
+        uint8_t *base   = (uint8_t *)CVPixelBufferGetBaseAddress(pixbuf);
+        size_t   stride = CVPixelBufferGetBytesPerRow(pixbuf);
+
+        static int s_visionThrottleYUYV = 0;
+        if (++s_visionThrottleYUYV >= 9) {
+            s_visionThrottleYUYV = 0;
+            BINFlashScheduleVisionDetection(base, width, height, stride, 2);
+        }
+
+        double brightFactor = clamp(brightness * 0.72, 0.0, 0.82);
+        double targetCb     = (-0.168736*hR_adj - 0.331264*hG_adj + 0.5*hB_adj)      * 255.0 + 128.0;
+        double targetCr     = ( 0.5*hR_adj      - 0.418688*hG_adj - 0.081312*hB_adj) * 255.0 + 128.0;
+        double chromaFactor = clamp(brightness * 1.02, 0.0, 0.98);
+
+        size_t yMinX = (size_t)fmax(0.0, cx - rx - 1.0);
+        size_t yMaxX = (size_t)fmin((double)(width  - 1), cx + rx + 1.0);
+        size_t yMinY = (size_t)fmax(0.0, cy - ry - 1.0);
+        size_t yMaxY = (size_t)fmin((double)(height - 1), cy + ry + 1.0);
+
+        for (size_t py = yMinY; py <= yMaxY; py++) {
+            uint8_t *row = base + py * stride;
+            for (size_t px = yMinX; px <= yMaxX; px++) {
+                double dx = ((double)px + 0.5 - cx) / rx;
+                double dy = ((double)py + 0.5 - cy) / ry;
+                double d2 = dx*dx + dy*dy;
+                if (d2 > 1.18) continue;
+
+                double t_fade = clamp((d2 - 0.30) / 0.88, 0.0, 1.0);
+                double inv    = 1.0 - t_fade;
+                double weight = inv * inv * (3.0 - 2.0 * inv);
+
+                // Y: each pixel has its own Y byte at px*2
+                double alpha = brightFactor * weight;
+                uint8_t *yp  = row + px * 2;
+                *yp = (uint8_t)clamp(alpha * (255.0 - *yp) + *yp, 0.0, 255.0);
+
+                // Cb/Cr bytes are shared by the pair (px & ~1, px|1).
+                // Apply once at the even pixel of the pair.
+                if ((px & 1) == 0) {
+                    double ca = chromaFactor * weight;
+                    row[px * 2 + 1] = (uint8_t)clamp(ca * (targetCb - row[px * 2 + 1]) + row[px * 2 + 1], 0.0, 255.0);
+                    row[px * 2 + 3] = (uint8_t)clamp(ca * (targetCr - row[px * 2 + 3]) + row[px * 2 + 3], 0.0, 255.0);
+                }
             }
         }
     } else {
@@ -187,8 +238,19 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
         uint8_t *base   = (uint8_t *)CVPixelBufferGetBaseAddress(pixbuf);
         size_t   stride = CVPixelBufferGetBytesPerRow(pixbuf);
 
-        // Vision face detection — same throttle as YUV path.
-        // Pass fmt=1 so BINFlashScheduleVisionDetection wraps as BGRA CGImage.
+        // Safety: if stride < width*4 this is not a 32bpp format (unrecognized packed YUV).
+        // Schedule Vision with YUYV Y-extraction (fmt=2) and skip the 32bpp pixel loop.
+        if (stride < width * 4) {
+            static int s_visionThrottleUnk = 0;
+            if (++s_visionThrottleUnk >= 9) {
+                s_visionThrottleUnk = 0;
+                BINFlashScheduleVisionDetection(base, width, height, stride, 2);
+            }
+            CVPixelBufferUnlockBaseAddress(pixbuf, 0);
+            return;
+        }
+
+        // Vision face detection — BGRA/ARGB/RGBA 32bpp.
         static int s_visionThrottleRGB = 0;
         if (++s_visionThrottleRGB >= 9) {
             s_visionThrottleRGB = 0;
@@ -197,7 +259,7 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
 
         double brightFactor = clamp(brightness * 0.70, 0.0, 0.78);
         double chromaFactor = clamp(brightness * 0.90, 0.0, 0.96);
-        double hR255 = hR * 255.0, hG255 = hG * 255.0, hB255 = hB * 255.0;
+        double hR255 = hR_adj * 255.0, hG255 = hG_adj * 255.0, hB255 = hB_adj * 255.0;
 
         size_t bMinX = (size_t)fmax(0.0, cx - rx - 1.0);
         size_t bMaxX = (size_t)fmin((double)(width  - 1), cx + rx + 1.0);
@@ -214,17 +276,16 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
                 double t_fade = clamp((d2 - 0.30) / 0.88, 0.0, 1.0);
                 double inv    = 1.0 - t_fade;
                 double weight = inv * inv * (3.0 - 2.0 * inv);
-                double depth  = clamp(1.0 - d2 * 0.45, 0.20, 1.0);
 
                 uint8_t *pixel = base + py * stride + px * 4;
                 double r = pixel[rOff], g = pixel[gOff], b = pixel[bOff];
 
-                double ba = brightFactor * weight * depth;
+                double ba = brightFactor * weight;
                 r = ba * (255.0 - r) + r;
                 g = ba * (255.0 - g) + g;
                 b = ba * (255.0 - b) + b;
 
-                double ca = chromaFactor * weight * depth;
+                double ca = chromaFactor * weight;
                 r = hR255 * ca + (1.0 - ca) * r;
                 g = hG255 * ca + (1.0 - ca) * g;
                 b = hB255 * ca + (1.0 - ca) * b;

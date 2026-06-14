@@ -12,6 +12,7 @@
 #import <string.h>
 
 extern void vcamSendDiag(NSString *msg);
+extern int  g_effectiveRTMPRotation;
 
 double g_faceCX           = 0.5;
 double g_faceCY           = 0.50;   // true frame centre (RTMP face is centred in stream)
@@ -28,6 +29,15 @@ void BINFlashComputeFaceRegion(NSDictionary *prefs,
                                 double *outCX, double *outCY,
                                 double *outRX, double *outRY)
 {
+    // When RTMP rotation changes, discard the stale sticky face position so the
+    // next detection populates fresh coordinates for the new buffer orientation.
+    static int s_lastEffectiveRotation = -1;
+    int effRot = g_effectiveRTMPRotation;
+    if (effRot != s_lastEffectiveRotation) {
+        s_lastEffectiveRotation = effRot;
+        g_faceEverDetected = NO;
+    }
+
     BOOL manualRegion = BINFlashBoolForKey(prefs, kBINFlashKeyManualRegion, kBINFlashDefaultManualRegion);
     double region     = BINFlashDoubleForKey(prefs, kBINFlashKeyRegion, kBINFlashDefaultRegion);
 
@@ -52,12 +62,19 @@ void BINFlashComputeFaceRegion(NSDictionary *prefs,
     double minDim = (double)fmax(fmin((double)imgWidth, (double)imgHeight), 1.0);
 
     // Base radii for fallback (no face detection yet).
-    // RTMP face is always upright in the buffer regardless of landscape/portrait:
-    // rx = horizontal radius (face width, smaller), ry = vertical radius (face height, larger).
+    // For upright faces (rotation 0/180): rx < ry (face is taller than wide).
+    // For sideways faces (rotation 90/270): rx > ry (portrait face lies on its side →
+    // its height becomes the buffer width dimension, so rx should be the larger value).
     double smallerBase = minDim * (r * 0.25 + 0.15);
     double largerBase  = minDim * (r * 0.36 + 0.24);
-    double baseForRX = smallerBase;
-    double baseForRY = largerBase;
+    double baseForRX, baseForRY;
+    if (effRot == 90 || effRot == 270) {
+        baseForRX = largerBase;   // face is lying sideways — wider than tall in buffer
+        baseForRY = smallerBase;
+    } else {
+        baseForRX = smallerBase;  // face upright — narrower than tall
+        baseForRY = largerBase;
+    }
 
     double rx_computed = baseForRX;
     double ry_computed = baseForRY;
@@ -145,6 +162,9 @@ void BINFlashUpdateFaceFromLandmarks(NSArray *landmarks) {
 }
 
 // ── Vision face detection ─────────────────────────────────────────────────────
+static void vcamFreeYBuf(void *info, const void *data, size_t size) {
+    free((void *)data);
+}
 // Persistent Y-plane buffer: allocated once, grown only when camera resolution
 // increases, never freed between calls. Eliminates per-call malloc/free and
 // prevents heap fragmentation that caused progressive lag under sustained use.
@@ -186,27 +206,58 @@ void BINFlashScheduleVisionDetection(const void *pixels,
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
         @autoreleasepool {
-            // Build CGImage from the CPU copy — supports both gray (fmt=0) and BGRA (fmt=1).
-            CGColorSpaceRef cs;
-            CGBitmapInfo   bi;
-            size_t bpc, bpp;
-            if (pixFmt == 1) {
-                // BGRA: 4 bytes/pixel, DeviceRGB, little-endian 32-bit, skip alpha
-                cs  = CGColorSpaceCreateDeviceRGB();
-                bi  = (CGBitmapInfo)(kCGBitmapByteOrder32Little | kCGImageAlphaNoneSkipFirst);
-                bpc = 8; bpp = 32;
+            // Build CGImage from the CPU copy.
+            // fmt=0: grayscale Y-plane; fmt=1: BGRA; fmt=2: YUYV (extract Y).
+            CGImageRef cgImg = NULL;
+
+            if (pixFmt == 2) {
+                // YUYV 4:2:2 packed: Y bytes are at even offsets in each row.
+                // Extract them into a packed grayscale buffer for Vision.
+                size_t ySize = w * h;
+                uint8_t *yBuf = (uint8_t *)malloc(ySize);
+                if (!yBuf) {
+                    vcamSendDiag(@"vis:no-ymem");
+                    __sync_lock_release(&s_visionBusy);
+                    return;
+                }
+                for (size_t row = 0; row < h; row++) {
+                    const uint8_t *src = (const uint8_t *)bufPtr + row * stride;
+                    uint8_t *dst = yBuf + row * w;
+                    for (size_t col = 0; col < w; col++) {
+                        dst[col] = src[col * 2];
+                    }
+                }
+                CGColorSpaceRef cs = CGColorSpaceCreateDeviceGray();
+                // vcamFreeYBuf is called when CGImage releases the provider.
+                CGDataProviderRef dp = CGDataProviderCreateWithData(
+                    NULL, yBuf, ySize, vcamFreeYBuf);
+                cgImg = CGImageCreate(w, h, 8, 8, w, cs,
+                    (CGBitmapInfo)(kCGBitmapByteOrderDefault | kCGImageAlphaNone),
+                    dp, NULL, true, kCGRenderingIntentDefault);
+                CGColorSpaceRelease(cs);
+                CGDataProviderRelease(dp);
             } else {
-                // Grayscale Y-plane: 1 byte/pixel
-                cs  = CGColorSpaceCreateDeviceGray();
-                bi  = (CGBitmapInfo)(kCGBitmapByteOrderDefault | kCGImageAlphaNone);
-                bpc = 8; bpp = 8;
+                CGColorSpaceRef cs;
+                CGBitmapInfo   bi;
+                size_t bpc, bpp;
+                if (pixFmt == 1) {
+                    // BGRA: 4 bytes/pixel, DeviceRGB, little-endian 32-bit, skip alpha
+                    cs  = CGColorSpaceCreateDeviceRGB();
+                    bi  = (CGBitmapInfo)(kCGBitmapByteOrder32Little | kCGImageAlphaNoneSkipFirst);
+                    bpc = 8; bpp = 32;
+                } else {
+                    // Grayscale Y-plane: 1 byte/pixel
+                    cs  = CGColorSpaceCreateDeviceGray();
+                    bi  = (CGBitmapInfo)(kCGBitmapByteOrderDefault | kCGImageAlphaNone);
+                    bpc = 8; bpp = 8;
+                }
+                CGDataProviderRef dp = CGDataProviderCreateWithData(
+                    NULL, bufPtr, stride * h, NULL);
+                cgImg = CGImageCreate(
+                    w, h, bpc, bpp, stride, cs, bi, dp, NULL, true, kCGRenderingIntentDefault);
+                CGColorSpaceRelease(cs);
+                CGDataProviderRelease(dp);
             }
-            CGDataProviderRef dp = CGDataProviderCreateWithData(
-                NULL, bufPtr, stride * h, NULL);
-            CGImageRef cgImg = CGImageCreate(
-                w, h, bpc, bpp, stride, cs, bi, dp, NULL, true, kCGRenderingIntentDefault);
-            CGColorSpaceRelease(cs);
-            CGDataProviderRelease(dp);
 
             if (!cgImg) {
                 vcamSendDiag(@"vis:no-cgimg");
