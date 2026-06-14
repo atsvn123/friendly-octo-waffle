@@ -72,7 +72,10 @@ void vcamInstallColorSampleListener(void) {
             CGRect viewRect = CGRectMake(-(CGFloat)xf + DIM * 0.5f,
                                          -(CGFloat)yf + DIM * 0.5f,
                                          (CGFloat)sz.width, (CGFloat)sz.height);
-            [targetWindow drawViewHierarchyInRect:viewRect afterScreenUpdates:YES];
+            // afterScreenUpdates:NO — faster (no compositor wait) and excludes
+            // AVCaptureVideoPreviewLayer/AVSampleBufferDisplayLayer (GPU-rendered camera
+            // content). We want the app's background color, not the camera feed.
+            [targetWindow drawViewHierarchyInRect:viewRect afterScreenUpdates:NO];
 
             UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();

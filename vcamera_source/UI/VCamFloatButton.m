@@ -223,10 +223,10 @@ void vcamUpdateFloatButton(void) {
         return;
     }
 
-    // Menu closed + auto color on: sample screen color under button center
-    CGPoint center = g_floatButton.center;  // in VCamColorPickerWindow coords
+    // Menu closed + auto color on: sample the app background color.
+    // Sample from the top-center of the screen (navigation bar / header area) —
+    // this is always solid background color and is never covered by the camera oval
+    // or camera preview layer content.
     if (sz.width <= 0 || sz.height <= 0) return;
-    float nx = (float)(center.x / sz.width);
-    float ny = (float)(center.y / sz.height);
-    vcamSendPickerSampleRequest(nx, ny);
+    vcamSendPickerSampleRequest(0.5f, 0.06f);
 }

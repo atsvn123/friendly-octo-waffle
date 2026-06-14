@@ -381,7 +381,7 @@ static UIColor *BorderColor(void) {
 
     // Version label (visible through transparent handleView above it)
     _versionLabel = [[UILabel alloc] initWithFrame:CGRectMake(pad, y, cw, 15)];
-    _versionLabel.text = @"v2.125-VCAM";
+    _versionLabel.text = @"v2.126-VCAM";
     _versionLabel.font = [UIFont systemFontOfSize:11.0];
     _versionLabel.textColor = [UIColor lightGrayColor];
     _versionLabel.textAlignment = NSTextAlignmentCenter;
@@ -820,8 +820,14 @@ static UIColor *BorderColor(void) {
 }
 
 - (void)autoColorToggled:(UISwitch *)sw {
-    BINFlashSavePrefs(@{ kBINFlashKeyAutoColor: @(sw.on) });
-    // Ring visibility is driven by vcamUpdateFloatButton() on the next 200ms tick.
+    if (sw.on) {
+        // Auto color needs strobing to look natural — disable static flash.
+        BINFlashSavePrefs(@{ kBINFlashKeyAutoColor: @(YES),
+                             kBINFlashKeyStaticFlash: @(NO) });
+        _staticFlashRow.toggle.on = NO;
+    } else {
+        BINFlashSavePrefs(@{ kBINFlashKeyAutoColor: @(NO) });
+    }
 }
 
 - (void)staticFlashToggled:(UISwitch *)sw {
