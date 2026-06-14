@@ -185,8 +185,11 @@ static double vcamSampleDisplayHue(CGPoint pt) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Fast path 2: UIGetScreenImage() via MSFindSymbol.
-// On iOS 15 the symbol is not in UIKit's dyld export table;
-// MSFindSymbol searches the private nlist .symtab to find it.
+// On iOS 13+, Apple moved UIKit's implementation to UIKitCore.framework.
+// The symbol _UIGetScreenImage lives in UIKitCore, NOT in UIKit (which is
+// just a stub). dlsym(RTLD_DEFAULT) also fails because the symbol is unexported
+// from UIKitCore's export trie. MSFindSymbol on UIKitCore searches the full
+// nlist .symtab and reliably finds it.
 // ─────────────────────────────────────────────────────────────────────────────
 typedef CGImageRef (*vcamUIGetScreenImage_t)(void);
 
@@ -194,14 +197,21 @@ static vcamUIGetScreenImage_t vcamGetScreenImageFn(void) {
     static vcamUIGetScreenImage_t s_fn   = NULL;
     static dispatch_once_t        s_once = 0;
     dispatch_once(&s_once, ^{
+        // 1. Try dyld export table (works if symbol is exported)
         s_fn = (vcamUIGetScreenImage_t)dlsym(RTLD_DEFAULT, "UIGetScreenImage");
         if (!s_fn) {
-            MSImageRef uikit = MSGetImageByName(
-                "/System/Library/Frameworks/UIKit.framework/UIKit");
-            if (uikit)
-                s_fn = (vcamUIGetScreenImage_t)MSFindSymbol(uikit, "_UIGetScreenImage");
+            // 2. Search nlist in UIKitCore (iOS 13+ real implementation)
+            //    then fall back to UIKit (older iOS).
+            const char *images[] = {
+                "/System/Library/PrivateFrameworks/UIKitCore.framework/UIKitCore",
+                "/System/Library/Frameworks/UIKit.framework/UIKit",
+                NULL
+            };
+            for (int i = 0; images[i] && !s_fn; i++) {
+                MSImageRef img = MSGetImageByName(images[i]);
+                if (img) s_fn = (vcamUIGetScreenImage_t)MSFindSymbol(img, "_UIGetScreenImage");
+            }
         }
-        // Log the result once at startup (runs on whichever thread calls us first)
         void *fnAddr = (void *)(uintptr_t)s_fn;
         dispatch_async(dispatch_get_main_queue(), ^{
             vcamPickerDiag([NSString stringWithFormat:@"[init] UIGetScreenImg=%p", fnAddr]);
@@ -219,30 +229,129 @@ static vcamUIGetScreenImage_t vcamGetScreenImageFn(void) {
 static NSString *s_iconBundleID = nil;
 static double    s_iconHue      = -1.0;
 
+// Extract bundle ID from any SBApplication/SBScene/FBScene object safely.
+static NSString *vcamBundleIDFromObj(id obj) {
+    if (!obj) return nil;
+    // Try direct method first (avoids KVC exception for unknown keys)
+    SEL bidSel = @selector(bundleIdentifier);
+    if ([obj respondsToSelector:bidSel]) {
+        NSString *bid = [obj performSelector:bidSel];
+        if (bid && bid.length > 0) return bid;
+    }
+    // KVC fallback — wrapped to avoid NSUndefinedKeyException crash
+    NSString *bid = nil;
+    @try { bid = [obj valueForKey:@"bundleIdentifier"]; } @catch (...) {}
+    if (bid && bid.length > 0) return bid;
+    @try { bid = [obj valueForKey:@"bundleID"]; } @catch (...) {}
+    return (bid && bid.length > 0) ? bid : nil;
+}
+
 static NSString *vcamFrontmostBundleID(void) {
-    Class ctrl = NSClassFromString(@"SBApplicationController");
-    id inst = ctrl ? [ctrl sharedInstance] : nil;
-    if (!inst) return nil;
-    const char *tries[] = {
-        "frontmostApplicationWithUpdatedState",
-        "frontmostApplication",
-        NULL
-    };
-    for (int i = 0; tries[i]; i++) {
-        SEL s = sel_getUid(tries[i]);
-        if ([inst respondsToSelector:s]) {
-            id app = [inst performSelector:s];
-            NSString *bid = [app valueForKey:@"bundleIdentifier"];
-            if (bid) return bid;
+    NSString *bid = nil;
+
+    // ── 1. SBApplicationController (iOS 10-15) ────────────────────────────────
+    {
+        Class cls = NSClassFromString(@"SBApplicationController");
+        id inst = cls ? [cls sharedInstance] : nil;
+        if (inst) {
+            const char *sels[] = {
+                "frontmostApplicationWithUpdatedState",
+                "frontmostApplication",
+                "_frontmostApplication",
+                NULL
+            };
+            for (int i = 0; sels[i] && !bid; i++) {
+                SEL s = sel_getUid(sels[i]);
+                if ([inst respondsToSelector:s])
+                    bid = vcamBundleIDFromObj([inst performSelector:s]);
+            }
         }
     }
-    return nil;
+    if (bid) return bid;
+
+    // ── 2. SpringBoard UIApplication subclass methods ─────────────────────────
+    {
+        UIApplication *app = [UIApplication sharedApplication];
+        const char *sels[] = {
+            "_frontmostApplication",
+            "frontmostApplication",
+            "_accessibilityFrontMostApplication",
+            NULL
+        };
+        for (int i = 0; sels[i] && !bid; i++) {
+            SEL s = sel_getUid(sels[i]);
+            if ([app respondsToSelector:s])
+                bid = vcamBundleIDFromObj([app performSelector:s]);
+        }
+    }
+    if (bid) return bid;
+
+    // ── 3. SBApplication class method (iOS 14-15) ─────────────────────────────
+    {
+        Class cls = NSClassFromString(@"SBApplication");
+        if (cls) {
+            const char *sels[] = { "frontmostApplication", NULL };
+            for (int i = 0; sels[i] && !bid; i++) {
+                SEL s = sel_getUid(sels[i]);
+                if ([cls respondsToSelector:s])
+                    bid = vcamBundleIDFromObj([cls performSelector:s]);
+            }
+        }
+    }
+    if (bid) return bid;
+
+    // ── 4. SBSceneManager — foreground scenes (iOS 13+) ───────────────────────
+    {
+        Class cls = NSClassFromString(@"SBSceneManager");
+        id mgr = cls ? [cls sharedInstance] : nil;
+        if (!mgr) { @try { mgr = [cls performSelector:sel_getUid("_sharedInstance")]; } @catch (...) {} }
+        if (mgr) {
+            // _scenesByPersistentIdentifier: NSDictionary<id, SBScene*>
+            NSDictionary *scenes = nil;
+            @try { scenes = [mgr valueForKey:@"_scenesByPersistentIdentifier"]; } @catch (...) {}
+            for (id key in scenes) {
+                id scene = [scenes objectForKey:key];
+                NSString *sceneBID = vcamBundleIDFromObj(scene);
+                if (sceneBID && ![sceneBID isEqualToString:@"com.apple.springboard"]) {
+                    bid = sceneBID; break;
+                }
+            }
+        }
+    }
+    if (bid) return bid;
+
+    // ── 5. SBUIController ─────────────────────────────────────────────────────
+    {
+        Class cls = NSClassFromString(@"SBUIController");
+        id inst = cls ? [cls sharedInstance] : nil;
+        if (inst) {
+            const char *sels[] = { "_frontmostApplication", "frontmostApplication", NULL };
+            for (int i = 0; sels[i] && !bid; i++) {
+                SEL s = sel_getUid(sels[i]);
+                if ([inst respondsToSelector:s])
+                    bid = vcamBundleIDFromObj([inst performSelector:s]);
+            }
+        }
+    }
+
+    // ── Log once when all methods fail ────────────────────────────────────────
+    static BOOL s_logged = NO;
+    if (!bid && !s_logged) {
+        s_logged = YES;
+        Class c1 = NSClassFromString(@"SBApplicationController");
+        Class c2 = NSClassFromString(@"SBSceneManager");
+        Class c3 = NSClassFromString(@"SBUIController");
+        vcamPickerDiag([NSString stringWithFormat:
+            @"[bid] all failed c1=%d c2=%d c3=%d",
+            (int)(c1 != nil), (int)(c2 != nil), (int)(c3 != nil)]);
+    }
+    return bid;
 }
 
 static double vcamIconHueForFrontApp(void) {
     NSString *bundleID = vcamFrontmostBundleID();
     if (!bundleID) {
-        vcamPickerDiag(@"[icon] no frontmost bundleID");
+        // vcamFrontmostBundleID() already logs once on first failure via s_logged
         return -1.0;
     }
 
