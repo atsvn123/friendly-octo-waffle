@@ -50,8 +50,15 @@
 // State accessors
 - (BOOL)getLive;
 - (void)setLive:(BOOL)live;
+// Called by IPC code 1000/1001 — tracks the user's intended live state so
+// auto-resume logic can distinguish a spurious setLive:NO from a real user OFF.
+- (void)setLiveUserIntent:(BOOL)intent;
 - (void)setSwitchFace:(BOOL)flag;
 - (BOOL)getFloatWindow;
+
+// RTMP rotation override: -1 = Auto (orientation-detect), 0/90/180/270 = fixed degrees.
+// Controls which pre-rotated buffer is used in modifyImageBuffer:.
+- (void)setRTMPRotation:(int)degrees;
 
 // ── Frame input (called by VCamBridge after RTMP decode) ──────────────────────
 // setYUVSampleBuffer: is the PRIMARY path: stores decoded frame + pre-rotates

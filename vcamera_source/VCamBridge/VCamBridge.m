@@ -236,7 +236,7 @@ void vcamSendDiag(NSString *msg) {
                 [lines addObjectsFromArray:[g_vcamDiag componentsSeparatedByString:@"\n"]];
             }
             for (NSString *p in snapshot) [lines addObject:p];
-            while ([lines count] > 10) [lines removeObjectAtIndex:0];
+            while ([lines count] > 20) [lines removeObjectAtIndex:0];
             NSString *updated = [[lines componentsJoinedByString:@"\n"] retain];
             [g_vcamDiag release];
             g_vcamDiag = updated;
@@ -459,6 +459,7 @@ void vcamSendDiag(NSString *msg) {
         if (code == 1000) {
             // Pause delivery (stop() → stopDecoding) but keep server/thread alive.
             [self stop];
+            [[VCamLiveManager sharedInstance] setLiveUserIntent:YES];  // IPC intent tracking
             [[VCamLiveManager sharedInstance] setLive:YES];
             [[VCamLiveManager sharedInstance] setSwitchFace:NO];
 
@@ -490,7 +491,8 @@ void vcamSendDiag(NSString *msg) {
         }
         else if (code == 1001) {
             [buffer replaceBytesInRange:NSMakeRange(0, 4) withBytes:NULL length:0];
-            // Pause delivery but keep server + thread alive.
+            // Pause delivery but keep server + thread alive (OBS connection stays up).
+            [[VCamLiveManager sharedInstance] setLiveUserIntent:NO];  // IPC intent tracking
             if ([self server]) [[self server] stopDecoding];
             vcamSendDiag(@"LIVE->NO[1001]");
             [[VCamLiveManager sharedInstance] setLive:NO];
@@ -601,6 +603,14 @@ void vcamSendDiag(NSString *msg) {
             int32_t pos; memcpy(&pos, bytes + 4, 4);
             [buffer replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
             [[VCamLiveManager sharedInstance] setCameraSelected:pos];   // IDA: passes raw int directly
+        }
+        else if (code == 1019) {
+            // RTMP rotation angle: -1=Auto, 0=0°, 90=90°, 180=180°, 270=270°.
+            // Sent by SpringBoard menu when user changes the rotation segment.
+            if (buffer.length < 8) break;
+            int32_t angle; memcpy(&angle, bytes + 4, 4);
+            [buffer replaceBytesInRange:NSMakeRange(0, 8) withBytes:NULL length:0];
+            [[VCamLiveManager sharedInstance] setRTMPRotation:(int)angle];
         }
         else {
             // Unknown code — confirmed LABEL_52 at 0x8A1E0:

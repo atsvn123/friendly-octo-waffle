@@ -61,7 +61,11 @@ static void hook_emitSampleBuffer(id self, SEL _cmd, CMSampleBufferRef sbuf) {
         }
 
         if (isLive) {
-            // Resolution reporting: only update for landscape frames (IDA original behaviour).
+            // IDA-confirmed (sub_85ED4 0x85f68): inject ONLY for landscape frames (Width >= Height).
+            // Portrait frames are skipped entirely — they cause photo-mode orientation flip when
+            // iOS Camera photo pipelines deliver portrait-rotated buffers interleaved with
+            // landscape capture buffers. The NSRecursiveLock (v2.114) is the real RTMP-disconnect
+            // fix; this guard restores IDA-exact behavior for photo/portrait correctness.
             if (width >= height) {
                 // IDA: two separate [NSDate date] calls — one for elapsed check, one for store
                 NSDate *checkDate = [NSDate date];
@@ -74,12 +78,8 @@ static void hook_emitSampleBuffer(id self, SEL _cmd, CMSampleBufferRef sbuf) {
                     VCamBridge *bridge = [VCamBridge sharedInstance];
                     [bridge setResolution:(unsigned int)width height:(unsigned int)height];
                 }
+                [state modifyImageBuffer:sbuf];
             }
-
-            // IDA-confirmed: no size guard. All landscape frames get injection.
-            // The real fix for RTMP disconnect is serializing ALL VT operations through
-            // a single NSRecursiveLock in VCamLiveManager (v2.114), not skipping frames.
-            [state modifyImageBuffer:sbuf];
         }
     }
     ((void (*)(id, SEL, CMSampleBufferRef))orig_emitSampleBuffer)(self, _cmd, sbuf);

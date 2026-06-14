@@ -154,6 +154,9 @@ static UIColor *BorderColor(void) {
     // Menu opacity slider ("Độ mờ menu")
     VCamSliderRow   *_opacityRow;
 
+    // RTMP rotation selector
+    UISegmentedControl *_rotationSeg;
+
     // Debug panel (collapsible, shows g_vcamDiag stream)
     UIView       *_debugHeaderView;
     UIView       *_debugPanel;
@@ -229,6 +232,7 @@ static UIColor *BorderColor(void) {
     [_positionSeg release];
     [_colorBar release];
     [_opacityRow release];
+    [_rotationSeg release];
     [_debugHeaderView release];
     [_debugPanel release];
     [_debugTextView release];
@@ -377,7 +381,7 @@ static UIColor *BorderColor(void) {
 
     // Version label (visible through transparent handleView above it)
     _versionLabel = [[UILabel alloc] initWithFrame:CGRectMake(pad, y, cw, 15)];
-    _versionLabel.text = @"v2.114-VCAM";
+    _versionLabel.text = @"v2.115-VCAM";
     _versionLabel.font = [UIFont systemFontOfSize:11.0];
     _versionLabel.textColor = [UIColor lightGrayColor];
     _versionLabel.textAlignment = NSTextAlignmentCenter;
@@ -496,6 +500,39 @@ static UIColor *BorderColor(void) {
 
     y += 58.0;   // opacity row + gap
 
+    // ── RTMP rotation selector ──────────────────────────────────────────────────
+    UILabel *rotLbl = [[UILabel alloc] initWithFrame:CGRectMake(pad, y, cw, 18)];
+    rotLbl.text = @"Xoay RTMP";
+    rotLbl.font = [UIFont systemFontOfSize:10.5 weight:UIFontWeightMedium];
+    rotLbl.textColor = [UIColor lightGrayColor];
+    [_contentView addSubview:rotLbl];
+    [rotLbl release];
+    y += 20.0;
+
+    NSInteger savedRotIdx = [[NSUserDefaults standardUserDefaults]
+                              integerForKey:@"vcam.rtmp.rotation.idx"];
+    if (savedRotIdx < 0 || savedRotIdx > 4) savedRotIdx = 0;
+
+    _rotationSeg = [[UISegmentedControl alloc]
+                    initWithItems:@[@"Auto", @"0°", @"90°", @"180°", @"270°"]];
+    _rotationSeg.frame = CGRectMake(pad, y, cw, 32);
+    _rotationSeg.selectedSegmentIndex = savedRotIdx;
+    _rotationSeg.tintColor = AccentColor();
+    if (@available(iOS 13.0, *)) {
+        _rotationSeg.selectedSegmentTintColor = AccentColor();
+        UIColor *fgNormal   = [UIColor darkGrayColor];
+        UIColor *fgSelected = [UIColor whiteColor];
+        [_rotationSeg setTitleTextAttributes:@{NSForegroundColorAttributeName: fgNormal}
+                                    forState:UIControlStateNormal];
+        [_rotationSeg setTitleTextAttributes:@{NSForegroundColorAttributeName: fgSelected}
+                                    forState:UIControlStateSelected];
+    }
+    [_rotationSeg addTarget:self action:@selector(rotationSegChanged:)
+           forControlEvents:UIControlEventValueChanged];
+    [_contentView addSubview:_rotationSeg];
+
+    y += 40.0;
+
     // ── DEBUG section header (collapsible) ──────────────────────────────────────
     _debugHeaderView = [[UIView alloc] initWithFrame:CGRectMake(pad, y, cw, 44)];
     _debugHeaderView.backgroundColor = SectionBg();
@@ -531,7 +568,7 @@ static UIColor *BorderColor(void) {
     _debugPanel.clipsToBounds = YES;
     [_contentView addSubview:_debugPanel];
 
-    _debugTextView = [[UITextView alloc] initWithFrame:CGRectMake(4, 4, cw - 8, 122)];
+    _debugTextView = [[UITextView alloc] initWithFrame:CGRectMake(4, 4, cw - 8, 192)];
     _debugTextView.backgroundColor = [UIColor clearColor];
     UIFont *monoFont = [UIFont fontWithName:@"Courier" size:9.5];
     _debugTextView.font = monoFont ? monoFont : [UIFont systemFontOfSize:9.5];
@@ -728,6 +765,16 @@ static UIColor *BorderColor(void) {
 
 - (void)liveToggled:(UISwitch *)sw {
     int32_t code = sw.on ? 1000 : 1001;
+    if (sw.on && _rotationSeg) {
+        // Resend current rotation before enabling LIVE so mediaserverd
+        // has the right setting even after it was restarted.
+        static const int32_t kAngles[] = {-1, 0, 90, 180, 270};
+        NSInteger idx = _rotationSeg.selectedSegmentIndex;
+        if (idx >= 0 && idx <= 4) {
+            int32_t rotBuf[2] = {1019, kAngles[idx]};
+            [[VCamBridge sharedInstance] send:[NSData dataWithBytes:rotBuf length:8]];
+        }
+    }
     [[VCamBridge sharedInstance] send:[self packetCode:code]];
     BINFlashSavePrefs(@{ kBINFlashKeyLive: @(sw.on) });
     if (sw.on) {
@@ -806,9 +853,23 @@ static UIColor *BorderColor(void) {
     [[NSUserDefaults standardUserDefaults] setDouble:(double)sl.value forKey:kVcamMenuOpacity];
 }
 
+- (void)rotationSegChanged:(UISegmentedControl *)seg {
+    // Map segment index → rotation angle: 0=Auto(-1), 1=0°, 2=90°, 3=180°, 4=270°
+    static const int32_t kAngles[] = {-1, 0, 90, 180, 270};
+    NSInteger idx = seg.selectedSegmentIndex;
+    if (idx < 0 || idx > 4) return;
+    int32_t angle = kAngles[idx];
+
+    [[NSUserDefaults standardUserDefaults] setInteger:idx forKey:@"vcam.rtmp.rotation.idx"];
+
+    // Send code 1019 to mediaserverd immediately (works even when LIVE is off).
+    int32_t buf[2] = {1019, angle};
+    [[VCamBridge sharedInstance] send:[NSData dataWithBytes:buf length:8]];
+}
+
 - (void)toggleDebugPanel {
     _debugPanelVisible = !_debugPanelVisible;
-    CGFloat targetH = _debugPanelVisible ? 130.0 : 0.0;
+    CGFloat targetH = _debugPanelVisible ? 200.0 : 0.0;
     [UIView animateWithDuration:0.22 animations:^{
         CGRect pf = _debugPanel.frame;
         pf.size.height = targetH;

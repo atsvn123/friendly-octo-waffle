@@ -35,7 +35,9 @@ void DataLayer::writeExact(const void *buf, size_t len) {
     const uint8_t *p = reinterpret_cast<const uint8_t *>(buf);
     size_t remaining = len;
     while (remaining > 0) {
-        ssize_t n = ::send(_fd, p, remaining, 0);
+        // MSG_NOSIGNAL: prevents SIGPIPE signal when OBS disconnects while we're writing.
+        // Without this flag, writing to a closed socket raises SIGPIPE which kills the thread.
+        ssize_t n = ::send(_fd, p, remaining, MSG_NOSIGNAL);
         if (n <= 0) {
             if (n < 0 && errno == EINTR) continue;
             throw std::runtime_error("DataLayer: send() error");

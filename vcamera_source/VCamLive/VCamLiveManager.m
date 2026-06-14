@@ -24,22 +24,24 @@ extern void vcamSendDiag(NSString *msg);
 // ─────────────────────────────────────────────────────────────────────────────
 @implementation VCamLiveManager {
     // IDA-confirmed: single NSRecursiveLock that serializes ALL frame operations.
-    // - setYUVSampleBuffer: (RTMP decode thread) holds it during CMSampleBufferCreateCopy
-    //   + create90ImageBuffer: (VTImageRotationSessionTransferImage)
-    // - setYUVPixelBuffer: (face-swap / other paths) holds it during createImageBuffer:
-    //   (VTPixelTransferSessionTransferImage) + create90ImageBuffer:
-    // - modifyImageBuffer: (camera pipeline thread) holds it through the entire
-    //   VTPixelTransferSessionTransferImage call
-    // This prevents concurrent VT hardware use from different threads, which caused
-    // VT session invalidation and RTMP disconnect on A11 and dual-camera devices.
     NSRecursiveLock    *_lock;
 
     // IDA-confirmed dedup dictionary (maps key → timestamp NSNumber).
-    // Key = (uintptr_t)destBuffer + pts.value as NSNumber/uint64.
-    // When multiple BWNodeOutput nodes share the same underlying CVPixelBuffer
-    // for the same camera tick, the first call does the injection; subsequent
-    // calls with the same key are filtered. Entries expire after 200ms.
     NSMutableDictionary *_dictionary;
+
+    // User's intended live state — set ONLY by IPC code 1000 (YES) / 1001 (NO).
+    // When something spuriously calls setLive:NO while the user wants LIVE,
+    // setYUVSampleBuffer: auto-restores bLive to YES as long as _userIntentLive is set.
+    BOOL _userIntentLive;
+
+    // RTMP rotation: -1 = Auto (orientation-detect, IDA-original), 0/90/180/270 = fixed.
+    // Updated via setRTMPRotation: (IPC code 1019 from SpringBoard menu).
+    int _rtmpRotation;
+
+    // Additional cached rotation sessions for 180° and 270° rotations.
+    // The 90° session is the IDA-original _imageRotationSession.
+    VTImageRotationSessionRef _imageRotationSession180;
+    VTImageRotationSessionRef _imageRotationSession270;
 }
 
 // ── +sharedInstance (0x900EC) ──────────────────────────────────────────────
@@ -86,6 +88,19 @@ extern void vcamSendDiag(NSString *msg);
                              kVTImageRotationPropertyKey_EnableHighSpeedTransfer,
                              kCFBooleanTrue);
 
+        VTImageRotationSessionCreate(kCFAllocatorDefault, 180, &_imageRotationSession180);
+        VTSessionSetProperty((VTSessionRef)(void *)_imageRotationSession180,
+                             kVTImageRotationPropertyKey_EnableHighSpeedTransfer,
+                             kCFBooleanTrue);
+
+        VTImageRotationSessionCreate(kCFAllocatorDefault, 270, &_imageRotationSession270);
+        VTSessionSetProperty((VTSessionRef)(void *)_imageRotationSession270,
+                             kVTImageRotationPropertyKey_EnableHighSpeedTransfer,
+                             kCFBooleanTrue);
+
+        _rtmpRotation = -1;  // Auto by default (IDA-original orientation detection)
+        _userIntentLive = NO;
+
         NSThread *t = [[NSThread alloc] initWithTarget:self selector:@selector(run) object:nil];
         [t start];
         [t release];
@@ -127,10 +142,21 @@ extern void vcamSendDiag(NSString *msg);
 // create90ImageBuffer: (IDA 0x90708) — creates 90°-rotated copy (dimensions swapped).
 // Called by setYUVSampleBuffer: and setYUVPixelBuffer: under _lock.
 - (CVPixelBufferRef)create90ImageBuffer:(CVPixelBufferRef)src {
-    if (!src || !_imageRotationSession) return NULL;
+    return [self createRotImageBuffer:src session:_imageRotationSession swapDims:YES];
+}
+
+// createRotImageBuffer:session:swapDims: — generic rotation into an IOSurface buffer.
+// swapDims=YES for 90°/270° (output W/H swapped vs input), NO for 180° (same dims).
+- (CVPixelBufferRef)createRotImageBuffer:(CVPixelBufferRef)src
+                                 session:(VTImageRotationSessionRef)session
+                                swapDims:(BOOL)swapDims
+{
+    if (!src || !session) return NULL;
     OSType fmt = CVPixelBufferGetPixelFormatType(src);
     int srcW = (int)CVPixelBufferGetWidth(src);
     int srcH = (int)CVPixelBufferGetHeight(src);
+    int dstW = swapDims ? srcH : srcW;
+    int dstH = swapDims ? srcW : srcH;
 
     NSDictionary *ioSurfaceProps = @{
         @"IOSurfacePreallocPages":    @0,
@@ -140,12 +166,11 @@ extern void vcamSendDiag(NSString *msg);
         (NSString *)kCVPixelBufferIOSurfacePropertiesKey: ioSurfaceProps,
     };
     CVPixelBufferRef dst = NULL;
-    // Destination has swapped dimensions (90° rotation)
-    if (CVPixelBufferCreate(kCFAllocatorDefault, (size_t)srcH, (size_t)srcW, fmt,
+    if (CVPixelBufferCreate(kCFAllocatorDefault, (size_t)dstW, (size_t)dstH, fmt,
                             (__bridge CFDictionaryRef)attrs, &dst) != kCVReturnSuccess) {
         return NULL;
     }
-    if (VTImageRotationSessionTransferImage(_imageRotationSession, src, dst) != noErr) {
+    if (VTImageRotationSessionTransferImage(session, src, dst) != noErr) {
         CVPixelBufferRelease(dst);
         return NULL;
     }
@@ -178,10 +203,24 @@ extern void vcamSendDiag(NSString *msg);
 // ─────────────────────────────────────────────────────────────────────────────
 
 // setYUVSampleBuffer: (IDA 0x90A98) — primary RTMP frame delivery path.
-// Holds _lock during BOTH CMSampleBufferCreateCopy AND create90ImageBuffer:
-// (VTImageRotationSessionTransferImage), serializing with modifyImageBuffer:.
+// Extended in v2.115:
+//   - Logs OBS stream dimensions when they change (obs:WxH diagnostic).
+//   - Creates pre-rotated buffer based on _rtmpRotation instead of always 90°.
+//   - Auto-resumes bLive if _userIntentLive is YES but bLive was spuriously cleared.
 - (void)setYUVSampleBuffer:(CMSampleBufferRef)sbuf {
     if (!sbuf) return;
+
+    // Track OBS stream dimensions — log once when size changes.
+    static int s_obsW = 0, s_obsH = 0;
+    CVImageBufferRef ibuf = CMSampleBufferGetImageBuffer(sbuf);
+    if (ibuf) {
+        int w = (int)CVPixelBufferGetWidth((CVPixelBufferRef)ibuf);
+        int h = (int)CVPixelBufferGetHeight((CVPixelBufferRef)ibuf);
+        if (w != s_obsW || h != s_obsH) {
+            s_obsW = w; s_obsH = h;
+            vcamSendDiag([NSString stringWithFormat:@"obs:%dx%d", w, h]);
+        }
+    }
 
     [_lock lock];
 
@@ -189,12 +228,41 @@ extern void vcamSendDiag(NSString *msg);
     if (old) { CFRelease(old); _liveYUVSampleBuffer = NULL; }
     CMSampleBufferCreateCopy(kCFAllocatorDefault, sbuf, &_liveYUVSampleBuffer);
 
+    // Pre-rotate based on _rtmpRotation.
+    // -1 (Auto) and 90: use 90° session (IDA-original; used by Auto orientation detection).
+    // 0: no pre-rotation.
+    // 180: use 180° session (same dimensions).
+    // 270: use 270° session (dimensions swapped again).
     CVPixelBufferRef old90 = _pixelYUVBuffer90;
     if (old90) { CFRelease(old90); _pixelYUVBuffer90 = NULL; }
-    _pixelYUVBuffer90 = [self create90ImageBuffer:
-                         (CVPixelBufferRef)CMSampleBufferGetImageBuffer(sbuf)];
+
+    CVPixelBufferRef src = (CVPixelBufferRef)CMSampleBufferGetImageBuffer(sbuf);
+    int rot = _rtmpRotation;
+    if (rot == 0) {
+        // No pre-rotation needed; modifyImageBuffer: will use srcBuffer directly.
+    } else if (rot == 180) {
+        _pixelYUVBuffer90 = [self createRotImageBuffer:src
+                                               session:_imageRotationSession180
+                                              swapDims:NO];
+    } else if (rot == 270) {
+        _pixelYUVBuffer90 = [self createRotImageBuffer:src
+                                               session:_imageRotationSession270
+                                              swapDims:YES];
+    } else {
+        // Auto (-1) or explicit 90°: 90° rotation (IDA-original path).
+        _pixelYUVBuffer90 = [self create90ImageBuffer:src];
+    }
 
     [_lock unlock];
+
+    // Auto-resume injection if RTMP frames are arriving but bLive was spuriously cleared.
+    // _userIntentLive is only set by IPC code 1000 (YES) / 1001 (NO).
+    // This prevents unknown callers of setLive:NO from permanently breaking injection
+    // while the user wants LIVE on and frames are actively arriving.
+    if (_userIntentLive && !self.bLive) {
+        vcamSendDiag(@"bLive:auto-resume");
+        self.bLive = YES;
+    }
 }
 
 // setYUVPixelBuffer: (IDA 0x90A2C) — face-swap / alternate path.
@@ -309,14 +377,35 @@ extern void vcamSendDiag(NSString *msg);
     int dstW = (int)CVPixelBufferGetWidth((CVPixelBufferRef)destBuffer);
     int dstH = (int)CVPixelBufferGetHeight((CVPixelBufferRef)destBuffer);
 
-    // IDA-confirmed orientation logic:
-    //   same orientation (both landscape or both portrait) → use srcBuffer
-    //   different orientation                               → use _pixelYUVBuffer90
+    // Source buffer selection — either auto (IDA-original) or user-configured rotation.
+    // _rtmpRotation == -1: Auto — detect orientation from buffer dimensions.
+    // _rtmpRotation == 0:  No rotation — always use srcBuffer directly.
+    // _rtmpRotation > 0:   Fixed rotation — use pre-rotated _pixelYUVBuffer90.
     CVImageBufferRef transferSrc;
-    if ((srcW > srcH) == (dstW > dstH)) {
+    int rot = _rtmpRotation;
+    if (rot == 0) {
+        // User selected "no rotation" — inject RTMP landscape as-is.
         transferSrc = srcBuffer;
-    } else {
+    } else if (rot > 0) {
+        // User selected explicit angle — use the pre-rotated buffer.
         transferSrc = (CVImageBufferRef)_pixelYUVBuffer90;
+    } else {
+        // Auto (IDA-confirmed 0x92080): same orientation → srcBuffer, different → 90° buffer.
+        if ((srcW > srcH) == (dstW > dstH)) {
+            transferSrc = srcBuffer;
+        } else {
+            transferSrc = (CVImageBufferRef)_pixelYUVBuffer90;
+        }
+    }
+
+    // Once-per-second orientation diagnostic.
+    static double s_oriLog = 0;
+    double oriNow = [[NSDate date] timeIntervalSince1970];
+    if (oriNow - s_oriLog >= 1.0) {
+        s_oriLog = oriNow;
+        int branch = (transferSrc == srcBuffer) ? 0 : 1;
+        vcamSendDiag([NSString stringWithFormat:@"ori:src%dx%d dst%dx%d r%d b%d",
+            srcW, srcH, dstW, dstH, rot, branch]);
     }
 
     BOOL success = NO;
@@ -487,9 +576,37 @@ extern void vcamSendDiag(NSString *msg);
 
 - (void)setLive:(BOOL)live {
     if (!live && self.bLive) {
-        vcamSendDiag(@"LIVE->NO[?]");
+        // Log which thread called setLive:NO so we can trace spurious callers in the debug view.
+        NSString *thr = [NSThread currentThread].name;
+        if (!thr || thr.length == 0)
+            thr = [NSString stringWithFormat:@"thr%p", (void *)[NSThread currentThread]];
+        vcamSendDiag([NSString stringWithFormat:@"LIVE->NO[%@]", thr]);
     }
     self.bLive = live;
+}
+
+// Called by parse: code 1000 (YES) / 1001 (NO) to record the user's explicit intent.
+// As long as _userIntentLive is YES, setYUVSampleBuffer: will auto-restore bLive=YES
+// whenever RTMP frames arrive, preventing spurious setLive:NO from breaking injection.
+- (void)setLiveUserIntent:(BOOL)intent {
+    _userIntentLive = intent;
+    if (!intent) {
+        // User explicitly turned off — clear bLive immediately (no auto-resume for this frame).
+        self.bLive = NO;
+    }
+}
+
+// Set RTMP rotation angle. Valid values: -1 (Auto), 0, 90, 180, 270.
+// The change takes effect on the next RTMP frame (setYUVSampleBuffer: call).
+- (void)setRTMPRotation:(int)degrees {
+    static const int kValidAngles[] = {-1, 0, 90, 180, 270};
+    BOOL valid = NO;
+    for (int i = 0; i < 5; i++) {
+        if (degrees == kValidAngles[i]) { valid = YES; break; }
+    }
+    if (!valid) return;
+    _rtmpRotation = degrees;
+    vcamSendDiag([NSString stringWithFormat:@"rot:%d", degrees]);
 }
 
 - (void)setSwitchFace:(BOOL)flag {

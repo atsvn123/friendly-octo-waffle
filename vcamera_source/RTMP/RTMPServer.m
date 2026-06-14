@@ -18,6 +18,9 @@
 #import "../VCamBridge/VCamBridge.h"
 #import <dispatch/dispatch.h>
 #import <pthread.h>
+#include <signal.h>
+
+extern void vcamSendDiag(NSString *msg);
 
 @implementation RTMPServer {
     dispatch_source_t _watchdog;
@@ -48,6 +51,7 @@
         NSThread *th = srv.RTMPThread;
         if (!th || th.isFinished || th.isCancelled) {
             // Thread was externally killed — revive it.
+            vcamSendDiag(@"srv:wd-revive");
             if ([RTMPServer createActiveTCPServer]) {
                 [srv _spawnHandleRTMPThread];
             }
@@ -66,6 +70,7 @@
 
 // ── -startServerLoop — idempotent (0xA2998) ──────────────────────────────────
 - (void)startServerLoop {
+    vcamSendDiag(@"srv:start");
     // H264Decoder: create if nil, otherwise reinit from saved SPS/PPS for
     // immediate decode after LIVE toggle on (OBS already connected, won't resend SPS/PPS).
     if (!self.h264Decoder) {
@@ -104,6 +109,7 @@
 
 // ── -stopDecoding — pause delivery, keep server/thread alive ─────────────────
 - (void)stopDecoding {
+    vcamSendDiag(@"srv:dec-off");
     self.deliversFrames = NO;
     // endDecode releases the VT hardware decoder session, freeing it for other apps.
     // The H264Decoder object itself is NOT nilled — startServerLoop will reinitFromSaved.
@@ -138,6 +144,9 @@
 - (void)handleRTMP {
     // Prevent external pthread_cancel from killing this thread.
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+    // Ignore SIGPIPE — prevents silent thread kill when OBS disconnects mid-write.
+    // DataLayer::writeExact uses MSG_NOSIGNAL for extra safety; this is belt-and-suspenders.
+    signal(SIGPIPE, SIG_IGN);
 
     while (self.userWantsRunning) {
         self.isRunning = YES;
