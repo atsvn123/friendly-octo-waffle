@@ -18,6 +18,7 @@
 #include <string.h>
 #include <math.h>
 #include <mach/mach.h>
+#include <mach-o/dyld.h>
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Diagnostic logging — main queue only
@@ -197,21 +198,39 @@ static vcamUIGetScreenImage_t vcamGetScreenImageFn(void) {
     static vcamUIGetScreenImage_t s_fn   = NULL;
     static dispatch_once_t        s_once = 0;
     dispatch_once(&s_once, ^{
-        // 1. Try dyld export table (works if symbol is exported)
+        // 1. dyld export trie (fast, works if symbol is exported)
         s_fn = (vcamUIGetScreenImage_t)dlsym(RTLD_DEFAULT, "UIGetScreenImage");
+
+        // 2. Iterate ALL loaded dyld images looking for UIKitCore by name substring.
+        //    Avoids hardcoded path mismatch — on iOS 15 with dyld shared cache the
+        //    path dyld registers internally may differ from the filesystem path.
+        //    Try both nlist name variants: "_UIGetScreenImage" (C func UIGetScreenImage)
+        //    and "__UIGetScreenImage" (C func _UIGetScreenImage, Apple private naming).
         if (!s_fn) {
-            // 2. Search nlist in UIKitCore (iOS 13+ real implementation)
-            //    then fall back to UIKit (older iOS).
-            const char *images[] = {
-                "/System/Library/PrivateFrameworks/UIKitCore.framework/UIKitCore",
-                "/System/Library/Frameworks/UIKit.framework/UIKit",
-                NULL
-            };
-            for (int i = 0; images[i] && !s_fn; i++) {
-                MSImageRef img = MSGetImageByName(images[i]);
-                if (img) s_fn = (vcamUIGetScreenImage_t)MSFindSymbol(img, "_UIGetScreenImage");
+            const char *syms[] = { "_UIGetScreenImage", "__UIGetScreenImage", NULL };
+            uint32_t cnt = _dyld_image_count();
+            for (uint32_t i = 0; i < cnt && !s_fn; i++) {
+                const char *name = _dyld_get_image_name(i);
+                if (!name || !strstr(name, "UIKitCore")) continue;
+                // Log the actual path dyld knows (helps diagnose path mismatch)
+                const char *logName = name;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    vcamPickerDiag([NSString stringWithFormat:@"[init] UIKitCore=%s", logName]);
+                });
+                MSImageRef img = MSGetImageByName(name);
+                if (!img) continue;
+                for (int j = 0; syms[j] && !s_fn; j++)
+                    s_fn = (vcamUIGetScreenImage_t)MSFindSymbol(img, syms[j]);
             }
         }
+
+        // 3. UIKit stub fallback (older iOS where UIKit is not a stub)
+        if (!s_fn) {
+            MSImageRef img = MSGetImageByName(
+                "/System/Library/Frameworks/UIKit.framework/UIKit");
+            if (img) s_fn = (vcamUIGetScreenImage_t)MSFindSymbol(img, "_UIGetScreenImage");
+        }
+
         void *fnAddr = (void *)(uintptr_t)s_fn;
         dispatch_async(dispatch_get_main_queue(), ^{
             vcamPickerDiag([NSString stringWithFormat:@"[init] UIGetScreenImg=%p", fnAddr]);
@@ -220,225 +239,6 @@ static vcamUIGetScreenImage_t vcamGetScreenImageFn(void) {
     return s_fn;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Fast path 3: App icon dominant hue.
-// Uses SpringBoard's SBApplicationController + UIKit private API to load the
-// frontmost app's icon without any injection into the protected app.
-// Result is cached per bundle ID so file I/O only runs on app switch.
-// ─────────────────────────────────────────────────────────────────────────────
-static NSString *s_iconBundleID = nil;
-static double    s_iconHue      = -1.0;
-
-// Extract bundle ID from any SBApplication/SBScene/FBScene object safely.
-static NSString *vcamBundleIDFromObj(id obj) {
-    if (!obj) return nil;
-    // Try direct method first; guard return type to avoid treating int/BOOL as NSString*
-    SEL bidSel = @selector(bundleIdentifier);
-    if ([obj respondsToSelector:bidSel]) {
-        id ret = [obj performSelector:bidSel];
-        if ([ret isKindOfClass:[NSString class]] && [(NSString *)ret length] > 0)
-            return (NSString *)ret;
-    }
-    // KVC fallback — wrapped to avoid NSUndefinedKeyException crash
-    id bid = nil;
-    @try { bid = [obj valueForKey:@"bundleIdentifier"]; } @catch (...) {}
-    if ([bid isKindOfClass:[NSString class]] && [(NSString *)bid length] > 0)
-        return (NSString *)bid;
-    bid = nil;
-    @try { bid = [obj valueForKey:@"bundleID"]; } @catch (...) {}
-    if ([bid isKindOfClass:[NSString class]] && [(NSString *)bid length] > 0)
-        return (NSString *)bid;
-    return nil;
-}
-
-static NSString *vcamFrontmostBundleID(void) {
-    NSString *bid = nil;
-
-    // ── 1. SBApplicationController (iOS 10-15) ────────────────────────────────
-    {
-        Class cls = NSClassFromString(@"SBApplicationController");
-        id inst = cls ? [cls sharedInstance] : nil;
-        if (inst) {
-            const char *sels[] = {
-                "frontmostApplicationWithUpdatedState",
-                "frontmostApplication",
-                "_frontmostApplication",
-                NULL
-            };
-            for (int i = 0; sels[i] && !bid; i++) {
-                SEL s = sel_getUid(sels[i]);
-                if ([inst respondsToSelector:s])
-                    bid = vcamBundleIDFromObj([inst performSelector:s]);
-            }
-        }
-    }
-    if (bid) return bid;
-
-    // ── 2. SpringBoard UIApplication subclass methods ─────────────────────────
-    {
-        UIApplication *app = [UIApplication sharedApplication];
-        const char *sels[] = {
-            "_frontmostApplication",
-            "frontmostApplication",
-            "_accessibilityFrontMostApplication",
-            NULL
-        };
-        for (int i = 0; sels[i] && !bid; i++) {
-            SEL s = sel_getUid(sels[i]);
-            if ([app respondsToSelector:s])
-                bid = vcamBundleIDFromObj([app performSelector:s]);
-        }
-    }
-    if (bid) return bid;
-
-    // ── 3. SBApplication class method (iOS 14-15) ─────────────────────────────
-    {
-        Class cls = NSClassFromString(@"SBApplication");
-        if (cls) {
-            const char *sels[] = { "frontmostApplication", NULL };
-            for (int i = 0; sels[i] && !bid; i++) {
-                SEL s = sel_getUid(sels[i]);
-                if ([cls respondsToSelector:s])
-                    bid = vcamBundleIDFromObj([cls performSelector:s]);
-            }
-        }
-    }
-    if (bid) return bid;
-
-    // ── 4. SBSceneManager — foreground scenes (iOS 13+) ───────────────────────
-    @try {
-        Class cls = NSClassFromString(@"SBSceneManager");
-        id mgr = cls ? [cls sharedInstance] : nil;
-        if (!mgr && cls && [cls respondsToSelector:sel_getUid("_sharedInstance")])
-            mgr = [cls performSelector:sel_getUid("_sharedInstance")];
-        if (mgr) {
-            id rawScenes = [mgr valueForKey:@"_scenesByPersistentIdentifier"];
-            // Guard type: valueForKey: may return non-NSDictionary on some iOS versions
-            if ([rawScenes isKindOfClass:[NSDictionary class]]) {
-                NSDictionary *scenes = (NSDictionary *)rawScenes;
-                for (id key in scenes) {
-                    id scene = [scenes objectForKey:key];
-                    NSString *sceneBID = vcamBundleIDFromObj(scene);
-                    if (sceneBID && ![sceneBID isEqualToString:@"com.apple.springboard"]) {
-                        bid = sceneBID; break;
-                    }
-                }
-            }
-        }
-    } @catch (...) {}
-    if (bid) return bid;
-
-    // ── 5. SBUIController ─────────────────────────────────────────────────────
-    {
-        Class cls = NSClassFromString(@"SBUIController");
-        id inst = cls ? [cls sharedInstance] : nil;
-        if (inst) {
-            const char *sels[] = { "_frontmostApplication", "frontmostApplication", NULL };
-            for (int i = 0; sels[i] && !bid; i++) {
-                SEL s = sel_getUid(sels[i]);
-                if ([inst respondsToSelector:s])
-                    bid = vcamBundleIDFromObj([inst performSelector:s]);
-            }
-        }
-    }
-
-    // ── Log once when all methods fail ────────────────────────────────────────
-    static BOOL s_logged = NO;
-    if (!bid && !s_logged) {
-        s_logged = YES;
-        Class c1 = NSClassFromString(@"SBApplicationController");
-        Class c2 = NSClassFromString(@"SBSceneManager");
-        Class c3 = NSClassFromString(@"SBUIController");
-        vcamPickerDiag([NSString stringWithFormat:
-            @"[bid] all failed c1=%d c2=%d c3=%d",
-            (int)(c1 != nil), (int)(c2 != nil), (int)(c3 != nil)]);
-    }
-    return bid;
-}
-
-static double vcamIconHueForFrontApp(void) {
-    NSString *bundleID = vcamFrontmostBundleID();
-    if (!bundleID) {
-        // vcamFrontmostBundleID() already logs once on first failure via s_logged
-        return -1.0;
-    }
-
-    // Cache: same app → same icon → same hue, no re-loading
-    if (s_iconBundleID && [s_iconBundleID isEqualToString:bundleID])
-        return s_iconHue;
-
-    [s_iconBundleID release];
-    s_iconBundleID = [bundleID copy];
-    s_iconHue = -1.0;
-
-    UIImage *icon = nil;
-
-    // Method 1: UIKit private API _applicationIconImageForBundleIdentifier:format:scale:
-    // Use id return + isKindOfClass guard — avoids crash from wrong return-type assumption.
-    @try {
-        SEL privSel = sel_getUid("_applicationIconImageForBundleIdentifier:format:scale:");
-        if ([UIImage respondsToSelector:privSel]) {
-            Method m = class_getClassMethod([UIImage class], privSel);
-            if (m) {
-                typedef id (*IconFn)(Class, SEL, NSString *, NSInteger, CGFloat);
-                IconFn fn = (IconFn)method_getImplementation(m);
-                id iconObj = fn([UIImage class], privSel, bundleID, 0,
-                                [UIScreen mainScreen].scale);
-                if ([iconObj isKindOfClass:[UIImage class]])
-                    icon = (UIImage *)iconObj;
-            }
-        }
-    } @catch (...) {}
-
-    // Method 2: load from bundle via LSApplicationProxy (covers App Store + jailbreak apps)
-    if (!icon || !icon.CGImage) {
-        NSString *bundlePath = nil;
-        // Try NSBundle (works for system apps loaded in the same process)
-        bundlePath = [[NSBundle bundleWithIdentifier:bundleID] bundlePath];
-        // Try LSApplicationProxy for user/jailbreak apps
-        if (!bundlePath) {
-            @try {
-                Class LSProxy = NSClassFromString(@"LSApplicationProxy");
-                if (!LSProxy) LSProxy = NSClassFromString(@"LSBundleProxy");
-                SEL pSel = sel_getUid("applicationProxyForIdentifier:");
-                if (LSProxy && [LSProxy respondsToSelector:pSel]) {
-                    id proxy = [LSProxy performSelector:pSel withObject:bundleID];
-                    id rawURL = [proxy valueForKey:@"bundleURL"];
-                    if ([rawURL isKindOfClass:[NSURL class]])
-                        bundlePath = [(NSURL *)rawURL path];
-                    else if ([rawURL isKindOfClass:[NSString class]])
-                        bundlePath = (NSString *)rawURL;
-                }
-            } @catch (...) {}
-        }
-        if (bundlePath) {
-            NSDictionary *info = [NSDictionary dictionaryWithContentsOfFile:
-                                  [bundlePath stringByAppendingPathComponent:@"Info.plist"]];
-            NSArray *files = [[[info objectForKey:@"CFBundleIcons"]
-                                objectForKey:@"CFBundlePrimaryIcon"]
-                                objectForKey:@"CFBundleIconFiles"];
-            NSString *base = [files lastObject];
-            if (base) {
-                NSString *p2x = [bundlePath stringByAppendingPathComponent:
-                                 [base stringByAppendingString:@"@2x.png"]];
-                icon = [UIImage imageWithContentsOfFile:p2x];
-                if (!icon)
-                    icon = [UIImage imageWithContentsOfFile:
-                            [bundlePath stringByAppendingPathComponent:
-                             [base stringByAppendingString:@".png"]]];
-            }
-        }
-    }
-
-    if (!icon || !icon.CGImage) {
-        vcamPickerDiag([NSString stringWithFormat:@"[icon] no img: %@", bundleID]);
-        return -1.0;
-    }
-
-    s_iconHue = vcamSampleImageHueFull(icon.CGImage, 40, 40);
-    vcamPickerDiag([NSString stringWithFormat:@"[icon] %@ h=%.2f", bundleID, s_iconHue]);
-    return s_iconHue;
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Darwin notify infrastructure (fallback for non-RootHide apps)
@@ -520,24 +320,6 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
         }
     } else {
         if (shouldLog) vcamPickerDiag(@"[FP2] fn=NULL");
-    }
-
-    // ── Fast path 3: frontmost app icon dominant hue ──────────────────────────
-    // Works even when RootHide blocks dylib injection into the foreground app.
-    // Wrapped in @try/@catch: any SpringBoard private API misbehavior is caught
-    // here rather than crashing SpringBoard into safe mode.
-    double iconHue = -1.0;
-    @try {
-        iconHue = vcamIconHueForFrontApp();
-    } @catch (NSException *e) {
-        vcamPickerDiag([NSString stringWithFormat:@"[icon] ex: %@", e.reason]);
-    } @catch (...) {
-        vcamPickerDiag(@"[icon] unknown ex");
-    }
-    if (iconHue >= 0.0) {
-        [g_floatButton setRingHue:iconHue];
-        BINFlashSavePrefs(@{ kBINFlashKeyHue: @(iconHue) });
-        return;
     }
 
     // ── Fallback: cross-process Darwin notify ─────────────────────────────────
