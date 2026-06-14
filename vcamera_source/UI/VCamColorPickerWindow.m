@@ -65,21 +65,34 @@ static double vcamComputeHueFromRaw(const uint8_t *bytes,
     int x1 = x0 + SZ; if (x1 > (int)imgW) { x1 = (int)imgW; x0 = x1-SZ; if (x0<0) x0=0; }
     int y1 = y0 + SZ; if (y1 > (int)imgH) { y1 = (int)imgH; y0 = y1-SZ; if (y0<0) y0=0; }
 
+    // On iOS 16+ with Display P3, UICreateScreenImage returns 64bpp (bpp=8 bytes/pixel):
+    // kCGBitmapByteOrder16Little | kCGImageAlphaNoneSkipLast (bi=0x1005).
+    // Layout: R(2 bytes LE), G(2 bytes LE), B(2 bytes LE), X(2 bytes LE).
+    // On iOS 15 and non-P3 devices: 32bpp (bpp=4), use rOff/gOff/bOff as before.
+    BOOL wide = (bpp == 8);
+
     double tR = 0.0, tG = 0.0, tB = 0.0;
     int count = 0;
     for (int row = y0; row < y1; row++) {
         const uint8_t *rp = bytes + (size_t)row * bpr;
         for (int col = x0; col < x1; col++) {
             const uint8_t *p = rp + (size_t)col * bpp;
-            tR += p[rOff]; tG += p[gOff]; tB += p[bOff];
+            if (wide) {
+                tR += (double)((uint16_t)p[0] | ((uint16_t)p[1] << 8));
+                tG += (double)((uint16_t)p[2] | ((uint16_t)p[3] << 8));
+                tB += (double)((uint16_t)p[4] | ((uint16_t)p[5] << 8));
+            } else {
+                tR += p[rOff]; tG += p[gOff]; tB += p[bOff];
+            }
             count++;
         }
     }
     if (count == 0) return -1.0;
 
-    double r = tR / (count * 255.0);
-    double g = tG / (count * 255.0);
-    double b = tB / (count * 255.0);
+    double scale = wide ? 65535.0 : 255.0;
+    double r = tR / (count * scale);
+    double g = tG / (count * scale);
+    double b = tB / (count * scale);
 
     if (diagOut)
         *diagOut = [NSString stringWithFormat:@"%zux%zu px=%d py=%d R=%.2f G=%.2f B=%.2f",

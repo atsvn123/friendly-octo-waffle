@@ -188,6 +188,10 @@ void vcamUpdateFloatButton(void) {
 
     if (menuPresent) return;
 
+    // Skip color sampling while dragging — CGDataProviderCopyData copies 8-22MB on
+    // the main thread (~60ms per call), blocking gesture recognizer callbacks.
+    if (g_floatButton.isMoving) return;
+
     if (sz.width <= 0 || sz.height <= 0) return;
     CGPoint center = g_floatButton.center;
     vcamSendPickerSampleRequest((float)(center.x / sz.width),
