@@ -278,13 +278,10 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
     }
     // -2.0 → no entitlement; falls through on A10/iOS 15
 
-    // ── Fast path 2: UICreateScreenImage (iOS 15+ rename of UIGetScreenImage) ──
-    // CGDataProviderCopyData copies 8-22MB on the main thread (~60ms per call).
-    // Rate-limit to once per 2s to keep SpringBoard's main thread free.
-    static CFAbsoluteTime s_fp2LastTime = 0.0;
-    CFAbsoluteTime fp2Now = CFAbsoluteTimeGetCurrent();
-    if (fp2Now - s_fp2LastTime < 2.0) return;
-    s_fp2LastTime = fp2Now;
+    // ── Fast path 2: UICreateScreenImage → crop → tiny bitmap ────────────────
+    // Crop a 60×60 native-pixel region around the button, render into a small
+    // BGRA CPU buffer (~14 KB, ~1-5 ms) instead of CGDataProviderCopyData on
+    // the full 8-22 MB screen image (~62 ms). Runs at the native 200 ms tick.
     static dispatch_queue_t s_q          = NULL;
     static volatile BOOL    s_fp2Running = NO;
     static dispatch_once_t  s_qOnce      = 0;
@@ -297,56 +294,59 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
         if (!s_fp2Running) {
             s_fp2Running = YES;
 
-            // ── ALL image I/O on main thread ──────────────────────────────────
-            // UICreateScreenImage must be called here (UIKit requirement).
-            // CGDataProviderCopyData is also called here immediately after so
-            // the IOSurface lock is held while we're still on the render thread.
+            // UICreateScreenImage must be called on the main thread.
             CGImageRef screenImg = getScreenImage();
             if (!screenImg) { s_fp2Running = NO; return; }
 
             size_t imgW = CGImageGetWidth(screenImg);
             size_t imgH = CGImageGetHeight(screenImg);
-            size_t bpr  = CGImageGetBytesPerRow(screenImg);
-            size_t bpp  = CGImageGetBitsPerPixel(screenImg) / 8;
-            CGBitmapInfo bi = CGImageGetBitmapInfo(screenImg);
-            CFDataRef rawData = CGDataProviderCopyData(CGImageGetDataProvider(screenImg));
-            CGImageRelease(screenImg);
 
-            // Determine channel offsets from bitmapInfo.
-            // Most common on iOS: kCGBitmapByteOrder32Little | PremultFirst = BGRA
-            // memory layout: p[0]=B p[1]=G p[2]=R p[3]=A
-            int rOff = 2, gOff = 1, bOff = 0; // BGRA default
-            if ((bi & kCGBitmapByteOrderMask) != kCGBitmapByteOrder32Little) {
-                rOff = 1; gOff = 2; bOff = 3; // ARGB (big-endian)
+            const size_t SZ = 60;
+            size_t cx = (size_t)(nx * (double)imgW + 0.5);
+            size_t cy = (size_t)(ny * (double)imgH + 0.5);
+            size_t x0 = (cx >= SZ/2) ? (cx - SZ/2) : 0;
+            size_t y0 = (cy >= SZ/2) ? (cy - SZ/2) : 0;
+            if (x0 + SZ > imgW) x0 = (imgW >= SZ) ? (imgW - SZ) : 0;
+            if (y0 + SZ > imgH) y0 = (imgH >= SZ) ? (imgH - SZ) : 0;
+            size_t cropW = (x0 + SZ <= imgW) ? SZ : (imgW - x0);
+            size_t cropH = (y0 + SZ <= imgH) ? SZ : (imgH - y0);
+
+            CGImageRef cropImg = CGImageCreateWithImageInRect(screenImg,
+                CGRectMake((CGFloat)x0, (CGFloat)y0, (CGFloat)cropW, (CGFloat)cropH));
+            CGImageRelease(screenImg);
+            if (!cropImg) { s_fp2Running = NO; return; }
+
+            // Fixed-format BGRA 8bpp — no bitmapInfo detection needed.
+            uint8_t *buf = (uint8_t *)calloc(cropW * cropH, 4);
+            if (!buf) { CGImageRelease(cropImg); s_fp2Running = NO; return; }
+
+            CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
+            CGContextRef ctx = CGBitmapContextCreate(buf, cropW, cropH, 8, cropW * 4, cs,
+                kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+            CGColorSpaceRelease(cs);
+            if (ctx) {
+                CGContextDrawImage(ctx, CGRectMake(0, 0, (CGFloat)cropW, (CGFloat)cropH), cropImg);
+                CGContextRelease(ctx);
             }
-            CGImageAlphaInfo ai = bi & kCGBitmapAlphaInfoMask;
-            if ((bi & kCGBitmapByteOrderMask) == kCGBitmapByteOrder32Little
-                && (ai == kCGImageAlphaPremultipliedLast || ai == kCGImageAlphaNoneSkipLast
-                    || ai == kCGImageAlphaLast)) {
-                // RGBA little-endian: p[0]=R p[1]=G p[2]=B p[3]=A
-                rOff = 0; gOff = 1; bOff = 2;
-            }
+            CGImageRelease(cropImg);
 
             if (shouldLog)
-                vcamPickerDiag([NSString stringWithFormat:
-                    @"[FP2-FMT] %zux%zu bpp=%zu bpr=%zu bi=0x%X %@",
-                    imgW, imgH, bpp, bpr, (unsigned)bi, rawData ? @"GOT" : @"NODATA"]);
+                vcamPickerDiag([NSString stringWithFormat:@"[FP2] crop %zux%zu at (%zu,%zu)",
+                    cropW, cropH, x0, y0]);
 
-            if (!rawData || bpp < 3) { s_fp2Running = NO; return; }
-
-            float capturedNx = nx;
-            float capturedNy = ny;
             BOOL log = shouldLog;
+            size_t capturedW = cropW;
+            size_t capturedH = cropH;
 
-            // ── Hue math on background queue (CPU only, no I/O) ──────────────
+            // Hue math on background queue. buf ownership transferred to block.
             dispatch_async(s_q, ^{
                 NSString *diag = nil;
-                const uint8_t *bytes = CFDataGetBytePtr(rawData);
-                double hue = vcamComputeHueFromRaw(bytes, imgW, imgH, bpr, bpp,
-                                                    rOff, gOff, bOff,
-                                                    capturedNx, capturedNy,
+                // BGRA LE: p[0]=B p[1]=G p[2]=R → rOff=2 gOff=1 bOff=0
+                // nx=0.5 ny=0.5 → sample center of the 60×60 crop
+                double hue = vcamComputeHueFromRaw(buf, capturedW, capturedH, capturedW * 4,
+                                                    4, 2, 1, 0, 0.5f, 0.5f,
                                                     log ? &diag : NULL);
-                CFRelease(rawData);
+                free(buf);
                 s_fp2Running = NO;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });
