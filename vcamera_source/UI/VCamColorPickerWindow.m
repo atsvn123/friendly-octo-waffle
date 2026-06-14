@@ -232,18 +232,23 @@ static double    s_iconHue      = -1.0;
 // Extract bundle ID from any SBApplication/SBScene/FBScene object safely.
 static NSString *vcamBundleIDFromObj(id obj) {
     if (!obj) return nil;
-    // Try direct method first (avoids KVC exception for unknown keys)
+    // Try direct method first; guard return type to avoid treating int/BOOL as NSString*
     SEL bidSel = @selector(bundleIdentifier);
     if ([obj respondsToSelector:bidSel]) {
-        NSString *bid = [obj performSelector:bidSel];
-        if (bid && bid.length > 0) return bid;
+        id ret = [obj performSelector:bidSel];
+        if ([ret isKindOfClass:[NSString class]] && [(NSString *)ret length] > 0)
+            return (NSString *)ret;
     }
     // KVC fallback — wrapped to avoid NSUndefinedKeyException crash
-    NSString *bid = nil;
+    id bid = nil;
     @try { bid = [obj valueForKey:@"bundleIdentifier"]; } @catch (...) {}
-    if (bid && bid.length > 0) return bid;
+    if ([bid isKindOfClass:[NSString class]] && [(NSString *)bid length] > 0)
+        return (NSString *)bid;
+    bid = nil;
     @try { bid = [obj valueForKey:@"bundleID"]; } @catch (...) {}
-    return (bid && bid.length > 0) ? bid : nil;
+    if ([bid isKindOfClass:[NSString class]] && [(NSString *)bid length] > 0)
+        return (NSString *)bid;
+    return nil;
 }
 
 static NSString *vcamFrontmostBundleID(void) {
@@ -301,23 +306,26 @@ static NSString *vcamFrontmostBundleID(void) {
     if (bid) return bid;
 
     // ── 4. SBSceneManager — foreground scenes (iOS 13+) ───────────────────────
-    {
+    @try {
         Class cls = NSClassFromString(@"SBSceneManager");
         id mgr = cls ? [cls sharedInstance] : nil;
-        if (!mgr) { @try { mgr = [cls performSelector:sel_getUid("_sharedInstance")]; } @catch (...) {} }
+        if (!mgr && cls && [cls respondsToSelector:sel_getUid("_sharedInstance")])
+            mgr = [cls performSelector:sel_getUid("_sharedInstance")];
         if (mgr) {
-            // _scenesByPersistentIdentifier: NSDictionary<id, SBScene*>
-            NSDictionary *scenes = nil;
-            @try { scenes = [mgr valueForKey:@"_scenesByPersistentIdentifier"]; } @catch (...) {}
-            for (id key in scenes) {
-                id scene = [scenes objectForKey:key];
-                NSString *sceneBID = vcamBundleIDFromObj(scene);
-                if (sceneBID && ![sceneBID isEqualToString:@"com.apple.springboard"]) {
-                    bid = sceneBID; break;
+            id rawScenes = [mgr valueForKey:@"_scenesByPersistentIdentifier"];
+            // Guard type: valueForKey: may return non-NSDictionary on some iOS versions
+            if ([rawScenes isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *scenes = (NSDictionary *)rawScenes;
+                for (id key in scenes) {
+                    id scene = [scenes objectForKey:key];
+                    NSString *sceneBID = vcamBundleIDFromObj(scene);
+                    if (sceneBID && ![sceneBID isEqualToString:@"com.apple.springboard"]) {
+                        bid = sceneBID; break;
+                    }
                 }
             }
         }
-    }
+    } @catch (...) {}
     if (bid) return bid;
 
     // ── 5. SBUIController ─────────────────────────────────────────────────────
@@ -366,15 +374,21 @@ static double vcamIconHueForFrontApp(void) {
     UIImage *icon = nil;
 
     // Method 1: UIKit private API _applicationIconImageForBundleIdentifier:format:scale:
-    SEL privSel = sel_getUid("_applicationIconImageForBundleIdentifier:format:scale:");
-    if ([UIImage respondsToSelector:privSel]) {
-        Method m = class_getClassMethod([UIImage class], privSel);
-        if (m) {
-            typedef UIImage *(*IconFn)(Class, SEL, NSString *, NSInteger, CGFloat);
-            IconFn fn = (IconFn)method_getImplementation(m);
-            icon = fn([UIImage class], privSel, bundleID, 0, [UIScreen mainScreen].scale);
+    // Use id return + isKindOfClass guard — avoids crash from wrong return-type assumption.
+    @try {
+        SEL privSel = sel_getUid("_applicationIconImageForBundleIdentifier:format:scale:");
+        if ([UIImage respondsToSelector:privSel]) {
+            Method m = class_getClassMethod([UIImage class], privSel);
+            if (m) {
+                typedef id (*IconFn)(Class, SEL, NSString *, NSInteger, CGFloat);
+                IconFn fn = (IconFn)method_getImplementation(m);
+                id iconObj = fn([UIImage class], privSel, bundleID, 0,
+                                [UIScreen mainScreen].scale);
+                if ([iconObj isKindOfClass:[UIImage class]])
+                    icon = (UIImage *)iconObj;
+            }
         }
-    }
+    } @catch (...) {}
 
     // Method 2: load from bundle via LSApplicationProxy (covers App Store + jailbreak apps)
     if (!icon || !icon.CGImage) {
@@ -383,14 +397,19 @@ static double vcamIconHueForFrontApp(void) {
         bundlePath = [[NSBundle bundleWithIdentifier:bundleID] bundlePath];
         // Try LSApplicationProxy for user/jailbreak apps
         if (!bundlePath) {
-            Class LSProxy = NSClassFromString(@"LSApplicationProxy");
-            if (!LSProxy) LSProxy = NSClassFromString(@"LSBundleProxy");
-            SEL pSel = sel_getUid("applicationProxyForIdentifier:");
-            if (LSProxy && [LSProxy respondsToSelector:pSel]) {
-                id proxy = [LSProxy performSelector:pSel withObject:bundleID];
-                NSURL *u = [proxy valueForKey:@"bundleURL"];
-                bundlePath = [u path];
-            }
+            @try {
+                Class LSProxy = NSClassFromString(@"LSApplicationProxy");
+                if (!LSProxy) LSProxy = NSClassFromString(@"LSBundleProxy");
+                SEL pSel = sel_getUid("applicationProxyForIdentifier:");
+                if (LSProxy && [LSProxy respondsToSelector:pSel]) {
+                    id proxy = [LSProxy performSelector:pSel withObject:bundleID];
+                    id rawURL = [proxy valueForKey:@"bundleURL"];
+                    if ([rawURL isKindOfClass:[NSURL class]])
+                        bundlePath = [(NSURL *)rawURL path];
+                    else if ([rawURL isKindOfClass:[NSString class]])
+                        bundlePath = (NSString *)rawURL;
+                }
+            } @catch (...) {}
         }
         if (bundlePath) {
             NSDictionary *info = [NSDictionary dictionaryWithContentsOfFile:
@@ -505,8 +524,16 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
 
     // ── Fast path 3: frontmost app icon dominant hue ──────────────────────────
     // Works even when RootHide blocks dylib injection into the foreground app.
-    // Each app's icon has a characteristic color that makes a reasonable flash color.
-    double iconHue = vcamIconHueForFrontApp();
+    // Wrapped in @try/@catch: any SpringBoard private API misbehavior is caught
+    // here rather than crashing SpringBoard into safe mode.
+    double iconHue = -1.0;
+    @try {
+        iconHue = vcamIconHueForFrontApp();
+    } @catch (NSException *e) {
+        vcamPickerDiag([NSString stringWithFormat:@"[icon] ex: %@", e.reason]);
+    } @catch (...) {
+        vcamPickerDiag(@"[icon] unknown ex");
+    }
     if (iconHue >= 0.0) {
         [g_floatButton setRingHue:iconHue];
         BINFlashSavePrefs(@{ kBINFlashKeyHue: @(iconHue) });
