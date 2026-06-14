@@ -47,57 +47,97 @@ static void vcamPickerDiag(NSString *msg) {
 // the area is achromatic (white/black/gray).
 // ─────────────────────────────────────────────────────────────────────────────
 // Sample a 20×20 px cluster at the donut center from a full-screen CGImage.
-// The donut hole is transparent, so (nx,ny) IS the background pixel we want.
-// Uses a Y-flipped CG context so UIKit screen coordinates map correctly.
+// The donut hole is transparent so the background shows through at (nx,ny).
 // Returns hue [0,1) or -1.0 if achromatic.
-static double vcamSampleCenterCluster(CGImageRef img, float nx, float ny) {
+static double vcamSampleCenterCluster(CGImageRef img, float nx, float ny,
+                                      NSString **diagOut) {
     size_t imgW = CGImageGetWidth(img);
     size_t imgH = CGImageGetHeight(img);
     if (!imgW || !imgH) return -1.0;
 
-    // Center pixel in image coordinates.
-    int px = (int)(nx * imgW + 0.5);
-    int py = (int)(ny * imgH + 0.5);
+    int px = (int)(nx * (double)imgW + 0.5);
+    int py = (int)(ny * (double)imgH + 0.5);
 
-    // 20×20 px sampling cluster around center.
     const int SZ = 20;
     int x0 = px - SZ/2; if (x0 < 0) x0 = 0;
     int y0 = py - SZ/2; if (y0 < 0) y0 = 0;
-    int x1 = x0 + SZ;   if (x1 > (int)imgW) { x1 = (int)imgW; x0 = x1 - SZ; if (x0 < 0) x0 = 0; }
-    int y1 = y0 + SZ;   if (y1 > (int)imgH) { y1 = (int)imgH; y0 = y1 - SZ; if (y0 < 0) y0 = 0; }
+    int x1 = x0 + SZ; if (x1 > (int)imgW) { x1 = (int)imgW; x0 = x1 - SZ; if (x0 < 0) x0 = 0; }
+    int y1 = y0 + SZ; if (y1 > (int)imgH) { y1 = (int)imgH; y0 = y1 - SZ; if (y0 < 0) y0 = 0; }
     int w = x1 - x0, h = y1 - y0;
     if (w <= 0 || h <= 0) return -1.0;
 
-    uint8_t buf[20*20*4];
-    memset(buf, 0, sizeof(buf));
+    double r = 0.0, g = 0.0, b = 0.0;
+    int count = 0;
+    BOOL usedDirect = NO;
 
-    CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
-    CGContextRef ctx = CGBitmapContextCreate(buf, (size_t)w, (size_t)h, 8, (size_t)w * 4, cs,
-        kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
-    CGColorSpaceRelease(cs);
-    if (!ctx) return -1.0;
-
-    // No Y-flip: CGContextDrawImage places image row 0 at rect.origin.y (CG bottom).
-    // Rect at (-x0, -y0) → image row y0 lands at CG y=0 → buf row 0. Correct.
-    // A Y-flip would mirror the sample to row (imgH - y0), causing wrong color on
-    // devices where the content at the mirrored position differs (e.g. iPhone 8 Plus).
-    CGContextSetInterpolationQuality(ctx, kCGInterpolationNone);
-    CGContextDrawImage(ctx, CGRectMake(-(CGFloat)x0, -(CGFloat)y0,
-                                       (CGFloat)imgW, (CGFloat)imgH), img);
-    CGContextRelease(ctx);
-
-    // Average all pixels in the cluster. BGRA layout.
-    double totalR = 0.0, totalG = 0.0, totalB = 0.0;
-    int count = w * h;
-    for (int i = 0; i < count; i++) {
-        totalR += buf[i*4+2] / 255.0;
-        totalG += buf[i*4+1] / 255.0;
-        totalB += buf[i*4+0] / 255.0;
+    // Primary path: read directly from the data provider.
+    // CGImageRef stores row 0 at screen TOP (standard image convention).
+    // Direct access: pixel at (col, row) = bytes + row*bpr + col*bpp.
+    // No CGContext → no coordinate-system ambiguity.
+    CFDataRef rawData = CGDataProviderCopyData(CGImageGetDataProvider(img));
+    if (rawData) {
+        size_t bpr = CGImageGetBytesPerRow(img);
+        size_t bpp = CGImageGetBitsPerPixel(img) / 8;
+        if (bpp >= 3) {
+            const uint8_t *bytes = CFDataGetBytePtr(rawData);
+            CGBitmapInfo bi = CGImageGetBitmapInfo(img);
+            // kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst = BGRA
+            // kCGBitmapByteOrder32Big   | kCGImageAlphaPremultipliedFirst = ARGB
+            int rOff, gOff, bOff;
+            if ((bi & kCGBitmapByteOrderMask) == kCGBitmapByteOrder32Little) {
+                rOff = 2; gOff = 1; bOff = 0; // BGRA
+            } else {
+                rOff = 1; gOff = 2; bOff = 3; // ARGB
+            }
+            double tR = 0.0, tG = 0.0, tB = 0.0;
+            for (int row = y0; row < y1; row++) {
+                const uint8_t *rp = bytes + (size_t)row * bpr;
+                for (int col = x0; col < x1; col++) {
+                    const uint8_t *p = rp + (size_t)col * bpp;
+                    tR += p[rOff]; tG += p[gOff]; tB += p[bOff];
+                    count++;
+                }
+            }
+            if (count > 0) {
+                r = tR / (count * 255.0);
+                g = tG / (count * 255.0);
+                b = tB / (count * 255.0);
+                usedDirect = YES;
+            }
+        }
+        CFRelease(rawData);
     }
 
-    double r = totalR / count;
-    double g = totalG / count;
-    double b = totalB / count;
+    // Fallback: CGContext with Y-flip (sequential-access data providers).
+    if (!usedDirect) {
+        uint8_t buf[20*20*4];
+        memset(buf, 0, sizeof(buf));
+        CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
+        CGContextRef ctx = CGBitmapContextCreate(buf, (size_t)w, (size_t)h, 8,
+            (size_t)w * 4, cs, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+        CGColorSpaceRelease(cs);
+        if (!ctx) return -1.0;
+        CGContextTranslateCTM(ctx, 0, (CGFloat)h);
+        CGContextScaleCTM(ctx, 1.0, -1.0);
+        CGContextSetInterpolationQuality(ctx, kCGInterpolationNone);
+        CGContextDrawImage(ctx, CGRectMake(-(CGFloat)x0, -(CGFloat)y0,
+                                           (CGFloat)imgW, (CGFloat)imgH), img);
+        CGContextRelease(ctx);
+        count = w * h;
+        double tR = 0.0, tG = 0.0, tB = 0.0;
+        for (int i = 0; i < count; i++) {
+            tR += buf[i*4+2]; tG += buf[i*4+1]; tB += buf[i*4+0];
+        }
+        r = tR / (count * 255.0);
+        g = tG / (count * 255.0);
+        b = tB / (count * 255.0);
+    }
+
+    if (diagOut)
+        *diagOut = [NSString stringWithFormat:@"%s %zux%zu px=%d py=%d R=%.2f G=%.2f B=%.2f",
+                    usedDirect ? "DIR" : "CTX", imgW, imgH, px, py, r, g, b];
+
+    if (count == 0) return -1.0;
 
     double maxC  = r > g ? (r > b ? r : b) : (g > b ? g : b);
     double minC  = r < g ? (r < b ? r : b) : (g < b ? g : b);
@@ -307,15 +347,19 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
             }
             float capturedNx = nx;
             float capturedNy = ny;
+            BOOL log = shouldLog;
             dispatch_async(s_q, ^{
-                double hue = vcamSampleCenterCluster(screenImg, capturedNx, capturedNy);
+                NSString *diag = nil;
+                double hue = vcamSampleCenterCluster(screenImg, capturedNx, capturedNy,
+                                                     log ? &diag : NULL);
                 CGImageRelease(screenImg);
                 s_fp2Running = NO;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [g_floatButton setRingHue:hue];
                     BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });
-                    if (shouldLog)
-                        vcamPickerDiag([NSString stringWithFormat:@"[FP2] h=%.2f", hue]);
+                    if (log)
+                        vcamPickerDiag([NSString stringWithFormat:@"[FP2] h=%.2f %@",
+                                        hue, diag ? diag : @""]);
                 });
             });
         }
