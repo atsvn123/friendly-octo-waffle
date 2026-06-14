@@ -26,7 +26,7 @@ RTMPEndpoint::~RTMPEndpoint() {}
 void RTMPEndpoint::doHandshake() {
     // --- C0 ---
     uint8_t c0 = _layer->readU8();
-    if (c0 != 0x03)
+    if (c0 != 0x03 && c0 != 0x06)
         throw std::runtime_error("RTMP: unsupported version");
 
     // --- C1 ---

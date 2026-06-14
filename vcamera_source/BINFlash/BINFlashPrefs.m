@@ -35,7 +35,8 @@ static NSDictionary *_unpackState(uint64_t s) {
     double speed      = ((s >> 3) & 0x3FF) / 10.0;
     int brightness    = (int)((s >> 13) & 0x7F);
     int region        = (int)((s >> 20) & 0x7F);
-    double hue        = ((s >> 27) & 0x3FF) / 1000.0;
+    BOOL noColor      = ((s >> 57) & 1) != 0;
+    double hue        = noColor ? -1.0 : (((s >> 27) & 0x3FF) / 1000.0);
     double regionX    = ((s >> 37) & 0x3FF) / 1000.0;
     double regionY    = ((s >> 47) & 0x3FF) / 1000.0;
 
@@ -137,7 +138,11 @@ static void _packAndSetState(NSDictionary *prefs) {
     s |= ((uint64_t)(llround(fmax(fmin(speed, 102.3), 0.0) * 10.0)) * 8) & 0x1FF8ULL;
     s |= ((uint64_t)(llround(fmax(fmin(brightness, 100.0), 0.0))) << 13) & 0xFE000ULL;
     s |= ((uint64_t)(llround(fmax(fmin(region,     100.0), 0.0))) << 20) & 0x7F00000ULL;
-    s |= ((uint64_t)(llround(fmax(fmin(hue,    1.0), 0.0) * 1000.0) & 0x3FF) << 27);
+    if (hue < 0.0) {
+        s |= (1ULL << 57);  // "no color" — hue bits stay 0
+    } else {
+        s |= ((uint64_t)(llround(fmax(fmin(hue, 1.0), 0.0) * 1000.0) & 0x3FF) << 27);
+    }
     s |= ((uint64_t)(llround(fmax(fmin(regionX,1.0), 0.0) * 1000.0) & 0x3FF) << 37);
     s |= ((uint64_t)(llround(fmax(fmin(regionY,1.0), 0.0) * 1000.0) & 0x3FF) << 47);
 

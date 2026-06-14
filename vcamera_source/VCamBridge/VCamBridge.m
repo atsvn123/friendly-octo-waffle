@@ -475,7 +475,12 @@ void vcamSendDiag(NSString *msg) {
 
             RTMPServer *srvRef = [self server];
 
-            BOOL bindOK = [RTMPServer createActiveTCPServer];  // no-op if already bound
+            // Retry up to 5 × 100ms — handles transient port-in-use on iOS 16.
+            BOOL bindOK = NO;
+            for (int _r = 0; _r < 5 && !bindOK; _r++) {
+                bindOK = [RTMPServer createActiveTCPServer];
+                if (!bindOK && _r < 4) usleep(100000);
+            }
 
             if (!bindOK) {
                 NSString *err = [RTMPServer lastBindError] ?: @"?";
@@ -484,7 +489,7 @@ void vcamSendDiag(NSString *msg) {
             } else {
                 [_serverSocket sendAll:makeErrorPacket(2001, @"1935:ok")];
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                    [srvRef startServerLoop];  // idempotent: no-op on thread/TCPServer if alive
+                    [srvRef startServerLoop];
                 });
             }
 

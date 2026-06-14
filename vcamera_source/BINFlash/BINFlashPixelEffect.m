@@ -90,6 +90,8 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
     BINFlashComputeFaceRegion(prefs, width, height, &cx, &cy, &rx, &ry);
 
     double hue = BINFlashDoubleForKey(prefs, kBINFlashKeyHue, kBINFlashDefaultHue);
+    // hue < 0.0 means "no color" (auto picker saw achromatic pixels) → no flash at all.
+    if (hue < 0.0) return;
     double hR, hG, hB;
     HueToRGB(hue, &hR, &hG, &hB);
     double hR_adj = hR * 0.82 + 0.18;
