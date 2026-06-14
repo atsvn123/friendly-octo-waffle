@@ -195,89 +195,20 @@ static vcamUIGetScreenImage_t vcamGetScreenImageFn(void) {
     static vcamUIGetScreenImage_t s_fn   = NULL;
     static dispatch_once_t        s_once = 0;
     dispatch_once(&s_once, ^{
-        // 1. dyld export trie
-        s_fn = (vcamUIGetScreenImage_t)dlsym(RTLD_DEFAULT, "UIGetScreenImage");
-
-        // 2. Search EVERY loaded dyld image — symbol may have moved frameworks.
-        //    dispatch_once means this runs once at startup; O(n) over ~200 images is fine.
-        if (!s_fn) {
-            const char *syms[] = { "_UIGetScreenImage", "__UIGetScreenImage", NULL };
-            uint32_t cnt = _dyld_image_count();
-            for (uint32_t i = 0; i < cnt && !s_fn; i++) {
-                const char *name = _dyld_get_image_name(i);
-                if (!name) continue;
-                MSImageRef img = MSGetImageByName(name);
-                if (!img) continue;
-                for (int j = 0; syms[j] && !s_fn; j++) {
-                    void *hit = MSFindSymbol(img, syms[j]);
-                    if (hit) {
-                        s_fn = (vcamUIGetScreenImage_t)hit;
-                        const char *foundIn = name;
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            vcamPickerDiag([NSString stringWithFormat:
-                                @"[init] UIGetScreenImg found in %s", foundIn]);
-                        });
-                    }
-                }
-            }
-        }
+        // iOS 15+: UIGetScreenImage was renamed to UICreateScreenImage.
+        // It lives in UIKitCore's export trie → plain dlsym finds it.
+        s_fn = (vcamUIGetScreenImage_t)dlsym(RTLD_DEFAULT, "UICreateScreenImage");
+        // Older iOS fallback
+        if (!s_fn) s_fn = (vcamUIGetScreenImage_t)dlsym(RTLD_DEFAULT, "UIGetScreenImage");
 
         void *fnAddr = (void *)(uintptr_t)s_fn;
         dispatch_async(dispatch_get_main_queue(), ^{
-            vcamPickerDiag([NSString stringWithFormat:@"[init] UIGetScreenImg=%p", fnAddr]);
+            vcamPickerDiag([NSString stringWithFormat:@"[init] screenImageFn=%p", fnAddr]);
         });
     });
     return s_fn;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Fast path 2b: UIScreen private ObjC screenshot methods.
-// In SpringBoard, UIScreen may have private methods that call into the
-// compositor directly. Try known private selector names.
-// Returns a +1 retained CGImageRef, or NULL.
-// ─────────────────────────────────────────────────────────────────────────────
-static CGImageRef vcamScreenshotViaUIScreen(void) {
-    static dispatch_once_t s_once = 0;
-    static SEL s_sel = NULL;
-    dispatch_once(&s_once, ^{
-        UIScreen *scr = [UIScreen mainScreen];
-        const char *names[] = {
-            "_screenshot",
-            "screenshot",
-            "_screenshotForHIDCallout",
-            "_snapshotCGImage",
-            "_createSnapshotImage",
-            "_screenshotImage",
-            NULL
-        };
-        for (int i = 0; names[i]; i++) {
-            SEL sel = sel_getUid(names[i]);
-            if ([scr respondsToSelector:sel]) {
-                s_sel = sel;
-                const char *found = names[i];
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    vcamPickerDiag([NSString stringWithFormat:
-                        @"[init] UIScreen.screenshot=%s", found]);
-                });
-                break;
-            }
-        }
-        if (!s_sel) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                vcamPickerDiag(@"[init] UIScreen.screenshot=none");
-            });
-        }
-    });
-    if (!s_sel) return NULL;
-    id result = [[UIScreen mainScreen] performSelector:s_sel];
-    if (!result) return NULL;
-    if ([result isKindOfClass:[UIImage class]])
-        return CGImageRetain(((UIImage *)result).CGImage);
-    // Some selectors may return CGImageRef wrapped as id (unlikely but log it)
-    vcamPickerDiag([NSString stringWithFormat:@"[FP2b] unexpected type: %@",
-                    NSStringFromClass([result class])]);
-    return NULL;
-}
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -337,7 +268,7 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
     }
     // -2.0 → no entitlement; falls through on A10/iOS 15
 
-    // ── Fast path 2a: UIGetScreenImage (C function) ───────────────────────────
+    // ── Fast path 2: UICreateScreenImage (iOS 15+ rename of UIGetScreenImage) ──
     vcamUIGetScreenImage_t getScreenImage = vcamGetScreenImageFn();
     if (getScreenImage) {
         CGImageRef screenImg = getScreenImage();
@@ -347,7 +278,7 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
             double screenHue = vcamSampleImageHueFull(screenImg, 60, 90);
             CGImageRelease(screenImg);
             if (shouldLog)
-                vcamPickerDiag([NSString stringWithFormat:@"[FP2a] img=%dx%d h=%.2f",
+                vcamPickerDiag([NSString stringWithFormat:@"[FP2] img=%dx%d h=%.2f",
                                 (int)W, (int)H, screenHue]);
             if (screenHue >= 0.0) {
                 [g_floatButton setRingHue:screenHue];
@@ -355,27 +286,10 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
                 return;
             }
         } else {
-            if (shouldLog) vcamPickerDiag(@"[FP2a] img=NULL");
+            if (shouldLog) vcamPickerDiag(@"[FP2] img=NULL");
         }
-    }
-
-    // ── Fast path 2b: UIScreen private screenshot ObjC method ─────────────────
-    {
-        CGImageRef screenImg = vcamScreenshotViaUIScreen();
-        if (screenImg) {
-            size_t W = CGImageGetWidth(screenImg);
-            size_t H = CGImageGetHeight(screenImg);
-            double screenHue = vcamSampleImageHueFull(screenImg, 60, 90);
-            CGImageRelease(screenImg);
-            if (shouldLog)
-                vcamPickerDiag([NSString stringWithFormat:@"[FP2b] img=%dx%d h=%.2f",
-                                (int)W, (int)H, screenHue]);
-            if (screenHue >= 0.0) {
-                [g_floatButton setRingHue:screenHue];
-                BINFlashSavePrefs(@{ kBINFlashKeyHue: @(screenHue) });
-                return;
-            }
-        }
+    } else {
+        if (shouldLog) vcamPickerDiag(@"[FP2] fn=NULL");
     }
 
     // ── Fallback: cross-process Darwin notify ─────────────────────────────────
