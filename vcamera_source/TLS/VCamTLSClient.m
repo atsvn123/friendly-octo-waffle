@@ -65,10 +65,7 @@
     int ret = mbedtls_ctr_drbg_seed(&_ctrDrbg,
                                      mbedtls_entropy_func, &_entropy,
                                      (const unsigned char *)pers, strlen(pers));
-    if (ret != 0) {
-        NSLog(@"[VCamTLS] ctr_drbg_seed failed: %d", ret);
-        return NO;
-    }
+    if (ret != 0) return NO;
 
     char portStr[8];
     snprintf(portStr, sizeof(portStr), "%u", _port);
@@ -77,17 +74,13 @@
                                [_host UTF8String],
                                portStr,
                                MBEDTLS_NET_PROTO_TCP);
-    if (ret != 0) {
-        NSLog(@"[VCamTLS] net_connect failed: %d", ret);
-        return NO;
-    }
+    if (ret != 0) return NO;
 
     ret = mbedtls_ssl_config_defaults(&_conf,
                                        MBEDTLS_SSL_IS_CLIENT,
                                        MBEDTLS_SSL_TRANSPORT_STREAM,
                                        MBEDTLS_SSL_PRESET_DEFAULT);
     if (ret != 0) {
-        NSLog(@"[VCamTLS] ssl_config_defaults failed: %d", ret);
         mbedtls_net_free(&_serverFd);
         return NO;
     }
@@ -98,14 +91,12 @@
 
     ret = mbedtls_ssl_setup(&_ssl, &_conf);
     if (ret != 0) {
-        NSLog(@"[VCamTLS] ssl_setup failed: %d", ret);
         mbedtls_net_free(&_serverFd);
         return NO;
     }
 
     ret = mbedtls_ssl_set_hostname(&_ssl, [_host UTF8String]);
     if (ret != 0) {
-        NSLog(@"[VCamTLS] ssl_set_hostname failed: %d", ret);
         mbedtls_net_free(&_serverFd);
         return NO;
     }
@@ -116,7 +107,6 @@
     // TLS handshake
     while ((ret = mbedtls_ssl_handshake(&_ssl)) != 0) {
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
-            NSLog(@"[VCamTLS] ssl_handshake failed: %d", ret);
             mbedtls_net_free(&_serverFd);
             return NO;
         }
@@ -144,7 +134,6 @@
         int ret = mbedtls_ssl_write(&_ssl, buf, remaining);
         if (ret == MBEDTLS_ERR_SSL_WANT_WRITE || ret == MBEDTLS_ERR_SSL_WANT_READ) continue;
         if (ret < 0) {
-            NSLog(@"[VCamTLS] ssl_write failed: %d", ret);
             _connected = NO;
             return NO;
         }
@@ -169,7 +158,6 @@
             break;
         }
         if (ret < 0) {
-            NSLog(@"[VCamTLS] ssl_read failed: %d", ret);
             _connected = NO;
             return nil;
         }

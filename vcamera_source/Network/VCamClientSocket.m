@@ -159,7 +159,6 @@ static void launch_stop(const char *label) {
     int v4 = -1;  // trigger counter: !(v4 + 10*(v3/10)) fires at attempts 10,20,30...
 
     while (![self connect]) {
-        NSLog(@"connecting ...");
         if (!(v4 + 10 * (v3 / 10))) {
             launch_stop("com.apple.mediaserverd");
         }
@@ -235,10 +234,8 @@ static void socketCallBack(CFSocketRef s, CFSocketCallBackType type,
         _source = NULL;
     }
     if (_runLoop) {
-        NSLog(@"_runLoop 1");
         CFRunLoopStop(_runLoop);
         _runLoop = NULL;
-        NSLog(@"_runLoop 2");
     }
     if (_thread) {
         [_thread cancel];

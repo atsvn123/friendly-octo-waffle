@@ -14,7 +14,6 @@ VCamFloatButton *g_floatButton = nil;
 
 @implementation VCamFloatButton {
     CAShapeLayer *_ringLayer;
-    int           _moveLogCount;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -26,8 +25,6 @@ VCamFloatButton *g_floatButton = nil;
        forControlEvents:UIControlEventTouchDownRepeat];
         [self addTarget:self action:@selector(buttonDrag)
        forControlEvents:UIControlEventTouchDragInside];
-        NSLog(@"[FloatBtn] init frame=(%.0f,%.0f,%.0f,%.0f)",
-              frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
     }
     return self;
 }
@@ -69,7 +66,6 @@ VCamFloatButton *g_floatButton = nil;
 
 // -- Touch actions ------------------------------------------------------------
 - (void)buttonClicked {
-    NSLog(@"[FloatBtn] buttonClicked moving=%d", (int)self.isMoving);
     if (!self.isMoving) {
         [[VCamBridge sharedInstance] presentation];
     }
@@ -86,13 +82,8 @@ VCamFloatButton *g_floatButton = nil;
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesBegan:touches withEvent:event];
     self.isMoving    = NO;
-    _moveLogCount    = 0;
     UITouch *touch   = [touches anyObject];
     self.beginPosition = [touch locationInView:self];
-    CGPoint sc = [touch locationInView:nil];
-    NSLog(@"[FloatBtn] touchesBegan screen=(%.1f,%.1f) local=(%.1f,%.1f) btnCenter=(%.1f,%.1f)",
-          sc.x, sc.y, self.beginPosition.x, self.beginPosition.y,
-          self.center.x, self.center.y);
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -127,14 +118,11 @@ VCamFloatButton *g_floatButton = nil;
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesEnded:touches withEvent:event];
-    NSLog(@"[FloatBtn] touchesEnded center=(%.1f,%.1f) moving=%d",
-          self.center.x, self.center.y, (int)self.isMoving);
     self.isMoving = NO;
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesCancelled:touches withEvent:event];
-    NSLog(@"[FloatBtn] touchesCancelled center=(%.1f,%.1f)", self.center.x, self.center.y);
     self.isMoving = NO;
 }
 
@@ -176,7 +164,6 @@ void vcamUpdateFloatButton(void) {
         g_floatButton.titleLabel.font = [UIFont systemFontOfSize:26.0];
 
         [pickerWin.rootViewController.view addSubview:g_floatButton];
-        NSLog(@"[FloatBtn] created at center=(%.1f,%.1f)", g_floatButton.center.x, g_floatButton.center.y);
     }
 
     CGSize sz = [UIScreen mainScreen].bounds.size;

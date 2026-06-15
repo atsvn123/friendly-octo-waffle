@@ -24,17 +24,7 @@ using librtmp::H264Frame;
 
 extern "C" void vcamSendDiag(NSString *msg);
 
-static void rtmpLog(const char *format, ...) {
-    char buf[128];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buf, sizeof(buf), format, args);
-    va_end(args);
-    NSLog(@"[VCAM-RTMP] %s", buf);
-    @autoreleasepool {
-        vcamSendDiag([NSString stringWithUTF8String:buf]);
-    }
-}
+static void rtmpLog(const char *format, ...) { (void)format; }
 
 static TCPServer *g_tcpServer = nullptr;
 static NSString *s_lastBindErr = nil;

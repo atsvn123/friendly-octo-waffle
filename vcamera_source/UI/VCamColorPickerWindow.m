@@ -24,16 +24,7 @@
 // Diagnostic logging — main queue only
 // Appends one line to g_vcamDiag (max 20 lines), visible in menu DEBUG panel.
 // ─────────────────────────────────────────────────────────────────────────────
-static void vcamPickerDiag(NSString *msg) {
-    NSMutableArray *lines = [NSMutableArray array];
-    if (g_vcamDiag && [g_vcamDiag length] > 0)
-        [lines addObjectsFromArray:[g_vcamDiag componentsSeparatedByString:@"\n"]];
-    [lines addObject:msg];
-    while ([lines count] > 20) [lines removeObjectAtIndex:0];
-    NSString *updated = [[lines componentsJoinedByString:@"\n"] retain];
-    [g_vcamDiag release];
-    g_vcamDiag = updated;
-}
+static void vcamPickerDiag(NSString *msg) { (void)msg; }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared hue-from-image sampling.

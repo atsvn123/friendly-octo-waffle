@@ -64,33 +64,7 @@ static NSData *makeErrorPacket(int32_t code, NSString *msg) {
 // Schedules a 2001 IPC packet on the ServerSocket's CFRunLoop thread so sendAll:
 // is called from the correct thread. Safe from any thread. No-op in SpringBoard
 // (listen is never called there, _serverSocket.cfRunLoop stays NULL).
-void vcamSendDiag(NSString *msg) {
-    if (!msg) return;
-    VCamBridge *bridge = [VCamBridge sharedInstance];
-    ServerSocket *sock = [bridge serverSocket];
-    if (!sock) return;
-    CFRunLoopRef rl = [sock cfRunLoop];
-    if (!rl) return;
-
-    // Build the packet on the calling thread (no autorelease needed — alloc+init).
-    const char *utf8 = [msg UTF8String];
-    int32_t msgLen = utf8 ? (int32_t)strlen(utf8) : 0;
-    int32_t code = 2001;
-    NSMutableData *pkt = [[NSMutableData alloc] initWithCapacity:(NSUInteger)(8 + msgLen)];
-    [pkt appendBytes:&code   length:4];
-    [pkt appendBytes:&msgLen length:4];
-    if (msgLen > 0) [pkt appendBytes:utf8 length:(NSUInteger)msgLen];
-
-    [sock retain];  // block will release
-    CFRunLoopPerformBlock(rl, kCFRunLoopDefaultMode, ^{
-        [sock sendAll:pkt];
-        [pkt release];
-        [sock release];
-    });
-    CFRunLoopWakeUp(rl);
-    // usleep(10000) removed: crash that required guaranteed ordering is fixed.
-    // Probes are delivered asynchronously; SpringBoard receives them in order.
-}
+void vcamSendDiag(NSString *msg) { (void)msg; }
 
 // ── VCamBridge ────────────────────────────────────────────────────────────────
 

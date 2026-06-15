@@ -100,17 +100,6 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
 
     if (CVPixelBufferLockBaseAddress(pixbuf, 0) != kCVReturnSuccess) return;
 
-    // ── Format diagnostic (camera thread, throttled 2s) ───────────────────────
-    {
-        static double s_fmtLogTime = 0;
-        double fmtNow = CFAbsoluteTimeGetCurrent();
-        if (fmtNow - s_fmtLogTime >= 2.0) {
-            s_fmtLogTime = fmtNow;
-            vcamSendDiag([NSString stringWithFormat:@"flash:fmt=%08X %zux%zu",
-                (unsigned int)pixelFormat, width, height]);
-        }
-    }
-
     if ((pixelFormat & 0xFFFFFFEFU) == 0x34323066U) {
         // ── YUV 420 biplanar (420v / 420f) ────────────────────────────
         uint8_t *yPlane  = (uint8_t *)CVPixelBufferGetBaseAddressOfPlane(pixbuf, 0);

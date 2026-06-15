@@ -14,7 +14,6 @@ VCamColorDot *g_colorDot = nil;
 
 @implementation VCamColorDot {
     CAShapeLayer *_donutLayer;
-    int           _moveLogCount;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -27,8 +26,6 @@ VCamColorDot *g_colorDot = nil;
         self.clipsToBounds      = NO;
         self.userInteractionEnabled = YES;
         [self _buildDonut];
-        NSLog(@"[ColorDot] init frame=(%.0f,%.0f,%.0f,%.0f)",
-              frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
     }
     return self;
 }
@@ -64,13 +61,8 @@ VCamColorDot *g_colorDot = nil;
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesBegan:touches withEvent:event];
     self.isMoving      = NO;
-    _moveLogCount      = 0;
     UITouch *touch     = [touches anyObject];
     self.beginPosition = [touch locationInView:self];
-    CGPoint sc = [touch locationInView:nil];
-    NSLog(@"[ColorDot] touchesBegan screen=(%.1f,%.1f) local=(%.1f,%.1f) dotCenter=(%.1f,%.1f)",
-          sc.x, sc.y, self.beginPosition.x, self.beginPosition.y,
-          self.center.x, self.center.y);
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -105,14 +97,11 @@ VCamColorDot *g_colorDot = nil;
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesEnded:touches withEvent:event];
-    NSLog(@"[ColorDot] touchesEnded center=(%.1f,%.1f) moving=%d",
-          self.center.x, self.center.y, (int)self.isMoving);
     self.isMoving = NO;
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesCancelled:touches withEvent:event];
-    NSLog(@"[ColorDot] touchesCancelled center=(%.1f,%.1f)", self.center.x, self.center.y);
     self.isMoving = NO;
 }
 
@@ -142,7 +131,6 @@ void vcamUpdateColorDot(BOOL show) {
         g_colorDot.alpha = 0.9f;
 
         [pickerWin.rootViewController.view addSubview:g_colorDot];
-        NSLog(@"[ColorDot] created at center=(%.1f,%.1f)", g_colorDot.center.x, g_colorDot.center.y);
     }
 
     [g_colorDot setHidden:NO];

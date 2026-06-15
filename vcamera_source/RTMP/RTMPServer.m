@@ -160,7 +160,7 @@ extern void vcamSendDiag(NSString *msg);
         @try {
             [RTMPServer runRTMPAcceptLoop:self];
         } @catch (NSException *ex) {
-            NSLog(@"[VCAM] handleRTMP ObjC ex: %@", ex);
+            (void)ex;
         }
 
         if (!self.userWantsRunning) break;
