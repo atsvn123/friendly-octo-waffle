@@ -274,6 +274,7 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
         if (shouldLog)
             vcamPickerDiag([NSString stringWithFormat:@"[FP1] IOSurf h=%.2f", hue]);
         BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });
+        [g_floatButton setRingHue:hue];
         return;
     }
     // -2.0 → no entitlement; falls through on A10/iOS 15
@@ -362,6 +363,7 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
                 s_fp2Running = NO;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });
+                    [g_floatButton setRingHue:hue];
                     if (log)
                         vcamPickerDiag([NSString stringWithFormat:@"[FP2] h=%.2f %@",
                                         hue, diag ? diag : @""]);

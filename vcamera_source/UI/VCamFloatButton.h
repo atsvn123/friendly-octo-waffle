@@ -1,16 +1,12 @@
 // VCamFloatButton.h
-// Donut-shaped (ring) float button.
-// The center hole is fully transparent — background shows through for color preview.
-// Only the ring zone registers touches; center hole passes touches to the app.
-//
-// Ring color reflects the detected background hue (auto color mode).
-// Tap ring → opens menu. Drag → moves button.
+// Circular "Y" button. Drag via touchesBegan/Moved/Ended (no gesture recognizers).
+// Hue ring: thin CAShapeLayer stroke circle outside the button body.
 
 #import <UIKit/UIKit.h>
 
 @interface VCamFloatButton : UIButton
 
-// Set by UIPanGestureRecognizer. Reset to NO on tap/end.
+// YES while finger is actively dragging (>1pt). Resets to NO on touchesEnded.
 @property (nonatomic, assign) BOOL isMoving;
 
 // Update ring fill color to match sampled hue [0,1). -1.0 → white (no color).
