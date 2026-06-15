@@ -46,7 +46,7 @@ static void *connectThreadEntry(void *arg) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 vcamUpdateFloatButton();
             });
-            usleep(200000);  // 200ms
+            usleep(150000);  // 150ms
         } else {
             usleep(600000);  // 600ms
         }

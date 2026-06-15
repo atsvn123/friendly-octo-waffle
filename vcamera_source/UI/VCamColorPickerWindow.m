@@ -284,8 +284,8 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
     // CGContextDrawImage triggers IOSurface lock; in active apps the GPU can hold
     // the lock for a full frame (~16 ms at 60 fps). Running it on the background
     // queue keeps the main thread free so gesture recognizers stay responsive.
-    // Rate-limited at 0.5 s: UICreateScreenImage is the unavoidable main-thread
-    // cost; firing it every 200 ms (8 % + of main thread in-app) blocks drags.
+    // Rate-limited at 0.15 s: UICreateScreenImage is the unavoidable main-thread
+    // cost (~16 ms); 150 ms interval = ~10 % main-thread load, drags stay smooth.
     static CFAbsoluteTime   s_fp2LastTime = 0.0;
     static dispatch_queue_t s_q           = NULL;
     static volatile BOOL    s_fp2Running  = NO;
@@ -297,7 +297,7 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
     vcamUIGetScreenImage_t getScreenImage = vcamGetScreenImageFn();
     if (getScreenImage) {
         CFAbsoluteTime fp2Now = CFAbsoluteTimeGetCurrent();
-        if (!s_fp2Running && (fp2Now - s_fp2LastTime >= 0.5)) {
+        if (!s_fp2Running && (fp2Now - s_fp2LastTime >= 0.150)) {
             s_fp2Running  = YES;
             s_fp2LastTime = fp2Now;
 
