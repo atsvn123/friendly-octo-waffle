@@ -1,5 +1,6 @@
-// VCamFloatButton.m
-// Reconstructed from iHsfaTkdhwkzopQfsnwBd (0x12AD60) and sub_84D20 (0x84D20)
+﻿// VCamFloatButton.m
+// Donut ring visual with Y button drag logic
+// (incremental deltas in button-local coords -- locationInView:self)
 
 #import "VCamFloatButton.h"
 #import "VCamColorPickerWindow.h"
@@ -7,18 +8,24 @@
 #import "../VCamLive/VCamLiveManager.h"
 #import "../BINFlash/BINFlashPrefs.h"
 #import <QuartzCore/QuartzCore.h>
-#include <string.h>
 
-// Non-static so VCamColorPickerWindow.m can reference it via extern.
+static const CGFloat kArcR  = 18.5;
+static const CGFloat kLineW = 7.0;
+
 VCamFloatButton *g_floatButton = nil;
 
 @implementation VCamFloatButton {
-    CAShapeLayer *_ringLayer;
+    CAShapeLayer *_donutLayer;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        self.backgroundColor = [UIColor clearColor];
+        self.opaque          = NO;
+        self.clipsToBounds   = NO;
+        [self _buildDonut];
+
         [self addTarget:self action:@selector(buttonClicked)
        forControlEvents:UIControlEventTouchUpInside];
         [self addTarget:self action:@selector(buttonDoubleClicked)
@@ -29,50 +36,51 @@ VCamFloatButton *g_floatButton = nil;
     return self;
 }
 
-// ── Hue ring ─────────────────────────────────────────────────────────────────
-// The ring is a CAShapeLayer drawn OUTSIDE the button bounds (radius 30 vs
-// button radius 26). clipsToBounds must be NO for it to show (set below).
-// hue in [0,1) → show ring in that hue color.
-// hue = -1.0    → hide ring (button over achromatic / auto color OFF).
-- (void)setRingHue:(double)hue {
-    if (!_ringLayer) {
-        _ringLayer = [[CAShapeLayer alloc] init];
-        _ringLayer.fillColor   = [UIColor clearColor].CGColor;
-        _ringLayer.lineWidth   = 4.0;
-        _ringLayer.opacity     = 0.0;
+- (void)_buildDonut {
+    CGFloat cx = self.bounds.size.width  * 0.5;
+    CGFloat cy = self.bounds.size.height * 0.5;
 
-        // Circle centered at (26, 26), radius 30 — 4pt halo outside the button
-        CGPoint center = CGPointMake(26.0, 26.0);
-        UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:center
-                                                            radius:30.0
-                                                        startAngle:0
-                                                          endAngle:2.0 * M_PI
-                                                         clockwise:YES];
-        _ringLayer.path = path.CGPath;
-        [self.layer addSublayer:_ringLayer];
-        [_ringLayer release];
-    }
-
-    if (hue < 0.0) {
-        // Fade out
-        [CATransaction begin];
-        [CATransaction setAnimationDuration:0.2];
-        _ringLayer.opacity = 0.0;
-        [CATransaction commit];
-    } else {
-        _ringLayer.strokeColor = [UIColor colorWithHue:(CGFloat)hue
-                                            saturation:1.0
-                                            brightness:1.0
-                                                 alpha:1.0].CGColor;
-        // Fade in
-        [CATransaction begin];
-        [CATransaction setAnimationDuration:0.2];
-        _ringLayer.opacity = 1.0;
-        [CATransaction commit];
-    }
+    _donutLayer = [[CAShapeLayer alloc] init];
+    UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:CGPointMake(cx, cy)
+                                                        radius:kArcR
+                                                    startAngle:0
+                                                      endAngle:2.0 * M_PI
+                                                     clockwise:YES];
+    _donutLayer.path        = path.CGPath;
+    _donutLayer.fillColor   = [UIColor clearColor].CGColor;
+    _donutLayer.strokeColor = [UIColor colorWithWhite:1.0 alpha:0.90].CGColor;
+    _donutLayer.lineWidth   = kLineW;
+    _donutLayer.shadowColor   = [UIColor blackColor].CGColor;
+    _donutLayer.shadowOpacity = 0.45f;
+    _donutLayer.shadowOffset  = CGSizeMake(0, 1);
+    _donutLayer.shadowRadius  = 4.0;
+    [self.layer addSublayer:_donutLayer];
+    [_donutLayer release];
 }
 
-// ── Touch actions ─────────────────────────────────────────────────────────────
+// Full-bounds hit zone so taps anywhere inside the 52x52 frame register.
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
+    return CGRectContainsPoint(self.bounds, point);
+}
+
+// -- Hue tint -----------------------------------------------------------------
+// hue in [0,1) -> tint donut ring with that hue color.
+// hue = -1.0   -> reset donut to neutral white.
+- (void)setRingHue:(double)hue {
+    UIColor *color;
+    if (hue < 0.0) {
+        color = [UIColor colorWithWhite:1.0 alpha:0.90];
+    } else {
+        color = [UIColor colorWithHue:(CGFloat)hue saturation:0.80
+                           brightness:1.0 alpha:0.95];
+    }
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:0.15];
+    _donutLayer.strokeColor = [color CGColor];
+    [CATransaction commit];
+}
+
+// -- Touch actions ------------------------------------------------------------
 - (void)buttonClicked {
     if (!self.isMoving) {
         [[VCamBridge sharedInstance] presentation];
@@ -86,17 +94,19 @@ VCamFloatButton *g_floatButton = nil;
 - (void)buttonDrag {
 }
 
-// ── Drag ──────────────────────────────────────────────────────────────────────
+// -- Drag -- identical to Y button (d224837) ----------------------------------
+// locationInView:self gives button-local coords. As the button moves each frame,
+// the local frame shifts, so (loc - beginPosition) is a natural incremental delta
+// without needing to track total travel.
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesBegan:touches withEvent:event];
-    self.isMoving    = NO;
-    UITouch *touch   = [touches anyObject];
+    self.isMoving      = NO;
+    UITouch *touch     = [touches anyObject];
     self.beginPosition = [touch locationInView:self];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesMoved:touches withEvent:event];
-
     UITouch *touch = [touches anyObject];
     CGPoint loc    = [touch locationInView:self];
 
@@ -138,58 +148,22 @@ VCamFloatButton *g_floatButton = nil;
 
 @end
 
-// ── vcamUpdateFloatButton — mirrors sub_84D20 (0x84D20) ──────────────────────
-// Must be called on the main queue. First call creates the button and parents it
-// to VCamColorPickerWindow (persistent high-level window — no disappearance).
-// Every call: updates visibility + samples color if auto color is active.
+// -- vcamUpdateFloatButton -- mirrors sub_84D20 (0x84D20) ---------------------
 void vcamUpdateFloatButton(void) {
-
-    // ── Ensure the picker window exists ──
     VCamColorPickerWindow *pickerWin = [VCamColorPickerWindow sharedWindow];
 
-    // ── Create button on first call ──
     if (!g_floatButton) {
         g_floatButton = [[VCamFloatButton alloc]
                          initWithFrame:CGRectMake(0, 0, 52, 52)];
 
         CGFloat screenW = [UIScreen mainScreen].bounds.size.width;
         [g_floatButton setCenter:CGPointMake(screenW - 30.0, 150.0)];
-
-        // Background #F7B7CC (light pink)
-        [g_floatButton setBackgroundColor:
-            [UIColor colorWithRed:0.9686f green:0.7176f blue:0.8000f alpha:0.9f]];
-
-        // clipsToBounds must be NO so the ring halo can draw outside bounds
-        g_floatButton.clipsToBounds   = NO;
-        g_floatButton.layer.cornerRadius = 26.0;
+        g_floatButton.clipsToBounds = NO;
         [g_floatButton setAlpha:0.9f];
 
-        // Title color #4B3340 (dark mauve)
-        [g_floatButton setTitleColor:
-            [UIColor colorWithRed:0.2941f green:0.2000f blue:0.2510f alpha:1.0f]
-                            forState:UIControlStateNormal];
-
-        // Title "Y" — XOR decode: base64("Aw==")={0x03}, 0x03^0x5A=0x59='Y'
-        NSData *raw = [[NSData alloc] initWithBase64EncodedString:@"Aw==" options:0];
-        NSString *title = nil;
-        if (raw) {
-            NSMutableData *mut = [raw mutableCopy];
-            [raw release];
-            uint8_t *bytes = (uint8_t *)[mut mutableBytes];
-            for (NSUInteger i = 0; i < [mut length]; i++) bytes[i] ^= 0x5A;
-            title = [[NSString alloc] initWithData:mut encoding:NSUTF8StringEncoding];
-            [mut release];
-        }
-        if (!title) title = [@"" retain];
-        [g_floatButton setTitle:title forState:UIControlStateNormal];
-        [title release];
-        g_floatButton.titleLabel.font = [UIFont systemFontOfSize:26.0];
-
-        // Parent to VCamColorPickerWindow's root view — permanent, never re-added
         [pickerWin.rootViewController.view addSubview:g_floatButton];
     }
 
-    // ── Every call: landscape position, visibility ──
     CGSize sz = [UIScreen mainScreen].bounds.size;
     if (sz.width > sz.height) {
         [g_floatButton setCenter:CGPointMake(20.0, 150.0)];
@@ -204,26 +178,22 @@ void vcamUpdateFloatButton(void) {
     [g_floatButton setEnabled:showFloat];
     [g_floatButton setUserInteractionEnabled:showFloat];
 
-    // ── Color sampling when auto color is ON and menu is closed ──
     if (hidden) return;
 
-    NSDictionary *fp      = BINFlashLoadPrefs();
-    BOOL flashOn          = BINFlashBoolForKey(fp, kBINFlashKeyFlash,     kBINFlashDefaultFlash);
-    BOOL autoColor        = BINFlashBoolForKey(fp, kBINFlashKeyAutoColor, kBINFlashDefaultAutoColor);
-    BOOL menuPresent      = [[VCamBridge sharedInstance] isPresent];
+    NSDictionary *fp  = BINFlashLoadPrefs();
+    BOOL flashOn      = BINFlashBoolForKey(fp, kBINFlashKeyFlash,     kBINFlashDefaultFlash);
+    BOOL autoColor    = BINFlashBoolForKey(fp, kBINFlashKeyAutoColor, kBINFlashDefaultAutoColor);
+    BOOL menuPresent  = [[VCamBridge sharedInstance] isPresent];
 
     if (!flashOn || !autoColor) {
-        // Flash off or auto color off — hide ring
         [g_floatButton setRingHue:-1.0];
         return;
     }
 
     if (menuPresent) {
-        // Menu open: keep ring visible at last color, but don't sample
         return;
     }
 
-    // Menu closed + auto color on: sample the color at the float button's position.
     if (sz.width <= 0 || sz.height <= 0) return;
     CGPoint center = g_floatButton.center;
     vcamSendPickerSampleRequest((float)(center.x / sz.width),
