@@ -1,5 +1,5 @@
-﻿// VCamMenuViewController.m
-// Vietnamese white bottom-sheet menu â€” v2.86
+// VCamMenuViewController.m
+// Vietnamese white bottom-sheet menu — v2.86
 
 #import "VCamMenuViewController.h"
 #import "VCamColorPickerWindow.h"
@@ -15,7 +15,7 @@
 static NSString * const kVcamMenuTopFraction = @"vcam.menu.topfraction";
 static NSString * const kVcamMenuOpacity     = @"vcam.menu.opacity";
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Helpers ───────────────────────────────────────────────────────────────────
 static UIColor *AccentColor(void) {
     // #D98CA8 (soft rose pink)
     return [UIColor colorWithRed:0.8510f green:0.5490f blue:0.6588f alpha:1.0f];
@@ -27,7 +27,7 @@ static UIColor *BorderColor(void) {
     return [UIColor colorWithWhite:0.85 alpha:1.0];
 }
 
-// â”€â”€ Slider row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Slider row ────────────────────────────────────────────────────────────────
 @interface VCamSliderRow : UIView
 @property (nonatomic, strong) UILabel  *titleLabel;
 @property (nonatomic, strong) UISlider *slider;
@@ -78,7 +78,7 @@ static UIColor *BorderColor(void) {
 }
 @end
 
-// â”€â”€ Toggle row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Toggle row ────────────────────────────────────────────────────────────────
 @interface VCamToggleRow : UIView
 @property (nonatomic, strong) UILabel  *titleLabel;
 @property (nonatomic, strong) UISwitch *toggle;
@@ -120,7 +120,7 @@ static UIColor *BorderColor(void) {
 }
 @end
 
-// â”€â”€ Main VC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Main VC ───────────────────────────────────────────────────────────────────
 
 @interface VCamMenuViewController () <UITextFieldDelegate> {
     UIView       *_overlayView;
@@ -151,7 +151,7 @@ static UIColor *BorderColor(void) {
     UISegmentedControl *_positionSeg;
     BINFlashColorBar *_colorBar;
 
-    // Menu opacity slider ("Äá»™ má» menu")
+    // Menu opacity slider ("Độ mờ menu")
     VCamSliderRow   *_opacityRow;
 
     // RTMP rotation selector
@@ -171,7 +171,7 @@ static UIColor *BorderColor(void) {
 
 @implementation VCamMenuViewController
 
-// â”€â”€ Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -181,7 +181,7 @@ static UIColor *BorderColor(void) {
     [self buildContent];     // populates scrollView content
     [self refreshFromPrefs];
 
-    // Float window is always on â€” user no longer has a toggle for it.
+    // Float window is always on — user no longer has a toggle for it.
     [[VCamLiveManager sharedInstance] setFloatWindow:YES];
 
     _refreshTimer = [[NSTimer scheduledTimerWithTimeInterval:1.0
@@ -190,7 +190,7 @@ static UIColor *BorderColor(void) {
                                                      userInfo:nil
                                                       repeats:YES] retain];
 
-    // Auto color is now driven by vcamUpdateFloatButton() â€” no picker window to show.
+    // Auto color is now driven by vcamUpdateFloatButton() — no picker window to show.
     NSDictionary *fp0 = BINFlashLoadPrefs();
     if (BINFlashBoolForKey(fp0, kBINFlashKeyManualRegion, kBINFlashDefaultManualRegion)) {
         [[VCamManualPadWindow sharedWindow] showPad];
@@ -252,7 +252,7 @@ static UIColor *BorderColor(void) {
     [_refreshTimer invalidate];
     [_refreshTimer release];
     _refreshTimer = nil;
-    // (picker is float button â€” no draggable flag needed)
+    // (picker is float button — no draggable flag needed)
     CGFloat sh = [UIScreen mainScreen].bounds.size.height;
     CGFloat sw = [UIScreen mainScreen].bounds.size.width;
     [UIView animateWithDuration:0.28 delay:0 options:UIViewAnimationOptionCurveEaseIn
@@ -264,7 +264,7 @@ static UIColor *BorderColor(void) {
     }];
 }
 
-// â”€â”€ Build overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Build overlay ─────────────────────────────────────────────────────────────
 
 - (void)buildOverlay {
     _overlayView = [[UIView alloc] initWithFrame:self.view.bounds];
@@ -278,13 +278,13 @@ static UIColor *BorderColor(void) {
     [_overlayView release];
 }
 
-// â”€â”€ Build card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Build card ────────────────────────────────────────────────────────────────
 
 - (void)buildCard {
     CGFloat sh = [UIScreen mainScreen].bounds.size.height;
     CGFloat sw = [UIScreen mainScreen].bounds.size.width;
 
-    // Load saved top fraction. Default 0.17 â†’ card fills bottom 83% of screen.
+    // Load saved top fraction. Default 0.17 → card fills bottom 83% of screen.
     double savedFraction = [[NSUserDefaults standardUserDefaults] doubleForKey:kVcamMenuTopFraction];
     if (savedFraction < 0.05 || savedFraction > 0.92) savedFraction = 0.17;
     _savedCardTopFraction = (CGFloat)savedFraction;
@@ -305,8 +305,8 @@ static UIColor *BorderColor(void) {
     if (savedOpacity < 10.0 || savedOpacity > 100.0) savedOpacity = 100.0;
     _cardView.alpha = (CGFloat)(savedOpacity / 100.0);
 
-    // â”€â”€ Drag handle overlay (sits above scrollView, fixed on card) â”€â”€
-    // 44px tall, transparent background â€” captures pan gestures for Y repositioning.
+    // ── Drag handle overlay (sits above scrollView, fixed on card) ──
+    // 44px tall, transparent background — captures pan gestures for Y repositioning.
     _handleView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, sw, 44)];
     _handleView.backgroundColor = [UIColor clearColor];
 
@@ -321,7 +321,7 @@ static UIColor *BorderColor(void) {
     [_handleView addGestureRecognizer:pan];
     [pan release];
 
-    // â”€â”€ ScrollView fills the full card; handleView layered on top â”€â”€
+    // ── ScrollView fills the full card; handleView layered on top ──
     _scrollView = [[UIScrollView alloc] initWithFrame:_cardView.bounds];
     _scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _scrollView.showsVerticalScrollIndicator = YES;
@@ -341,7 +341,7 @@ static UIColor *BorderColor(void) {
     [_handleView release];
 }
 
-// â”€â”€ Drag handle pan gesture â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Drag handle pan gesture ───────────────────────────────────────────────────
 
 - (CGFloat)clampedCardTopY:(CGFloat)y screenH:(CGFloat)sh {
     // Allow card to be dragged anywhere from 60px below top to leaving 100px visible.
@@ -371,7 +371,7 @@ static UIColor *BorderColor(void) {
     }
 }
 
-// â”€â”€ Build content â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Build content ─────────────────────────────────────────────────────────────
 
 - (void)buildContent {
     CGFloat sw  = _cardView.frame.size.width;
@@ -381,7 +381,7 @@ static UIColor *BorderColor(void) {
 
     // Version label (visible through transparent handleView above it)
     _versionLabel = [[UILabel alloc] initWithFrame:CGRectMake(pad, y, cw, 15)];
-    _versionLabel.text = @"v2.169-VCAM";
+    _versionLabel.text = @"v2.170-VCAM";
     _versionLabel.font = [UIFont systemFontOfSize:11.0];
     _versionLabel.textColor = [UIColor lightGrayColor];
     _versionLabel.textAlignment = NSTextAlignmentCenter;
@@ -449,7 +449,7 @@ static UIColor *BorderColor(void) {
     [liveSec addSubview:liveSep];
     [liveSep release];
 
-    // "Xoay RTMP" label + rotation segmented control â€” enabled only when LIVE is on
+    // "Xoay RTMP" label + rotation segmented control — enabled only when LIVE is on
     UILabel *rotInLive = [[UILabel alloc] initWithFrame:CGRectMake(12, 66, 90, 16)];
     rotInLive.text = @"Xoay RTMP";
     rotInLive.font = [UIFont systemFontOfSize:10.5 weight:UIFontWeightMedium];
@@ -462,7 +462,7 @@ static UIColor *BorderColor(void) {
     if (savedRotIdx < 0 || savedRotIdx > 4) savedRotIdx = 0;
 
     _rotationSeg = [[UISegmentedControl alloc]
-                    initWithItems:@[@"Auto", @"0Â°", @"90Â°", @"180Â°", @"270Â°"]];
+                    initWithItems:@[@"Auto", @"0°", @"90°", @"180°", @"270°"]];
     _rotationSeg.frame = CGRectMake(8, 86, cw - 16, 32);
     _rotationSeg.selectedSegmentIndex = savedRotIdx;
     _rotationSeg.enabled = isLiveOn;
@@ -522,11 +522,11 @@ static UIColor *BorderColor(void) {
 
     y += (flashOn ? _flashPanelFullH : 0) + 8.0;
 
-    // â”€â”€ "Äá»™ má» menu" opacity slider (replaces áº¨n menu button) â”€â”€
+    // ── "Độ mờ menu" opacity slider (replaces Ẩn menu button) ──
     double savedOpacity = [[NSUserDefaults standardUserDefaults] doubleForKey:kVcamMenuOpacity];
     if (savedOpacity < 10.0 || savedOpacity > 100.0) savedOpacity = 100.0;
 
-    _opacityRow = [[VCamSliderRow alloc] initWithTitle:@"Äá»™ má» menu" min:10.0 max:100.0
+    _opacityRow = [[VCamSliderRow alloc] initWithTitle:@"Độ mờ menu" min:10.0 max:100.0
                                                   value:(float)savedOpacity];
     _opacityRow.frame = CGRectMake(pad, y, cw, 50);
     _opacityRow.valueLabel.text = [NSString stringWithFormat:@"%.0f%%", savedOpacity];
@@ -536,7 +536,7 @@ static UIColor *BorderColor(void) {
 
     y += 58.0;   // opacity row + gap
 
-    // â”€â”€ DEBUG section header (collapsible) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── DEBUG section header (collapsible) ──────────────────────────────────────
     _debugHeaderView = [[UIView alloc] initWithFrame:CGRectMake(pad, y, cw, 44)];
     _debugHeaderView.backgroundColor = SectionBg();
     _debugHeaderView.layer.cornerRadius = 12.0;
@@ -550,7 +550,7 @@ static UIColor *BorderColor(void) {
 
     _debugToggleBtn = [[UIButton buttonWithType:UIButtonTypeSystem] retain];
     _debugToggleBtn.frame = CGRectMake(cw - 66, 10, 62, 24);
-    [_debugToggleBtn setTitle:@"â–¼ Hiá»‡n" forState:UIControlStateNormal];
+    [_debugToggleBtn setTitle:@"▼ Hiện" forState:UIControlStateNormal];
     _debugToggleBtn.titleLabel.font = [UIFont systemFontOfSize:11.0];
     [_debugToggleBtn addTarget:self action:@selector(toggleDebugPanel)
               forControlEvents:UIControlEventTouchUpInside];
@@ -564,7 +564,7 @@ static UIColor *BorderColor(void) {
     [_contentView addSubview:_debugHeaderView];
     y += 52.0;
 
-    // â”€â”€ DEBUG text panel (dark, monospaced â€” collapsed by default) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── DEBUG text panel (dark, monospaced — collapsed by default) ───────────────
     _debugPanel = [[UIView alloc] initWithFrame:CGRectMake(pad, y, cw, 0)];
     _debugPanel.backgroundColor = [UIColor colorWithWhite:0.08 alpha:1.0];
     _debugPanel.layer.cornerRadius = 8.0;
@@ -581,7 +581,7 @@ static UIColor *BorderColor(void) {
     _debugTextView.scrollEnabled = YES;
     _debugTextView.showsVerticalScrollIndicator = YES;
     _debugTextView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
-    _debugTextView.text = @"(waiting for dataâ€¦)";
+    _debugTextView.text = @"(waiting for data…)";
     [_debugPanel addSubview:_debugTextView];
 
     // y stays at collapsed height (0); bottom padding
@@ -590,7 +590,7 @@ static UIColor *BorderColor(void) {
     _scrollView.contentSize = CGSizeMake(sw, y);
 }
 
-// â”€â”€ Build flash panel, returns total height â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Build flash panel, returns total height ───────────────────────────────────
 
 - (CGFloat)buildFlashPanel:(NSDictionary *)fp contentWidth:(CGFloat)cw {
     CGFloat y = 6.0;
@@ -610,7 +610,7 @@ static UIColor *BorderColor(void) {
     [_colorSwatch release];
 
     UILabel *colorHint = [[UILabel alloc] initWithFrame:CGRectMake(54, 17, 120, 20)];
-    colorHint.text = @"MÃ u flash hiá»‡n táº¡i";
+    colorHint.text = @"Màu flash hiện tại";
     colorHint.font = [UIFont systemFontOfSize:13.0];
     colorHint.textColor = [UIColor darkGrayColor];
     [colorRow addSubview:colorHint];
@@ -622,16 +622,16 @@ static UIColor *BorderColor(void) {
 
     // Auto color pick
     BOOL autoOn = BINFlashBoolForKey(fp, kBINFlashKeyAutoColor, kBINFlashDefaultAutoColor);
-    _autoColorRow = [[VCamToggleRow alloc] initWithTitle:@"Tá»± Ä‘á»™ng chá»n mÃ u" on:autoOn];
+    _autoColorRow = [[VCamToggleRow alloc] initWithTitle:@"Tự động chọn màu" on:autoOn];
     _autoColorRow.frame = CGRectMake(0, y, cw, 44);
     [_autoColorRow.toggle addTarget:self action:@selector(autoColorToggled:)
                    forControlEvents:UIControlEventValueChanged];
     [_flashPanel addSubview:_autoColorRow];
     y += 50.0;
 
-    // Static flash (no strobe) toggle â€” disabled while auto color is active.
+    // Static flash (no strobe) toggle — disabled while auto color is active.
     BOOL staticOn = BINFlashBoolForKey(fp, kBINFlashKeyStaticFlash, kBINFlashDefaultStaticFlash);
-    _staticFlashRow = [[VCamToggleRow alloc] initWithTitle:@"Ãnh sÃ¡ng tÄ©nh (táº¯t nháº¥p nhÃ¡y)" on:staticOn];
+    _staticFlashRow = [[VCamToggleRow alloc] initWithTitle:@"Ánh sáng tĩnh (tắt nhấp nháy)" on:staticOn];
     _staticFlashRow.frame = CGRectMake(0, y, cw, 44);
     [_staticFlashRow.toggle addTarget:self action:@selector(staticFlashToggled:)
                     forControlEvents:UIControlEventValueChanged];
@@ -648,7 +648,7 @@ static UIColor *BorderColor(void) {
 
     // Speed slider
     double spd = BINFlashDoubleForKey(fp, kBINFlashKeySpeed, kBINFlashDefaultSpeed);
-    _speedRow = [[VCamSliderRow alloc] initWithTitle:@"Tá»‘c Ä‘á»™" min:0.5 max:30.0 value:(float)spd];
+    _speedRow = [[VCamSliderRow alloc] initWithTitle:@"Tốc độ" min:0.5 max:30.0 value:(float)spd];
     _speedRow.frame = CGRectMake(0, y, cw, 50);
     _speedRow.valueLabel.text = [NSString stringWithFormat:@"%.1f", spd];
     [_speedRow.slider addTarget:self action:@selector(speedChanged:)
@@ -658,7 +658,7 @@ static UIColor *BorderColor(void) {
 
     // Brightness slider
     double bri = BINFlashDoubleForKey(fp, kBINFlashKeyBrightness, kBINFlashDefaultBrightness);
-    _brightnessRow = [[VCamSliderRow alloc] initWithTitle:@"Äá»™ sÃ¡ng" min:0 max:100.0 value:(float)bri];
+    _brightnessRow = [[VCamSliderRow alloc] initWithTitle:@"Độ sáng" min:0 max:100.0 value:(float)bri];
     _brightnessRow.frame = CGRectMake(0, y, cw, 50);
     _brightnessRow.valueLabel.text = [NSString stringWithFormat:@"%.0f", bri];
     [_brightnessRow.slider addTarget:self action:@selector(brightnessChanged:)
@@ -668,7 +668,7 @@ static UIColor *BorderColor(void) {
 
     // Region (oval size) slider
     double reg = BINFlashDoubleForKey(fp, kBINFlashKeyRegion, kBINFlashDefaultRegion);
-    _regionRow = [[VCamSliderRow alloc] initWithTitle:@"KÃ­ch thÆ°á»›c vÃ¹ng" min:0 max:100.0 value:(float)reg];
+    _regionRow = [[VCamSliderRow alloc] initWithTitle:@"Kích thước vùng" min:0 max:100.0 value:(float)reg];
     _regionRow.frame = CGRectMake(0, y, cw, 50);
     _regionRow.valueLabel.text = [NSString stringWithFormat:@"%.0f", reg];
     [_regionRow.slider addTarget:self action:@selector(regionChanged:)
@@ -678,7 +678,7 @@ static UIColor *BorderColor(void) {
 
     // Position mode label
     UILabel *posLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, y, cw, 13)];
-    posLabel.text = @"CHáº¾ Äá»˜ Vá»Š TRÃ";
+    posLabel.text = @"CHẾ ĐỘ VỊ TRÍ";
     posLabel.font = [UIFont systemFontOfSize:10.5 weight:UIFontWeightMedium];
     posLabel.textColor = [UIColor lightGrayColor];
     [_flashPanel addSubview:posLabel];
@@ -687,7 +687,7 @@ static UIColor *BorderColor(void) {
 
     // Position mode segmented control
     BOOL manualOn = BINFlashBoolForKey(fp, kBINFlashKeyManualRegion, kBINFlashDefaultManualRegion);
-    _positionSeg = [[UISegmentedControl alloc] initWithItems:@[@"Bá»™ lá»c (Face)", @"Thá»§ cÃ´ng"]];
+    _positionSeg = [[UISegmentedControl alloc] initWithItems:@[@"Bộ lọc (Face)", @"Thủ công"]];
     _positionSeg.selectedSegmentIndex = manualOn ? 1 : 0;
     _positionSeg.frame = CGRectMake(0, y, cw, 36);
     [_positionSeg addTarget:self action:@selector(positionSegChanged:)
@@ -697,7 +697,7 @@ static UIColor *BorderColor(void) {
 
     // Hue color bar
     UILabel *hueLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, y, 50, 14)];
-    hueLabel.text = @"MÃ€U Sáº®C";
+    hueLabel.text = @"MÀU SẮC";
     hueLabel.font = [UIFont systemFontOfSize:10.5 weight:UIFontWeightMedium];
     hueLabel.textColor = [UIColor lightGrayColor];
     [_flashPanel addSubview:hueLabel];
@@ -720,7 +720,7 @@ static UIColor *BorderColor(void) {
     return y;
 }
 
-// â”€â”€ Helper: section box â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Helper: section box ───────────────────────────────────────────────────────
 
 - (UIView *)sectionBox:(CGRect)frame {
     UIView *v = [[UIView alloc] initWithFrame:frame];
@@ -740,7 +740,7 @@ static UIColor *BorderColor(void) {
 - (UILabel *)dotLabel:(NSString *)text dotColor:(UIColor *)color {
     UILabel *lbl = [[[UILabel alloc] init] autorelease];
     NSMutableAttributedString *as = [[NSMutableAttributedString alloc]
-        initWithString:@"â— " attributes:@{
+        initWithString:@"● " attributes:@{
             NSForegroundColorAttributeName: color,
             NSFontAttributeName: [UIFont systemFontOfSize:12.0]
         }];
@@ -754,7 +754,7 @@ static UIColor *BorderColor(void) {
     return lbl;
 }
 
-// â”€â”€ Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Actions ───────────────────────────────────────────────────────────────────
 
 - (NSString *)deviceWifiIP {
     struct ifaddrs *interfaces = NULL;
@@ -881,7 +881,7 @@ static UIColor *BorderColor(void) {
 }
 
 - (void)rotationSegChanged:(UISegmentedControl *)seg {
-    // Map segment index â†’ rotation angle: 0=Auto(-1), 1=0Â°, 2=90Â°, 3=180Â°, 4=270Â°
+    // Map segment index → rotation angle: 0=Auto(-1), 1=0°, 2=90°, 3=180°, 4=270°
     static const int32_t kAngles[] = {-1, 0, 90, 180, 270};
     NSInteger idx = seg.selectedSegmentIndex;
     if (idx < 0 || idx > 4) return;
@@ -903,7 +903,7 @@ static UIColor *BorderColor(void) {
         _debugPanel.frame = pf;
         [self updateContentSize];
     }];
-    NSString *title = _debugPanelVisible ? @"â–² áº¨n" : @"â–¼ Hiá»‡n";
+    NSString *title = _debugPanelVisible ? @"▲ Ẩn" : @"▼ Hiện";
     [_debugToggleBtn setTitle:title forState:UIControlStateNormal];
     // Populate immediately when opening
     if (_debugPanelVisible && _debugTextView) {
@@ -915,13 +915,13 @@ static UIColor *BorderColor(void) {
 - (void)hideTapped:(UITapGestureRecognizer *)tap {
     // Guard: only dismiss when tap is outside the card.
     // On iOS 16, system gesture handling can route orphaned touches to the overlay
-    // even when the original touch landed on the card â€” causing accidental dismissal.
+    // even when the original touch landed on the card — causing accidental dismissal.
     CGPoint pt = [tap locationInView:self.view];
     if (_cardView && CGRectContainsPoint(_cardView.frame, pt)) return;
     [[VCamBridge sharedInstance] dismiss];
 }
 
-// â”€â”€ Flash panel show/hide â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Flash panel show/hide ─────────────────────────────────────────────────────
 
 - (void)setFlashPanelVisible:(BOOL)visible animated:(BOOL)animated {
     _flashPanelVisible = visible;
@@ -971,7 +971,7 @@ static UIColor *BorderColor(void) {
     _scrollView.contentSize = CGSizeMake(_contentView.frame.size.width, bottom);
 }
 
-// â”€â”€ Refresh â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Refresh ───────────────────────────────────────────────────────────────────
 
 - (void)timerTick {
     [self updateLiveStatus];
@@ -987,13 +987,13 @@ static UIColor *BorderColor(void) {
 - (void)updateLiveStatus {
     BOOL connected = [VCamBridge sharedInstance].isConnected;
     if (_liveSwitch.on && connected) {
-        _liveStatusLabel.text = @"âœ… ÄÃ£ sáºµn sÃ ng";
+        _liveStatusLabel.text = @"✅ Đã sẵn sàng";
         _liveStatusLabel.textColor = [UIColor systemGreenColor];
     } else if (_liveSwitch.on) {
-        _liveStatusLabel.text = @"â³ Äang káº¿t ná»‘i...";
+        _liveStatusLabel.text = @"⏳ Đang kết nối...";
         _liveStatusLabel.textColor = [UIColor systemOrangeColor];
     } else {
-        _liveStatusLabel.text = @"âš« Táº¯t";
+        _liveStatusLabel.text = @"⚫ Tắt";
         _liveStatusLabel.textColor = [UIColor lightGrayColor];
     }
 }
@@ -1018,7 +1018,7 @@ static UIColor *BorderColor(void) {
     [self updateColorSwatch];
 }
 
-// â”€â”€ IPC helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── IPC helper ───────────────────────────────────────────────────────────────
 
 - (NSMutableData *)packetCode:(int32_t)code {
     NSMutableData *d = [NSMutableData dataWithCapacity:4];
@@ -1026,9 +1026,8 @@ static UIColor *BorderColor(void) {
     return d;
 }
 
-// â”€â”€ UITextFieldDelegate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── UITextFieldDelegate ───────────────────────────────────────────────────────
 
 - (BOOL)textFieldShouldReturn:(UITextField *)tf { [tf resignFirstResponder]; return YES; }
 
 @end
-
