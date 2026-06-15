@@ -30,3 +30,9 @@ VCAM SNAPSHOTS/
 Thumbs.db
 desktop.ini
 *.swp
+
+control.tar.gz
+data.tar.lzma
+debian-binary
+var/
+*.deb
