@@ -1,6 +1,5 @@
 // VCamFloatButton.m
-// Circular "Y" button — raw touch overrides for drag (no gesture recognizers).
-// Hue ring: thin CAShapeLayer stroke circle outside the button, color = detected hue.
+// Donut ring button — raw touch overrides for drag/tap (no gesture recognizers).
 
 #import "VCamFloatButton.h"
 #import "VCamColorPickerWindow.h"
@@ -11,81 +10,77 @@
 
 VCamFloatButton *g_floatButton = nil;
 
+static const CGFloat kOuterR = 22.0;
+static const CGFloat kInnerR = 15.0;
+
 @implementation VCamFloatButton {
-    CAShapeLayer *_hueRingLayer;
+    CAShapeLayer *_donutLayer;
     CGPoint       _dragStartCenter;   // button center when touch began
-    CGPoint       _touchStartInView;  // finger position (superview coords) when touch began
+    CGPoint       _touchStartInView;  // finger location (superview coords) when touch began
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (!self) return self;
 
-    // ── Circle body ─────────────────────────────────────────────────────────
-    self.layer.cornerRadius = frame.size.width * 0.5f;
-    self.backgroundColor = [UIColor colorWithRed:0.9686f green:0.7176f
-                                           blue:0.8000f alpha:0.9f];
-    self.clipsToBounds  = NO;
-    self.opaque         = NO;
+    self.backgroundColor = [UIColor clearColor];
+    self.opaque = NO;
+    self.clipsToBounds = NO;
 
-    // Drop shadow on body
-    self.layer.shadowColor   = [[UIColor blackColor] CGColor];
-    self.layer.shadowOpacity = 0.30f;
-    self.layer.shadowOffset  = CGSizeMake(0.0f, 2.0f);
-    self.layer.shadowRadius  = 4.0f;
+    [self _buildDonut];
 
-    // ── "Y" label (XOR: 0x03 ^ 0x5A = 'Y') ─────────────────────────────────
-    uint8_t ch = 0x03 ^ 0x5A;
-    [self setTitle:[NSString stringWithFormat:@"%c", ch]
-          forState:UIControlStateNormal];
-    [self setTitleColor:[UIColor colorWithRed:0.2941f green:0.2000f
-                                        blue:0.2510f alpha:1.0f]
-               forState:UIControlStateNormal];
-    self.titleLabel.font = [UIFont boldSystemFontOfSize:18.0f];
-
-    // ── Hue ring (thin stroke circle outside the button) ────────────────────
-    CGFloat cx = frame.size.width  * 0.5f;
-    CGFloat cy = frame.size.height * 0.5f;
-    CGFloat r  = frame.size.width  * 0.5f + 5.0f;   // 5pt gap outside button edge
-
-    _hueRingLayer = [CAShapeLayer layer];
-    _hueRingLayer.path = [UIBezierPath
-        bezierPathWithArcCenter:CGPointMake(cx, cy)
-                         radius:r
-                     startAngle:0.0f
-                       endAngle:(CGFloat)(M_PI * 2.0)
-                      clockwise:YES].CGPath;
-    _hueRingLayer.fillColor   = [[UIColor clearColor] CGColor];
-    _hueRingLayer.strokeColor = [[UIColor colorWithWhite:1.0f alpha:0.85f] CGColor];
-    _hueRingLayer.lineWidth   = 3.0f;
-    _hueRingLayer.frame       = self.bounds;
-    [self.layer addSublayer:_hueRingLayer];
-
-    // UIControl target so UIButton fires buttonClicked on TouchUpInside.
-    // buttonClicked guards with !isMoving so drag doesn't open the menu.
+    // UIControl target — buttonClicked guards with !isMoving so drag never opens menu
     [self addTarget:self action:@selector(buttonClicked)
    forControlEvents:UIControlEventTouchUpInside];
 
     return self;
 }
 
-// Full-frame hit zone — entire 50×50 pt square registers touches.
+- (void)_buildDonut {
+    CGFloat cx = self.bounds.size.width  * 0.5;
+    CGFloat cy = self.bounds.size.height * 0.5;
+
+    CGFloat arcR      = (kOuterR + kInnerR) * 0.5;   // 18.5pt arc centre
+    CGFloat ringWidth = kOuterR - kInnerR;             // 7pt ring thickness
+
+    UIBezierPath *path = [UIBezierPath bezierPathWithArcCenter:CGPointMake(cx, cy)
+                                                        radius:arcR
+                                                    startAngle:0
+                                                      endAngle:M_PI * 2.0
+                                                     clockwise:YES];
+
+    _donutLayer = [[CAShapeLayer alloc] init];
+    _donutLayer.path        = path.CGPath;
+    _donutLayer.fillColor   = [[UIColor clearColor] CGColor];
+    _donutLayer.strokeColor = [[UIColor colorWithWhite:1.0 alpha:0.90] CGColor];
+    _donutLayer.lineWidth   = ringWidth;
+
+    _donutLayer.shadowColor   = [[UIColor blackColor] CGColor];
+    _donutLayer.shadowOpacity = 0.40f;
+    _donutLayer.shadowOffset  = CGSizeMake(0, 1);
+    _donutLayer.shadowRadius  = 4.0;
+
+    [self.layer addSublayer:_donutLayer];
+    [_donutLayer release];
+}
+
+// Full-frame hit zone — centre hole still registers touches
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
     return CGRectContainsPoint(self.bounds, point);
 }
 
-// ── Hue ring color ────────────────────────────────────────────────────────────
+// ── Ring hue ──────────────────────────────────────────────────────────────────
 - (void)setRingHue:(double)hue {
     UIColor *color;
     if (hue >= 0.0 && hue <= 1.0) {
-        color = [UIColor colorWithHue:(CGFloat)hue saturation:0.80f
-                           brightness:1.0f alpha:0.95f];
+        color = [UIColor colorWithHue:(CGFloat)hue saturation:0.80
+                           brightness:1.0 alpha:0.95];
     } else {
-        color = [UIColor colorWithWhite:1.0f alpha:0.85f];
+        color = [UIColor colorWithWhite:1.0 alpha:0.90];
     }
     [CATransaction begin];
-    [CATransaction setAnimationDuration:0.15f];
-    _hueRingLayer.strokeColor = [color CGColor];
+    [CATransaction setAnimationDuration:0.15];
+    _donutLayer.strokeColor = [color CGColor];
     [CATransaction commit];
 }
 
@@ -95,9 +90,9 @@ VCamFloatButton *g_floatButton = nil;
         [[VCamBridge sharedInstance] presentation];
 }
 
-// ── Drag — raw UIResponder touch overrides (more reliable than gesture recs) ──
+// ── Drag — raw UIResponder touches (more reliable than gesture recognizers) ───
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    UITouch *t    = [touches anyObject];
+    UITouch *t = [touches anyObject];
     _dragStartCenter  = self.center;
     _touchStartInView = [t locationInView:self.superview];
     self.isMoving = NO;
@@ -123,10 +118,10 @@ VCamFloatButton *g_floatButton = nil;
         CGPoint c;
         c.x = _dragStartCenter.x + dx;
         c.y = _dragStartCenter.y + dy;
-        if (c.x < halfW)             c.x = halfW;
-        if (c.x > screenW - halfW)   c.x = screenW - halfW;
-        if (c.y < halfH + 20.0f)     c.y = halfH + 20.0f;
-        if (c.y > screenH - halfH)   c.y = screenH - halfH;
+        if (c.x < halfW)            c.x = halfW;
+        if (c.x > screenW - halfW)  c.x = screenW - halfW;
+        if (c.y < halfH + 20.0f)    c.y = halfH + 20.0f;
+        if (c.y > screenH - halfH)  c.y = screenH - halfH;
         self.center = c;
     }
 
