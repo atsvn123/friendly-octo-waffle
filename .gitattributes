@@ -1,0 +1,14 @@
+# Force LF for all Unix build files regardless of platform
+*.mk        text eol=lf
+Makefile    text eol=lf
+*.sh        text eol=lf
+*.x         text eol=lf
+*.m         text eol=lf
+*.mm        text eol=lf
+*.cpp       text eol=lf
+*.h         text eol=lf
+*.c         text eol=lf
+control     text eol=lf
+postinst    text eol=lf
+prerm       text eol=lf
+postrm      text eol=lf

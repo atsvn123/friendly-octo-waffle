@@ -1,4 +1,4 @@
-﻿# VCAMVIP — Theos Makefile
+# VCAMVIP — Theos Makefile
 # Devices : arm64 (A10–A11: iPhone 7/8/X) and arm64e (A12+: XS/XR/11/12/13/14/SE2/SE3)
 # iOS     : 15.x and 16.x (Dopamine RootHide — rootless, paths under /var/jb/)
 # Hook lib: ElleKit (MSHookMessageEx/MSHookFunction compatible with substrate.h API)
