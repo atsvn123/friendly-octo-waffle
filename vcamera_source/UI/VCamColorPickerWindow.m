@@ -278,23 +278,29 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
     }
     // -2.0 → no entitlement; falls through on A10/iOS 15
 
-    // ── Fast path 2: UICreateScreenImage → crop → tiny bitmap ────────────────
-    // Crop a 60×60 native-pixel region around the button, render into a small
-    // BGRA CPU buffer (~14 KB, ~1-5 ms) instead of CGDataProviderCopyData on
-    // the full 8-22 MB screen image (~62 ms). Runs at the native 200 ms tick.
-    static dispatch_queue_t s_q          = NULL;
-    static volatile BOOL    s_fp2Running = NO;
-    static dispatch_once_t  s_qOnce      = 0;
+    // ── Fast path 2: UICreateScreenImage → crop (main) → bitmap (background) ──
+    // UICreateScreenImage is UIKit — must stay on main thread (~16 ms typical).
+    // CGContextDrawImage triggers IOSurface lock; in active apps the GPU can hold
+    // the lock for a full frame (~16 ms at 60 fps). Running it on the background
+    // queue keeps the main thread free so gesture recognizers stay responsive.
+    // Rate-limited at 0.5 s: UICreateScreenImage is the unavoidable main-thread
+    // cost; firing it every 200 ms (8 % + of main thread in-app) blocks drags.
+    static CFAbsoluteTime   s_fp2LastTime = 0.0;
+    static dispatch_queue_t s_q           = NULL;
+    static volatile BOOL    s_fp2Running  = NO;
+    static dispatch_once_t  s_qOnce       = 0;
     dispatch_once(&s_qOnce, ^{
         s_q = dispatch_queue_create("com.vcam.screencap", DISPATCH_QUEUE_SERIAL);
     });
 
     vcamUIGetScreenImage_t getScreenImage = vcamGetScreenImageFn();
     if (getScreenImage) {
-        if (!s_fp2Running) {
-            s_fp2Running = YES;
+        CFAbsoluteTime fp2Now = CFAbsoluteTimeGetCurrent();
+        if (!s_fp2Running && (fp2Now - s_fp2LastTime >= 0.5)) {
+            s_fp2Running  = YES;
+            s_fp2LastTime = fp2Now;
 
-            // UICreateScreenImage must be called on the main thread.
+            // ── Main thread: snapshot + crop reference (no pixel copy yet) ───
             CGImageRef screenImg = getScreenImage();
             if (!screenImg) { s_fp2Running = NO; return; }
 
@@ -311,24 +317,11 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
             size_t cropW = (x0 + SZ <= imgW) ? SZ : (imgW - x0);
             size_t cropH = (y0 + SZ <= imgH) ? SZ : (imgH - y0);
 
+            // Creates a sub-image reference; pixel access is deferred to draw time.
             CGImageRef cropImg = CGImageCreateWithImageInRect(screenImg,
                 CGRectMake((CGFloat)x0, (CGFloat)y0, (CGFloat)cropW, (CGFloat)cropH));
             CGImageRelease(screenImg);
             if (!cropImg) { s_fp2Running = NO; return; }
-
-            // Fixed-format BGRA 8bpp — no bitmapInfo detection needed.
-            uint8_t *buf = (uint8_t *)calloc(cropW * cropH, 4);
-            if (!buf) { CGImageRelease(cropImg); s_fp2Running = NO; return; }
-
-            CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
-            CGContextRef ctx = CGBitmapContextCreate(buf, cropW, cropH, 8, cropW * 4, cs,
-                kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
-            CGColorSpaceRelease(cs);
-            if (ctx) {
-                CGContextDrawImage(ctx, CGRectMake(0, 0, (CGFloat)cropW, (CGFloat)cropH), cropImg);
-                CGContextRelease(ctx);
-            }
-            CGImageRelease(cropImg);
 
             if (shouldLog)
                 vcamPickerDiag([NSString stringWithFormat:@"[FP2] crop %zux%zu at (%zu,%zu)",
@@ -338,15 +331,34 @@ void vcamSendPickerSampleRequest(float nx, float ny) {
             size_t capturedW = cropW;
             size_t capturedH = cropH;
 
-            // Hue math on background queue. buf ownership transferred to block.
+            // ── Background queue: IOSurface pixel access + hue math ───────────
+            // cropImg ownership transferred to block (CF — caller must release).
             dispatch_async(s_q, ^{
+                uint8_t *buf = (uint8_t *)calloc(capturedW * capturedH, 4);
+                if (buf) {
+                    // BGRA 8bpp fixed format — no bitmapInfo detection needed.
+                    CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
+                    CGContextRef ctx = CGBitmapContextCreate(buf, capturedW, capturedH, 8,
+                        capturedW * 4, cs,
+                        kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+                    CGColorSpaceRelease(cs);
+                    if (ctx) {
+                        // IOSurface lock happens here — on background thread, safe.
+                        CGContextDrawImage(ctx,
+                            CGRectMake(0, 0, (CGFloat)capturedW, (CGFloat)capturedH),
+                            cropImg);
+                        CGContextRelease(ctx);
+                    }
+                }
+                CGImageRelease(cropImg);
+
                 NSString *diag = nil;
                 // BGRA LE: p[0]=B p[1]=G p[2]=R → rOff=2 gOff=1 bOff=0
                 // nx=0.5 ny=0.5 → sample center of the 60×60 crop
-                double hue = vcamComputeHueFromRaw(buf, capturedW, capturedH, capturedW * 4,
-                                                    4, 2, 1, 0, 0.5f, 0.5f,
-                                                    log ? &diag : NULL);
-                free(buf);
+                double hue = buf ? vcamComputeHueFromRaw(buf, capturedW, capturedH,
+                                       capturedW * 4, 4, 2, 1, 0, 0.5f, 0.5f,
+                                       log ? &diag : NULL) : -1.0;
+                if (buf) free(buf);
                 s_fp2Running = NO;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     BINFlashSavePrefs(@{ kBINFlashKeyHue: @(hue) });
