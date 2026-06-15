@@ -123,10 +123,6 @@ VCamFloatButton *g_floatButton = nil;
         if (c.y < minY) self.center = CGPointMake(c.x, minY);
     } else { self.center = CGPointMake(c.x, screenH); }
 
-    if (++_moveLogCount % 10 == 0) {
-        NSLog(@"[FloatBtn] touchesMoved dx=%.1f dy=%.1f newCenter=(%.1f,%.1f) moving=%d",
-              dx, dy, self.center.x, self.center.y, (int)self.isMoving);
-    }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {

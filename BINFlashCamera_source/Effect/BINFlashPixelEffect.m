@@ -84,6 +84,7 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
     // Must be a CVPixelBuffer (not other CoreFoundation type)
     if (CFGetTypeID(pixbuf) != CVPixelBufferGetTypeID()) return;
 
+  @autoreleasepool {
     // Load prefs (100ms cache)
     NSDictionary *prefs = BINFlashCameraLoadPrefs();
 
@@ -125,90 +126,77 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
     double hR, hG, hB;
     HueToRGB(hue, &hR, &hG, &hB);
 
-    // Get face ellipse in pixel coordinates
+    // Get face ellipse in pixel coordinates (double precision for region bounds only)
     double cx, cy, rx, ry;
     BINFlashComputeFaceRegion(prefs, width, height, &cx, &cy, &rx, &ry);
 
     // ── YUV BiPlanar path (420f = 0x34323066, 420v = 0x34323076) ──
-    // Check: (format & 0xFFFFFFEF) == 0x34323066 — handles both 420f and 420v
     if ((pixelFormat & 0xFFFFFFEFU) == 0x34323066U) {
         uint8_t *yPlane  = (uint8_t *)CVPixelBufferGetBaseAddressOfPlane(pixbuf, 0);
         uint8_t *uvPlane = (uint8_t *)CVPixelBufferGetBaseAddressOfPlane(pixbuf, 1);
         size_t   yStride = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, 0);
         size_t  uvStride = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, 1);
 
-        double brightFactor = clamp(brightness * 0.72, 0.0, 0.82);
+        float brightFactor = (float)clamp(brightness * 0.72, 0.0, 0.82);
 
-        // Y-plane: brighten pixels within face ellipse
         size_t yBound_minX = (size_t)fmax(0.0, cx - rx - 1.0);
         size_t yBound_maxX = (size_t)fmin((double)(width - 1),  cx + rx + 1.0);
         size_t yBound_minY = (size_t)fmax(0.0, cy - ry - 1.0);
         size_t yBound_maxY = (size_t)fmin((double)(height - 1), cy + ry + 1.0);
 
+        float fcx = (float)cx, fcy = (float)cy, frx = (float)rx, fry = (float)ry;
+
         for (size_t py = yBound_minY; py <= yBound_maxY; py++) {
             for (size_t px = yBound_minX; px <= yBound_maxX; px++) {
-                double dx = ((double)px + 0.5 - cx) / rx;
-                double dy = ((double)py + 0.5 - cy) / ry;
-                double d2 = dx*dx + dy*dy;
+                float dx = ((float)px + 0.5f - fcx) / frx;
+                float dy = ((float)py + 0.5f - fcy) / fry;
+                float d2 = dx*dx + dy*dy;
 
-                if (d2 > 1.18) continue;
+                if (d2 > 1.18f) continue;
 
-                // Smoothstep falloff: strongest at center, fades toward edge
-                double t_fade = clamp((d2 - 0.30) / 0.88, 0.0, 1.0);
-                double inv    = 1.0 - t_fade;
-                double weight = inv * inv * (3.0 - 2.0 * inv);
-                double alpha  = brightFactor * weight;
+                float t_fade = d2 < 0.30f ? 0.0f : (d2 > 1.18f ? 1.0f : (d2 - 0.30f) / 0.88f);
+                float inv    = 1.0f - t_fade;
+                float weight = inv * inv * (3.0f - 2.0f * inv);
+                float alpha  = brightFactor * weight;
 
                 uint8_t *yp = yPlane + py * yStride + px;
-                *yp = (uint8_t)clamp(alpha * (255.0 - *yp) + *yp, 0.0, 255.0);
+                *yp = (uint8_t)clamp(alpha * (255.0f - *yp) + *yp, 0.0f, 255.0f);
             }
         }
 
-        // UV-plane: tint toward hue-derived Cb/Cr
-        // Convert hue RGB to YCbCr Cb/Cr components (BT.601)
-        double targetCb = -0.168736*hR - 0.331264*hG + 0.5*hB   + 128.0;
-        double targetCr =  0.5*hR      - 0.418688*hG - 0.081312*hB + 128.0;
-
-        double chromaFactor = clamp(brightness * 1.02, 0.0, 0.98);
+        float targetCb = (float)(-0.168736*hR - 0.331264*hG + 0.5*hB   + 128.0);
+        float targetCr = (float)( 0.5*hR      - 0.418688*hG - 0.081312*hB + 128.0);
+        float chromaFactor = (float)clamp(brightness * 1.02, 0.0, 0.98);
 
         size_t uvH = height / 2;
         size_t uvW = width  / 2;
 
         size_t uvBound_minX = yBound_minX / 2;
-        size_t uvBound_maxX = fmin((double)(uvW - 1), (double)(yBound_maxX / 2));
+        size_t uvBound_maxX = (size_t)fmin((double)(uvW - 1), (double)(yBound_maxX / 2));
         size_t uvBound_minY = yBound_minY / 2;
-        size_t uvBound_maxY = fmin((double)(uvH - 1), (double)(yBound_maxY / 2));
+        size_t uvBound_maxY = (size_t)fmin((double)(uvH - 1), (double)(yBound_maxY / 2));
 
         for (size_t vy = uvBound_minY; vy <= uvBound_maxY; vy++) {
             for (size_t vx = uvBound_minX; vx <= uvBound_maxX; vx++) {
-                // Each UV pixel covers 4 Y pixels; use center of 2×2 block for distance
-                double dx = ((double)vx * 2.0 + 1.0 - cx) / rx;
-                double dy = ((double)vy * 2.0 + 1.0 - cy) / ry;
-                double d2 = dx*dx + dy*dy;
+                float dx = ((float)vx * 2.0f + 1.0f - fcx) / frx;
+                float dy = ((float)vy * 2.0f + 1.0f - fcy) / fry;
+                float d2 = dx*dx + dy*dy;
 
-                if (d2 > 1.18) continue;
+                if (d2 > 1.18f) continue;
 
-                double t_fade = clamp((d2 - 0.30) / 0.88, 0.0, 1.0);
-                double inv    = 1.0 - t_fade;
-                double weight = inv * inv * (3.0 - 2.0 * inv);
-                double alpha  = chromaFactor * weight;
+                float t_fade = d2 < 0.30f ? 0.0f : (d2 > 1.18f ? 1.0f : (d2 - 0.30f) / 0.88f);
+                float inv    = 1.0f - t_fade;
+                float weight = inv * inv * (3.0f - 2.0f * inv);
+                float alpha  = chromaFactor * weight;
 
                 uint8_t *uvp = uvPlane + vy * uvStride + vx * 2;
-                // Interleaved Cb,Cr
-                uvp[0] = (uint8_t)clamp(alpha * (targetCb - uvp[0]) + uvp[0], 0.0, 255.0);
-                uvp[1] = (uint8_t)clamp(alpha * (targetCr - uvp[1]) + uvp[1], 0.0, 255.0);
+                uvp[0] = (uint8_t)clamp(alpha * (targetCb - uvp[0]) + uvp[0], 0.0f, 255.0f);
+                uvp[1] = (uint8_t)clamp(alpha * (targetCr - uvp[1]) + uvp[1], 0.0f, 255.0f);
             }
         }
 
     } else {
         // ── Packed BGRA / ARGB / RGBA / ABGR path ──
-        //
-        // Channel offsets vary by format. IDA showed these four cases:
-        //   32         (ARGB): A=0, R=1, G=2, B=3
-        //   0x42475241 (BGRA): B=0, G=1, R=2, A=3
-        //   0x52474241 (RGBA): R=0, G=1, B=2, A=3
-        //   0x41424752 (ABGR): A=0, B=1, G=2, R=3
-
         int rOff, gOff, bOff;
         switch (pixelFormat) {
             case 32:           rOff=1; gOff=2; bOff=3; break;  // ARGB
@@ -220,13 +208,13 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
         uint8_t *base   = (uint8_t *)CVPixelBufferGetBaseAddress(pixbuf);
         size_t   stride = CVPixelBufferGetBytesPerRow(pixbuf);
 
-        double brightFactor = clamp(brightness * 0.70, 0.0, 0.78);
-        double chromaFactor = clamp(brightness * 0.90, 0.0, 0.96);
+        float brightFactor = (float)clamp(brightness * 0.70, 0.0, 0.78);
+        float chromaFactor = (float)clamp(brightness * 0.90, 0.0, 0.96);
+        float hR255 = (float)(hR * 255.0);
+        float hG255 = (float)(hG * 255.0);
+        float hB255 = (float)(hB * 255.0);
 
-        // Hue target in 0-255 range
-        double hR255 = hR * 255.0;
-        double hG255 = hG * 255.0;
-        double hB255 = hB * 255.0;
+        float fcx = (float)cx, fcy = (float)cy, frx = (float)rx, fry = (float)ry;
 
         size_t bnd_minX = (size_t)fmax(0.0, cx - rx - 1.0);
         size_t bnd_maxX = (size_t)fmin((double)(width - 1),  cx + rx + 1.0);
@@ -235,39 +223,40 @@ void BINFlashApplyToPixelBuffer(CVPixelBufferRef pixbuf) {
 
         for (size_t py = bnd_minY; py <= bnd_maxY; py++) {
             for (size_t px = bnd_minX; px <= bnd_maxX; px++) {
-                double dx = ((double)px + 0.5 - cx) / rx;
-                double dy = ((double)py + 0.5 - cy) / ry;
-                double d2 = dx*dx + dy*dy;
+                float dx = ((float)px + 0.5f - fcx) / frx;
+                float dy = ((float)py + 0.5f - fcy) / fry;
+                float d2 = dx*dx + dy*dy;
 
-                if (d2 > 1.18) continue;
+                if (d2 > 1.18f) continue;
 
-                double t_fade = clamp((d2 - 0.30) / 0.88, 0.0, 1.0);
-                double inv    = 1.0 - t_fade;
-                double weight = inv * inv * (3.0 - 2.0 * inv);
+                float t_fade = d2 < 0.30f ? 0.0f : (d2 > 1.18f ? 1.0f : (d2 - 0.30f) / 0.88f);
+                float inv    = 1.0f - t_fade;
+                float weight = inv * inv * (3.0f - 2.0f * inv);
 
                 uint8_t *pixel = base + py * stride + px * 4;
 
-                double r = pixel[rOff];
-                double g = pixel[gOff];
-                double b = pixel[bOff];
+                float r = pixel[rOff];
+                float g = pixel[gOff];
+                float b = pixel[bOff];
 
-                // Step 1: brightness boost (blend toward 255)
-                r = brightFactor * weight * (255.0 - r) + r;
-                g = brightFactor * weight * (255.0 - g) + g;
-                b = brightFactor * weight * (255.0 - b) + b;
+                // Step 1: brightness boost
+                r = brightFactor * weight * (255.0f - r) + r;
+                g = brightFactor * weight * (255.0f - g) + g;
+                b = brightFactor * weight * (255.0f - b) + b;
 
-                // Step 2: hue tinting (blend toward hue-derived color)
-                double ca = chromaFactor * weight;
-                r = hR255 * ca + (1.0 - ca) * r;
-                g = hG255 * ca + (1.0 - ca) * g;
-                b = hB255 * ca + (1.0 - ca) * b;
+                // Step 2: hue tinting
+                float ca = chromaFactor * weight;
+                r = hR255 * ca + (1.0f - ca) * r;
+                g = hG255 * ca + (1.0f - ca) * g;
+                b = hB255 * ca + (1.0f - ca) * b;
 
-                pixel[rOff] = (uint8_t)clamp(r, 0.0, 255.0);
-                pixel[gOff] = (uint8_t)clamp(g, 0.0, 255.0);
-                pixel[bOff] = (uint8_t)clamp(b, 0.0, 255.0);
+                pixel[rOff] = (uint8_t)clamp(r, 0.0f, 255.0f);
+                pixel[gOff] = (uint8_t)clamp(g, 0.0f, 255.0f);
+                pixel[bOff] = (uint8_t)clamp(b, 0.0f, 255.0f);
             }
         }
     }
 
     CVPixelBufferUnlockBaseAddress(pixbuf, 0);
+  } // @autoreleasepool
 }

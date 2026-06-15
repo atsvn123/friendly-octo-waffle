@@ -26,13 +26,19 @@ extern void vcamSendDiag(NSString *msg);
 // Read by BINFlashFaceRegion to adjust face ellipse and clear stale position on change.
 int g_effectiveRTMPRotation = 0;
 
+// Ring buffer size for dedup — 8 slots covers 267ms at 30fps, more than enough.
+// dedup hits never fire in practice (pts always unique), so this is a sliding
+// window that evicts the oldest entry when full. Zero ObjC allocation.
+#define VCAM_DEDUP_MAX 8
+
 // ─────────────────────────────────────────────────────────────────────────────
 @implementation VCamLiveManager {
     // IDA-confirmed: single NSRecursiveLock that serializes ALL frame operations.
     NSRecursiveLock    *_lock;
 
-    // IDA-confirmed dedup dictionary (maps key → timestamp NSNumber).
-    NSMutableDictionary *_dictionary;
+    // C struct ring buffer — replaces NSDictionary dedup (zero ObjC allocation).
+    struct { uint64_t key; CFAbsoluteTime ts; } _dedup[VCAM_DEDUP_MAX];
+    int _dedupCount;
 
     // User's intended live state — set ONLY by IPC code 1000 (YES) / 1001 (NO).
     // When something spuriously calls setLive:NO while the user wants LIVE,
@@ -69,7 +75,8 @@ int g_effectiveRTMPRotation = 0;
         self.cameraSelected = YES;
 
         _lock       = [[NSRecursiveLock alloc] init];
-        _dictionary = [[NSMutableDictionary alloc] init];
+        memset(_dedup, 0, sizeof(_dedup));
+        _dedupCount = 0;
 
         VTPixelTransferSessionCreate(kCFAllocatorDefault, &_pixelTransferSession);
         VTSessionSetProperty((VTSessionRef)(void *)_pixelTransferSession,
@@ -105,10 +112,6 @@ int g_effectiveRTMPRotation = 0;
 
         _rtmpRotation = -1;  // Auto by default (IDA-original orientation detection)
         _userIntentLive = NO;
-
-        NSThread *t = [[NSThread alloc] initWithTarget:self selector:@selector(run) object:nil];
-        [t start];
-        [t release];
     }
     return self;
 }
@@ -326,10 +329,11 @@ int g_effectiveRTMPRotation = 0;
 // where concurrent VT operations during camera pipeline reconfiguration caused
 // VT session invalidation.
 - (CMSampleBufferRef)modifyImageBuffer:(CMSampleBufferRef)sampleBuffer {
-    // Once-per-second probe (outside lock — fast path).
-    static double s_mibInLog = 0;
-    double probeNow = [[NSDate date] timeIntervalSince1970];
-    if (probeNow - s_mibInLog >= 1.0) {
+  @autoreleasepool {
+    // Once-per-10-second probe (outside lock — fast path).
+    static CFAbsoluteTime s_mibInLog = 0;
+    CFAbsoluteTime probeNow = CFAbsoluteTimeGetCurrent();
+    if (probeNow - s_mibInLog >= 10.0) {
         s_mibInLog = probeNow;
         vcamSendDiag([NSString stringWithFormat:@"mib:in bL=%d sbuf=%d",
             (int)_bLive, (_liveYUVSampleBuffer ? 1 : 0)]);
@@ -343,44 +347,27 @@ int g_effectiveRTMPRotation = 0;
 
     CMTime pts = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
     // IDA: key = (char*)destBuffer + pts.value — uint64 wrapping addition.
-    NSNumber *key = [NSNumber numberWithUnsignedLongLong:
-                     (uint64_t)(uintptr_t)destBuffer + (uint64_t)pts.value];
+    uint64_t dedupKey = (uint64_t)(uintptr_t)destBuffer + (uint64_t)pts.value;
 
     [_lock lock];
 
-    // Dedup: already processed this (destBuffer, pts) pair this camera tick.
-    id existing = [_dictionary objectForKey:key];
-    if (existing) {
-        // Purge stale entries (> 200ms) while we have the lock.
-        NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
-        NSMutableArray *staleKeys = [NSMutableArray arrayWithCapacity:4];
-        for (NSNumber *k in _dictionary) {
-            if (now - [[_dictionary objectForKey:k] doubleValue] >= 0.2) {
-                [staleKeys addObject:k];
-            }
+    // Dedup: linear scan of ring buffer. Hits never fire in practice
+    // (pts always unique per frame) — this is a zero-allocation fast path.
+    for (int i = 0; i < _dedupCount; i++) {
+        if (_dedup[i].key == dedupKey) {
+            [_lock unlock];
+            return nil;
         }
-        for (id k in staleKeys) {
-            [_dictionary removeObjectForKey:k];
-        }
-        [_lock unlock];
-        return nil;
     }
 
-    // Mark this (destBuffer, pts) pair as processed.
-    [_dictionary setObject:[NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]]
-                    forKey:key];
-
-    // Prevent unbounded growth: pts is always unique per camera frame, so dedup hits
-    // (and their built-in cleanup) never fire. Purge stale entries whenever we exceed
-    // a reasonable cap (>20 entries = >650ms of frames at 30fps).
-    if ([_dictionary count] > 20) {
-        NSTimeInterval cleanNow = [[NSDate date] timeIntervalSince1970];
-        NSMutableArray *stale = [NSMutableArray arrayWithCapacity:8];
-        for (NSNumber *k in _dictionary) {
-            if (cleanNow - [[_dictionary objectForKey:k] doubleValue] >= 0.2) [stale addObject:k];
-        }
-        for (id k in stale) [_dictionary removeObjectForKey:k];
+    // Insert into ring — evict oldest slot when full.
+    if (_dedupCount == VCAM_DEDUP_MAX) {
+        memmove(&_dedup[0], &_dedup[1], sizeof(_dedup[0]) * (VCAM_DEDUP_MAX - 1));
+        _dedupCount = VCAM_DEDUP_MAX - 1;
     }
+    _dedup[_dedupCount].key = dedupKey;
+    _dedup[_dedupCount].ts  = CFAbsoluteTimeGetCurrent();
+    _dedupCount++;
 
     // Read source buffer from _liveYUVSampleBuffer (IDA-confirmed).
     CVImageBufferRef srcBuffer = CMSampleBufferGetImageBuffer(_liveYUVSampleBuffer);
@@ -419,10 +406,10 @@ int g_effectiveRTMPRotation = 0;
         }
     }
 
-    // Once-per-second orientation diagnostic.
-    static double s_oriLog = 0;
-    double oriNow = [[NSDate date] timeIntervalSince1970];
-    if (oriNow - s_oriLog >= 1.0) {
+    // Once-per-10-second orientation diagnostic.
+    static CFAbsoluteTime s_oriLog = 0;
+    CFAbsoluteTime oriNow = CFAbsoluteTimeGetCurrent();
+    if (oriNow - s_oriLog >= 10.0) {
         s_oriLog = oriNow;
         int branch = (transferSrc == srcBuffer) ? 0 : 1;
         vcamSendDiag([NSString stringWithFormat:@"ori:src%dx%d dst%dx%d r%d b%d",
@@ -434,9 +421,9 @@ int g_effectiveRTMPRotation = 0;
         OSStatus status = VTPixelTransferSessionTransferImage(
             _pixelTransferSession, transferSrc, destBuffer);
 
-        static double s_lastMibLog = 0;
-        double mibNow = [[NSDate date] timeIntervalSince1970];
-        if (mibNow - s_lastMibLog >= 1.0) {
+        static CFAbsoluteTime s_lastMibLog = 0;
+        CFAbsoluteTime mibNow = CFAbsoluteTimeGetCurrent();
+        if (mibNow - s_lastMibLog >= 10.0) {
             s_lastMibLog = mibNow;
             vcamSendDiag([NSString stringWithFormat:@"mib:st=%d", (int)status]);
         }
@@ -455,6 +442,7 @@ int g_effectiveRTMPRotation = 0;
     }
 
     return success ? sampleBuffer : nil;
+  } // @autoreleasepool
 }
 
 - (CMSampleBufferRef)modifyPixelBuffer:(CMSampleBufferRef)sampleBuffer {
@@ -662,12 +650,5 @@ int g_effectiveRTMPRotation = 0;
 
 - (void)startReading:(NSURL *)url { (void)url; }
 - (void)cancelReading {}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// BACKGROUND RUN LOOP
-// ─────────────────────────────────────────────────────────────────────────────
-- (void)run {
-    [[NSRunLoop currentRunLoop] run];
-}
 
 @end

@@ -50,31 +50,23 @@ static void hook_emitSampleBuffer(id self, SEL _cmd, CMSampleBufferRef sbuf) {
         VCamLiveManager *state = [VCamLiveManager sharedInstance];
         BOOL isLive = [state getLive];
 
-        // Once-per-second diagnostic: confirms hook is firing and shows frame state.
-        // Shows dimensions (to catch portrait vs landscape) and bLive.
-        static double s_emsLog = 0;
-        double emsNow = [[NSDate date] timeIntervalSince1970];
-        if (emsNow - s_emsLog >= 1.0) {
+        // Once-per-10-second diagnostic: confirms hook is firing and shows frame state.
+        static CFAbsoluteTime s_emsLog = 0;
+        CFAbsoluteTime emsNow = CFAbsoluteTimeGetCurrent();
+        if (emsNow - s_emsLog >= 10.0) {
             s_emsLog = emsNow;
             vcamSendDiag([NSString stringWithFormat:@"ems:%dx%d L=%d",
                 (int)width, (int)height, (int)isLive]);
         }
 
         if (isLive) {
-            // IDA-confirmed (sub_85ED4 0x85f68): inject ONLY for landscape frames (Width >= Height).
-            // Portrait frames are skipped entirely — they cause photo-mode orientation flip when
-            // iOS Camera photo pipelines deliver portrait-rotated buffers interleaved with
-            // landscape capture buffers. The NSRecursiveLock (v2.114) is the real RTMP-disconnect
-            // fix; this guard restores IDA-exact behavior for photo/portrait correctness.
             if (width >= height) {
-                // IDA: two separate [NSDate date] calls — one for elapsed check, one for store
-                NSDate *checkDate = [NSDate date];
-                double nowTS = [checkDate timeIntervalSince1970];
+                // IDA: two separate timestamp calls — one for elapsed check, one for store.
+                CFAbsoluteTime nowTS   = CFAbsoluteTimeGetCurrent();
                 double elapsed = nowTS - g_lastResolutionUpdate;
                 // IDA threshold: 0.100000001 (float 0.1f widened to double)
                 if (g_lastResolutionUpdate <= 0.100000001 || elapsed > 3.0) {
-                    NSDate *storeDate = [NSDate date];
-                    g_lastResolutionUpdate = [storeDate timeIntervalSince1970];
+                    g_lastResolutionUpdate = CFAbsoluteTimeGetCurrent();
                     VCamBridge *bridge = [VCamBridge sharedInstance];
                     [bridge setResolution:(unsigned int)width height:(unsigned int)height];
                 }
