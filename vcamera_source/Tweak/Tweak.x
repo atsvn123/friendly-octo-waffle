@@ -36,7 +36,7 @@ static void *listenThreadEntry(void *arg) {
 // Mirrors IDA fTaqaTecczndwop exactly — the float button only appears while this
 // loop is running AND isConnected==YES AND g_menuReady==1.
 static void *connectThreadEntry(void *arg) {
-    sleep(3);   // initial wait for mediaserverd to be ready at boot
+    sleep(3);   // initial wait for mediaserverd to be ready
     VCamBridge *bridge = [VCamBridge sharedInstance];
     [bridge connect];
 
@@ -49,34 +49,6 @@ static void *connectThreadEntry(void *arg) {
             usleep(200000);  // 200ms
         } else {
             usleep(600000);  // 600ms
-        }
-    }
-    return NULL;
-}
-
-// App process: same loop but no startup sleep — mediaserverd is already running
-// when any user-facing app launches.  Touch events go to the frontmost app process,
-// so the float button must live here (not in SpringBoard) to be tappable in-app.
-static void *connectThreadEntryApp(void *arg) {
-    VCamBridge *bridge = [VCamBridge sharedInstance];
-    [bridge connect];
-
-    // vcamUpdateFloatButton() checks [[VCamLiveManager sharedInstance] getFloatWindow].
-    // In app processes VCamLiveManager is a fresh instance defaulting to NO, so the
-    // button is created then immediately hidden+disabled.  The "Cửa sổ nổi" toggle
-    // was permanently removed in v2.86 (always on), so force it YES here.
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[VCamLiveManager sharedInstance] setFloatWindow:YES];
-    });
-
-    while ((g_done & 1) == 0) {
-        if ([bridge isConnected]) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                vcamUpdateFloatButton();
-            });
-            usleep(200000);
-        } else {
-            usleep(600000);
         }
     }
     return NULL;
@@ -110,26 +82,6 @@ static void vcamConstructorMain(void) {
 
         // Start IPC listen server
         pthread_create(&listenThread, NULL, listenThreadEntry, NULL);
-
-    } else {
-        // UIKit app process (camera app, TikTok, etc.):
-        // iOS routes touches to the frontmost app process, not to SpringBoard.
-        // We must create the float button here so it receives touch events when
-        // this app is in the foreground.
-        // Defer until UIApplicationDidBecomeActiveNotification — UIApplication is
-        // not yet set up when __attribute__((constructor)) runs.
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter]
-                addObserverForName:UIApplicationDidBecomeActiveNotification
-                            object:nil
-                             queue:[NSOperationQueue mainQueue]
-                        usingBlock:^(NSNotification *n) {
-                static dispatch_once_t appOnce;
-                dispatch_once(&appOnce, ^{
-                    pthread_create(&assistiveThread, NULL, connectThreadEntryApp, NULL);
-                });
-            }];
-        });
     }
 }
 
@@ -149,11 +101,11 @@ static void vcamInstallHooks(void) {
         vcamInstallPickerNotifyHandler();  // com.vcam.sampleresponse → float button ring
     } else {
         // Foreground UIKit app (TikTok, camera apps, etc.):
-        // Color sample listener: captures screen via drawViewHierarchyInRect: for auto-color.
-        // Picker notify handler: receives hue result and updates the float button ring color.
+        // Installs a Darwin notify listener that captures a pixel region via
+        // drawViewHierarchyInRect:afterScreenUpdates:YES and posts the hue back.
+        // This is the only approach that reliably sees on-screen camera content.
         vcamInstallColorSampleListener();
         vcamInstallDebugCaptureListener();
-        vcamInstallPickerNotifyHandler();
     }
 }
 
