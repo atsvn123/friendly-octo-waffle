@@ -61,6 +61,14 @@ static void *connectThreadEntryApp(void *arg) {
     VCamBridge *bridge = [VCamBridge sharedInstance];
     [bridge connect];
 
+    // vcamUpdateFloatButton() checks [[VCamLiveManager sharedInstance] getFloatWindow].
+    // In app processes VCamLiveManager is a fresh instance defaulting to NO, so the
+    // button is created then immediately hidden+disabled.  The "Cửa sổ nổi" toggle
+    // was permanently removed in v2.86 (always on), so force it YES here.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[VCamLiveManager sharedInstance] setFloatWindow:YES];
+    });
+
     while ((g_done & 1) == 0) {
         if ([bridge isConnected]) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -141,11 +149,11 @@ static void vcamInstallHooks(void) {
         vcamInstallPickerNotifyHandler();  // com.vcam.sampleresponse → float button ring
     } else {
         // Foreground UIKit app (TikTok, camera apps, etc.):
-        // Installs a Darwin notify listener that captures a pixel region via
-        // drawViewHierarchyInRect:afterScreenUpdates:YES and posts the hue back.
-        // This is the only approach that reliably sees on-screen camera content.
+        // Color sample listener: captures screen via drawViewHierarchyInRect: for auto-color.
+        // Picker notify handler: receives hue result and updates the float button ring color.
         vcamInstallColorSampleListener();
         vcamInstallDebugCaptureListener();
+        vcamInstallPickerNotifyHandler();
     }
 }
 
