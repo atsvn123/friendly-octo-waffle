@@ -1,0 +1,59 @@
+#!/bin/sh
+
+set -e
+
+
+migrate_user_config_pre() {
+    if [ ! -f /etc/ubuntu-advantage/uaclient.conf ]; then
+        return
+    fi
+
+    curr_conf_hash=$(md5sum /etc/ubuntu-advantage/uaclient.conf | awk '{print $1}')
+    expected_conf_hash=$(dpkg-query --showformat='${Conffiles}\n' --show ubuntu-advantage-tools | grep /etc/ubuntu-advantage/uaclient.conf | awk '{print $2}')
+
+    if [ "$curr_conf_hash" != "$expected_conf_hash" ]; then
+        # Back up existing conffile in case of an error unwind
+        cp -a /etc/ubuntu-advantage/uaclient.conf /etc/ubuntu-advantage/uaclient.conf.preinst-backup
+        # Create this backup in case the user has made some comments on the config file.
+        # In that way, the user can retrive them if they want to
+        cp -a /etc/ubuntu-advantage/uaclient.conf /etc/ubuntu-advantage/uaclient.conf.dpkg-bak
+        # Insert the new about-to-be-installed uaclient.conf to avoid conffile prompts
+        cat > /etc/ubuntu-advantage/uaclient.conf <<EOT
+contract_url: https://contracts.canonical.com
+log_level: debug
+EOT
+    fi
+}
+
+case "$1" in
+    install|upgrade)
+        # LP: #2004280
+        if dpkg --compare-versions "$2" lt "27.14~"; then
+            migrate_user_config_pre
+        fi
+        ;;
+esac
+
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/update-motd.d/99-esm 19.1~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/update-motd.d/80-esm 19.1~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/update-motd.d/80-livepatch 19.1~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/cron.daily/ubuntu-advantage-tools 19.1~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/init/ua-auto-attach.conf 20.2~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/update-motd.d/88-esm-announce 27.14~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+# Automatically added by dh_installdeb/13.6ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/ubuntu-advantage/help_data.yaml 30~ ubuntu-advantage-tools -- "$@"
+# End automatically added section
+
+exit 0

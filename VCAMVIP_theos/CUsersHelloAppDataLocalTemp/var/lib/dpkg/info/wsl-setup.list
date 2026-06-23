@@ -1,0 +1,11 @@
+/.
+/usr
+/usr/libexec
+/usr/libexec/nslogin
+/usr/libexec/wsl-setup
+/usr/libexec/wsl-systemd
+/usr/share
+/usr/share/doc
+/usr/share/doc/wsl-setup
+/usr/share/doc/wsl-setup/changelog.gz
+/usr/share/doc/wsl-setup/copyright

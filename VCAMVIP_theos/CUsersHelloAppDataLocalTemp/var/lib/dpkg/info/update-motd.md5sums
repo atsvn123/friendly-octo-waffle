@@ -1,0 +1,6 @@
+44d9a6e124eba9c76172c179ca797409  usr/sbin/update-motd
+ece1cf3c980934ad939ed4bdda978ea3  usr/share/doc/update-motd/README
+37e2c0055ad1f28348608c1c5b265080  usr/share/doc/update-motd/THANKS
+2f7c1ef83a424b75854a90a8a906b3d0  usr/share/doc/update-motd/changelog.gz
+90082868d192fb1ad017b80ff48c03cc  usr/share/doc/update-motd/copyright
+77b249636dcf00db3e9569ac70f6922c  usr/share/man/man8/update-motd.8.gz

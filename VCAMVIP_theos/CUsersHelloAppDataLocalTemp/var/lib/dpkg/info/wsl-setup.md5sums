@@ -1,0 +1,5 @@
+8ec7bc73590efd2e24829a35067027c4  usr/libexec/nslogin
+682998cdbb4c81d053cbe16c22d8928a  usr/libexec/wsl-setup
+cdcb4e5383b02b3c0bb001c8ce5cac45  usr/libexec/wsl-systemd
+7f21f416e9017bd5512fe7db384924a7  usr/share/doc/wsl-setup/changelog.gz
+84ef7293706168d0164cdf71ed0279d6  usr/share/doc/wsl-setup/copyright

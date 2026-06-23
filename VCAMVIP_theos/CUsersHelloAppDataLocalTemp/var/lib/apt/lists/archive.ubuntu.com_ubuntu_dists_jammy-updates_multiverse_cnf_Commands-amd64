@@ -1,0 +1,109 @@
+suite: jammy-updates
+component: multiverse
+arch: amd64
+
+
+name: libnvidia-gl-595
+version: 595.71.05-0ubuntu0.22.04.1
+commands: nvidia-ngx-updater,nvidia-pcc
+
+name: libnvidia-gl-595-server
+version: 595.71.05-0ubuntu0.22.04.1
+commands: nvidia-ngx-updater,nvidia-pcc
+
+name: mumax3
+version: 3.10-2ubuntu0.1
+commands: mumax3,mumax3-convert,mumax3-doc,mumax3-httpfsd,mumax3-plot,mumax3-script,mumax3-server,mumax3-test
+
+name: nvidia-compute-utils-595
+version: 595.71.05-0ubuntu0.22.04.1
+commands: nvidia-cuda-mps-control,nvidia-cuda-mps-server,nvidia-persistenced
+
+name: nvidia-compute-utils-595-server
+version: 595.71.05-0ubuntu0.22.04.1
+commands: nvidia-cuda-mps-control,nvidia-cuda-mps-server,nvidia-persistenced
+
+name: nvidia-fabricmanager-450
+version: 450.248.02-0ubuntu0.22.04.1
+commands: nv-fabricmanager,nvswitch-audit
+
+name: nvidia-fabricmanager-535
+version: 535.309.01-0ubuntu0.22.04.1
+commands: nv-fabricmanager,nvswitch-audit
+
+name: nvidia-fabricmanager-565
+version: 565.57.01-0ubuntu0.22.04.1
+commands: nv-fabricmanager,nvidia-fabricmanager-start.sh,nvswitch-audit
+
+name: nvidia-fabricmanager-580
+version: 580.159.03-0ubuntu0.22.04.1
+commands: nv-fabricmanager,nvidia-fabricmanager-start.sh,nvswitch-audit
+
+name: nvidia-fabricmanager-595
+version: 595.71.05-0ubuntu0.22.04.1
+commands: nv-fabricmanager,nvidia-fabricmanager-start.sh,nvswitch-audit
+
+name: nvidia-imex-565
+version: 565.57.01-0ubuntu0.22.04.1
+commands: nvidia-imex,nvidia-imex-ctl
+
+name: nvidia-imex-580
+version: 580.159.03-0ubuntu0.22.04.2
+commands: nvidia-imex,nvidia-imex-ctl
+
+name: nvidia-imex-595
+version: 595.71.05-0ubuntu0.22.04.1
+commands: nvidia-imex,nvidia-imex-ctl
+
+name: nvidia-kernel-common-595
+version: 595.71.05-0ubuntu0.22.04.1
+commands: nvidia-powerd,nvidia-sleep.sh,ub-device-create
+
+name: nvidia-kernel-common-595-server
+version: 595.71.05-0ubuntu0.22.04.1
+commands: nvidia-powerd,nvidia-sleep.sh,ub-device-create
+
+name: nvidia-utils-595
+version: 595.71.05-0ubuntu0.22.04.1
+commands: nvidia-bug-report.sh,nvidia-debugdump,nvidia-smi,nvidia-xconfig
+
+name: nvidia-utils-595-server
+version: 595.71.05-0ubuntu0.22.04.1
+commands: nvidia-bug-report.sh,nvidia-debugdump,nvidia-smi,nvidia-xconfig
+
+name: othman
+version: 0.6.0-2ubuntu0.22.04.1
+commands: othman-browser
+
+name: rar
+version: 2:6.23-1~22.04.1
+commands: rar
+
+name: unrar
+version: 1:6.1.5-1ubuntu0.1
+commands: unrar,unrar-nonfree
+
+name: virtualbox
+version: 6.1.50-dfsg-1~ubuntu1.22.04.3
+commands: VBoxBalloonCtrl,VBoxHeadless,VBoxManage,VBoxSDL,rdesktop-vrdp,vbox-img,vboxballoonctrl,vboxheadless,vboximg-mount,vboxmanage,vboxsdl,vboxwebsrv
+
+name: virtualbox-guest-utils
+version: 6.1.50-dfsg-1~ubuntu1.22.04.3
+commands: VBoxControl,VBoxService,mount.vboxsf
+
+name: virtualbox-guest-utils-hwe
+version: 6.1.50-dfsg-1~ubuntu1.22.04.3
+commands: VBoxControl,VBoxService,mount.vboxsf
+
+name: virtualbox-guest-x11
+version: 6.1.50-dfsg-1~ubuntu1.22.04.3
+commands: VBoxClient
+
+name: virtualbox-guest-x11-hwe
+version: 6.1.50-dfsg-1~ubuntu1.22.04.3
+commands: VBoxClient
+
+name: virtualbox-qt
+version: 6.1.50-dfsg-1~ubuntu1.22.04.3
+commands: VirtualBox,VirtualBoxVM,virtualbox,virtualboxvm
+

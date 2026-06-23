@@ -1,0 +1,12 @@
+#!/bin/sh
+# prerm — runs BEFORE dpkg removes any files.
+#
+# Remove .roothidepatch symlinks FIRST so ElleKit stops watching these
+# dylibs before dpkg removes the dylib files.
+
+DYNLIB_DIR="/var/jb/Library/MobileSubstrate/DynamicLibraries"
+
+rm -f "$DYNLIB_DIR/vcamera.dylib.roothidepatch"   2>/dev/null
+rm -f "$DYNLIB_DIR/NetHelper.dylib.roothidepatch"  2>/dev/null
+
+exit 0

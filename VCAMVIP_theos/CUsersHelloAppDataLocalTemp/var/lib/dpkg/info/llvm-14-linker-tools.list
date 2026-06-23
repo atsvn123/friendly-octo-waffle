@@ -1,0 +1,16 @@
+/.
+/usr
+/usr/lib
+/usr/lib/bfd-plugins
+/usr/lib/llvm-14
+/usr/lib/llvm-14/lib
+/usr/lib/llvm-14/lib/LLVMPolly.so
+/usr/lib/llvm-14/lib/LLVMgold.so
+/usr/lib/llvm-14/lib/libLTO.so.14
+/usr/share
+/usr/share/doc
+/usr/share/doc/llvm-14-linker-tools
+/usr/share/doc/llvm-14-linker-tools/copyright
+/usr/lib/bfd-plugins/LLVMgold-14.so
+/usr/share/doc/llvm-14-linker-tools/NEWS.Debian.gz
+/usr/share/doc/llvm-14-linker-tools/changelog.Debian.gz

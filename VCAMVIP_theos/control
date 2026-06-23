@@ -1,0 +1,9 @@
+Package: com.cam.chmp4
+Name: yukoCam
+Version: 2.173
+Architecture: iphoneos-arm64e
+Description: tung tung tung sahuar
+Section: Tweaks
+Author: yuko
+Maintainer: yuko
+Depends: mobilesubstrate (>= 0.9.5000)

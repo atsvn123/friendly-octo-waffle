@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+# Automatically added by dh_installdeb/13.3.1ubuntu1
+dpkg-maintscript-helper rm_conffile /etc/init/friendly-recovery.conf 0.2.36\~ -- "$@"
+# End automatically added section

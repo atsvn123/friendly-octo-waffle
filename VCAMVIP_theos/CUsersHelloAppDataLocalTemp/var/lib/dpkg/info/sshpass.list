@@ -1,0 +1,12 @@
+/.
+/usr
+/usr/bin
+/usr/bin/sshpass
+/usr/share
+/usr/share/doc
+/usr/share/doc/sshpass
+/usr/share/doc/sshpass/changelog.Debian.gz
+/usr/share/doc/sshpass/copyright
+/usr/share/man
+/usr/share/man/man1
+/usr/share/man/man1/sshpass.1.gz

@@ -1,0 +1,7 @@
+5622b74b5a7a5e043ca47ae3b1d3cd0d  usr/bin/tmux
+cea6b95beec58d1cca6bad8f7f73ed42  usr/share/doc/tmux/NEWS.Debian.gz
+aa5eb7ee716b536f8eba597d3a602ec8  usr/share/doc/tmux/README
+4b31c859cd930f4205ec2ca99698b6c9  usr/share/doc/tmux/changelog.Debian.gz
+77c0051ba11eee2123c647656e965ba7  usr/share/doc/tmux/copyright
+80b03d8f9cd813a7204eea563e592ecb  usr/share/doc/tmux/example_tmux.conf
+d12091664ffb3bf9f144b020c7fc9ccf  usr/share/man/man1/tmux.1.gz

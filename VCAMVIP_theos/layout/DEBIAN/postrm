@@ -1,0 +1,6 @@
+#!/bin/sh
+# postrm — runs AFTER dpkg removes all files.
+# No process kills. After uninstall, the next natural respring or reboot
+# will cleanly reload ElleKit without the removed dylibs.
+# Killing SpringBoard/mediaserverd here races with ElleKit and causes corruption.
+exit 0
